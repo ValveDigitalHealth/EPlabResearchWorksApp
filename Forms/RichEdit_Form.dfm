@@ -1,0 +1,41 @@
+object Rich_Edit_Form: TRich_Edit_Form
+  Left = 0
+  Top = 0
+  Caption = 'Notification'
+  ClientHeight = 574
+  ClientWidth = 763
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  PixelsPerInch = 96
+  TextHeight = 13
+  object RichEdit: TRichEdit
+    Left = 1
+    Top = 2
+    Width = 760
+    Height = 519
+    Font.Charset = ANSI_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'Tahoma'
+    Font.Style = []
+    ParentFont = False
+    ReadOnly = True
+    ScrollBars = ssVertical
+    TabOrder = 0
+    Zoom = 100
+  end
+  object Close_Button: TButton
+    Left = 1
+    Top = 527
+    Width = 760
+    Height = 42
+    Caption = 'CLOSE'
+    TabOrder = 1
+    OnClick = Close_ButtonClick
+  end
+end

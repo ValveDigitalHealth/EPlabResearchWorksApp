@@ -1,5 +1,22 @@
-# Prerequisites
-*.d
+__astcache/*
+__history/*
+__recovery/*
+*/__astcache/*
+*/__history/*
+*/__recovery/*
+Computational_Module/__history/*
+*.o
+*.ico
+*.html
+
+# C++Builder environment/project specific files
+AppxManifest.template.xml
+*.cbproj
+*.dsk
+*.res
+EPLab_Research_Suite*
+Win64/*
+Win64/
 
 # Compiled Object files
 *.slo
@@ -18,7 +35,6 @@
 
 # Fortran module files
 *.mod
-*.smod
 
 # Compiled Static libraries
 *.lai
@@ -30,3 +46,34 @@
 *.exe
 *.out
 *.app
+
+# CMake
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+install_manifest.txt
+*.cmake
+# ^ May need to add future .cmake files as exceptions
+
+# Test logs
+Testing/*
+
+# Test input
+test/gtc/*.dds
+
+# Project Files
+Makefile
+*.cbp
+*.user
+
+# Misc.
+*.log
+
+# local build(s)
+build*
+
+/.vs
+/.vscode
+/CMakeSettings.json
+.DS_Store
+
