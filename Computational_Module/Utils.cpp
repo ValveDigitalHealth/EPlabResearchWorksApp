@@ -73,19 +73,6 @@ void Utils_Tools::read_one_column_file_into_vector(AnsiString Filename, std::vec
         }
 
         df.close();
-/*
-///
-        ofstream df2;
-        df2.open(Filename.c_str());
-        df2 << count -1 << "\n";
-        for(int i=0;i<Vec.size()-1;i++)
-        {
-            df2 << Vec[i] << "\n";
-        }
-
-
-        df2.close();
-*/
 }
 
 //---------------------------------------------------------------------------
@@ -127,10 +114,6 @@ bool Utils_Tools::is_lasso_type_name(AnsiString Name)
 {
 	AnsiString Trimmed_Name = Name.Trim();
 
-//	if( is_substring_present(Trimmed_Name,"LAS")  ||
-//		is_substring_present(Trimmed_Name,"Spir") ||
-//		is_substring_present(Trimmed_Name,"Circ") ||
-//		is_substring_present(Trimmed_Name,"LS") )
 	if( is_substring_present(Trimmed_Name.UpperCase() ,"LAS")  ||
 		is_substring_present(Trimmed_Name.UpperCase(),"SPIR") ||
 		is_substring_present(Trimmed_Name.UpperCase(),"D") ||
@@ -162,7 +145,7 @@ void Utils_Tools::get_spline_and_electrode_from_pentray_name(AnsiString Name,int
 	if( as2 == "1" ) Electrode[0] = 3;
 	if( as2 == "D" ) Electrode[0] = 3;
 	if( as2 == "2" ) Electrode[0] = 2;
-    if( as2 == "3" ) Electrode[0] = 1;
+	if( as2 == "3" ) Electrode[0] = 1;
 
     if( as1 == "A" ) Spline[0] = 0;
     if( as1 == "B" ) Spline[0] = 1;
@@ -193,7 +176,7 @@ void Utils_Tools::get_spline_and_electrode_from_pentray_name(AnsiString Name,int
 
     }
     else
-    {
+	{
         Spline[0]=-1;
         Electrode[0]=-1;
 	}
@@ -277,7 +260,6 @@ AnsiString Utils_Tools::get_string_after_given_occurence_of_specified_string
 		Main_String.SubString(i,Given_String.Length()) == "." )
 	{
 		Set.push_back(Readed_Content);
-//        i+=Given_String.Length();
 		Readed_Content = "";
 
 		if( Main_String.SubString(i,Given_String.Length()) == Given_String )
@@ -526,7 +508,7 @@ AnsiString Utils_Tools::get_string_from_the_middle(AnsiString Main_String,AnsiSt
 
     Sub = Main_String.SubString(Start+Start_Stop_String.Length(),Stop-Start-Start_Stop_String.Length());
 
-    return Sub;
+	return Sub;
 }
 
 //------------------------------------------------------------------------------
@@ -557,7 +539,7 @@ State_Diagram::State_Diagram()
     Cell_Width = 120; // in pixels ///!!!!!! Its stored in plaque file!!!
     Cell_Height = 40; // in pixels
 
-    Box_Width = 250; // in pixels, box is inside the cell, so it should be smaller
+	Box_Width = 250; // in pixels, box is inside the cell, so it should be smaller
     Box_Height = 30; // in pixels, box is inside the cell, so it should be smaller
 
     State_Box_Color = clWhite;
@@ -619,7 +601,7 @@ int State_Diagram::is_this_sequence_present(int Phase_Code1,int Transition_Code,
     if(Diagram_Elements[e+2].Phase_Code == Phase_Code2)
     return e+1;
 
-    return -1;
+	return -1;
 }
 
 //------------------------------------------------------------------------------
@@ -775,7 +757,7 @@ int State_Diagram::reduce_time_sequenced_elements_to_diagram()
                     find_free_spot_around(Diagram_Elements.size()-1,&X,&Y);
 
                     Diagram_Elements.push_back(Time_Sequenced_Elements[e]);
-                    Diagram_Elements[Diagram_Elements.size()-1].Cell_X = X;
+					Diagram_Elements[Diagram_Elements.size()-1].Cell_X = X;
                     Diagram_Elements[Diagram_Elements.size()-1].Cell_Y = Y;
 //                    Diagram_Elements[Diagram_Elements.size()-1].Counter = 1;
                     Diagram_Elements[Diagram_Elements.size()-1].Connections_Ptrs.
@@ -868,7 +850,7 @@ int Mode_Types_Set::read_mode_types(AnsiString Application_Directory, AnsiString
         Types.push_back(MT);
     }
 
-    dfile.clear();
+	dfile.clear();
     dfile.close();
 
     return 1;
@@ -1175,50 +1157,6 @@ void Utils_Tools::load_int_variable_from_file(ifstream* File,AnsiString S1,int* 
 }
 
 //---------------------------------------------------------------------------
-/*
-bool Utils_Tools::is_this_basket_name_Flinders_Navx(AnsiString Name,
-								AnsiString* Spline,AnsiString* Electrode,
-								int* Spline_Id, int* Electrode_Id)
-{
-// syntax: (e.g. 'A60,4')
-
-	AnsiString Trimmed_Name = Name.Trim();
-	AnsiString L1 = Trimmed_Name.SubString(1,1);
-	AnsiString L3 = Trimmed_Name.SubString(5,1);
-
-	if( L1 == "A" || L1 == "B" || L1 == "C" || L1 == "D" || L1 == "E" ||
-		L1 == "F" || L1 == "G" || L1 == "H" )
-	if( L3 == "D" || L3 == "1" || L3 == "2" || L3 == "3" || L3 == "4" || L3 == "5" || L3 == "6" ||
-		L3 == "7" || L3 == "8")
-	{
-	Spline[0] = L1;
-	Electrode[0] = L3;
-
-		if( Spline[0] == "A" || Spline[0] == "1") Spline_Id[0] = 0;
-		if( Spline[0] == "B" || Spline[0] == "2") Spline_Id[0] = 1;
-		if( Spline[0] == "C" || Spline[0] == "3") Spline_Id[0] = 2;
-		if( Spline[0] == "D" || Spline[0] == "4") Spline_Id[0] = 3;
-		if( Spline[0] == "E" || Spline[0] == "5") Spline_Id[0] = 4;
-		if( Spline[0] == "F" || Spline[0] == "6") Spline_Id[0] = 5;
-		if( Spline[0] == "G" || Spline[0] == "7") Spline_Id[0] = 6;
-		if( Spline[0] == "H" || Spline[0] == "8") Spline_Id[0] = 7;
-
-		if( Electrode[0] == "1" || Electrode[0] == "D" ) Electrode_Id[0] = 0;
-		if( Electrode[0] == "2" ) Electrode_Id[0] = 1;
-		if( Electrode[0] == "3" ) Electrode_Id[0] = 2;
-		if( Electrode[0] == "4" ) Electrode_Id[0] = 3;
-		if( Electrode[0] == "5" ) Electrode_Id[0] = 4;
-		if( Electrode[0] == "6" ) Electrode_Id[0] = 5;
-		if( Electrode[0] == "7" ) Electrode_Id[0] = 6;
-		if( Electrode[0] == "8" ) Electrode_Id[0] = 7;
-
-	return true;
-	}
-
-   return false;
-}
-*/
-
 //---------------------------------------------------------------------------
 
 void Utils_Tools::save_std_string_to_File(ofstream* File, std::string QS)
@@ -1312,7 +1250,7 @@ AnsiString Utils_Tools::Cells_From_StringGrid_ToText(TStringGrid& AGrid, const T
   text = "";
   for (int row = ACells.Top;row <= ACells.Bottom;++row)
   {
-    for (int col = ACells.Left;col <= ACells.Right;++col)
+	for (int col = ACells.Left;col <= ACells.Right;++col)
     {
       text += AGrid.Cells[col][row];
       if (col < ACells.Right)
@@ -1444,7 +1382,6 @@ std::vector <Row_vec> Utils_Tools::load_rectangular_csv_file_to_grid(AnsiString 
 		{
 			Row1.Elements.push_back(QS);
 			QS = "";
-//			dfile.get(c);
 		}
 
 		if( c != 10 && c != 44)  QS += c; // end of line?

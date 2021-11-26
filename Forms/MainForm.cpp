@@ -57,8 +57,6 @@ __fastcall TMain_Application_Window::TMain_Application_Window(TComponent* Owner)
 
 	read_labels_list("Labels_List.txt");
 
-	read_app_version();
-
 	OpenGL_Panel_1.Segmentation_Painting_Happened_Flag = false;
 
 	Application_Closing_Flag = false;
@@ -2011,7 +2009,7 @@ void __fastcall TMain_Application_Window::All_EGMs_PaintBoxMouseUp(TObject *Send
 
 void __fastcall TMain_Application_Window::About1Click(TObject *Sender)
 {
-	ShowMessage("EPLab Works. Version v.2.0.0. (c) Pawel Kuklik. /*.");
+	ShowMessage("EPLab Works. Version v.2.0.0. (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
 }
 //---------------------------------------------------------------------------
 
@@ -3631,28 +3629,6 @@ void __fastcall TMain_Application_Window::Grow_Current_Segment_ButtonClick(TObje
 }
 //---------------------------------------------------------------------------
 
-void TMain_Application_Window::read_app_version()
-{
-	ifstream dfile((Application_Directory+"version.txt").c_str());
-
-	if( dfile == NULL )
-		ShowMessage("\n Error reading versioning file." );
-	else
-	{
-
-	char string[2000];
-
-	dfile >> string;
-
-	EPLAB_App_Version = (AnsiString)string;
-
-	dfile.close();
-	}
-
-}
-
-//---------------------------------------------------------------------------
-
 void TMain_Application_Window::read_labels_list(AnsiString FileName)
 {
 	ifstream dfile((Application_Directory+FileName).c_str());
@@ -3906,23 +3882,6 @@ void __fastcall TMain_Application_Window::Annotationsignalprocessinparameters1Cl
 	Annotation_Parameters_Form->Conduction_Block_Th_Edit->Text =  FloatToStr(App_Settings_Form->Application_Settings.Conduction_Block_CV_Threshold);
 	Annotation_Parameters_Form->Slow_Conduction_Th_Edit->Text =   FloatToStr(App_Settings_Form->Application_Settings.Slow_Conduction_Threshold);
 
-/*
-
-	if( Push_Part_of_Signal )
-	Annotation_Parameters_Form->ShE_Just_Portion_CheckBox->State = cbChecked;
-	else
-	Annotation_Parameters_Form->ShE_Just_Portion_CheckBox->State = cbUnchecked;
-
-*/
-/*
-	if( NL_Analysis_Form->Signal_1.Percentage_Range_for_Shannon == true )
-	Annotation_Parameters_Form->ShE_Just_Portion_CheckBox->State = cbChecked;
-	else
-	Annotation_Parameters_Form->ShE_Just_Portion_CheckBox->State = cbUnchecked;
-
-	Annotation_Parameters_Form->ShEn_Begin_Edit->Text = IntToStr(NL_Analysis_Form->Signal_1.ShE_Begining);
-	Annotation_Parameters_Form->ShEn_End_Edit->Text = IntToStr(NL_Analysis_Form->Signal_1.ShE_End);
-*/
 	//--------------------------------------------
 	//--------------------------------------------
 	result = Annotation_Parameters_Form->ShowModal();
@@ -4016,22 +3975,7 @@ void __fastcall TMain_Application_Window::Forcedatapointsontosurface1Click(TObje
 	STUDY->Surfaces_List[STUDY->Current_Surface].
 		force_data_points_to_surface(
 			STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr);
-/*
-	// force ablation points to surface
-	double x,y,z;
-	for(long i=0;i<(signed)STUDY->Surfaces_List[STUDY->Current_Surface].
-		Data_Point_Set[DS].Ablation_Points_List.size();i++)
-	{
-	STUDY->Surfaces_List[STUDY->Current_Surface].get_coordinates_of_nearest_surface_point(
-		STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[DS].Ablation_Points_List[i].x,
-		STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[DS].Ablation_Points_List[i].y,
-		STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[DS].Ablation_Points_List[i].z,
-		&x,&y,&z);
-	STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[DS].Ablation_Points_List[i].x = x;
-	STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[DS].Ablation_Points_List[i].y = y;
-	STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[DS].Ablation_Points_List[i].z = z;
-	}
-*/
+
 	Progress_Form->add_text("Updating map...");
 	Progress_Form->Show();
 	Application->ProcessMessages();
@@ -4103,12 +4047,7 @@ void __fastcall TMain_Application_Window::Annotation_Popup_ButtonClick(TObject *
 
 void __fastcall TMain_Application_Window::MenuItem1Click(TObject *Sender)
 {
-	double tt = Annotation_Box.Displayed_Segment_Length_ptr;
-
 	Annotation_Box.Displayed_Segment_Length_ptr *= 2.;
-
-//	save_state_of_GUI_controls(); // to recenter the display
-
 	Annotation_Window_PaintBoxPaint(this);
 }
 //---------------------------------------------------------------------------
@@ -4116,9 +4055,6 @@ void __fastcall TMain_Application_Window::MenuItem1Click(TObject *Sender)
 void __fastcall TMain_Application_Window::MenuItem2Click(TObject *Sender)
 {
 	Annotation_Box.Displayed_Segment_Length_ptr /= 2.;
-
-//	save_state_of_GUI_controls(); // to recenter the display
-
 	Annotation_Window_PaintBoxPaint(this);
 }
 //---------------------------------------------------------------------------
@@ -4206,11 +4142,11 @@ void TMain_Application_Window::post_import_initialization(int Surface_Ptr,double
 	}
 
 	}
+
+	STUDY->Surfaces_List[STUDY->Current_Surface].interpolate_all_values(0,dset,Progress_Form);
 }
 
-//-----------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------
-
 
 void __fastcall TMain_Application_Window::Showlogwindow1Click(TObject *Sender)
 {
@@ -4448,9 +4384,6 @@ void __fastcall TMain_Application_Window::Displayvaluesalongthepath1Click(TObjec
 }
 //---------------------------------------------------------------------------
 
-
-
-
 void __fastcall TMain_Application_Window::Closeworkspace1Click(TObject *Sender)
 {
 	TModalResult Res;
@@ -4483,7 +4416,6 @@ void TMain_Application_Window::close_workspace()
 void TMain_Application_Window::clear_controls()
 {
 	Geometry_Selection_ComboBox->Clear();
-//	Surfaces_CheckListBox->Clear();
 	STUDY->Current_Surface = -1;
 	Data_Point_Set_Selection_ComboBox->Clear();
 	Displayed_Value_Selection_ComboBox_1->Clear();
@@ -4670,11 +4602,7 @@ void __fastcall TMain_Application_Window::Getareaandareaofvalueaboveandbeyondspe
 		0,Current_Value_Ptr,Threshold,1,&Area_Above,&Total_Area,dset);
    STUDY->Surfaces_List[STUDY->Current_Surface].calculate_area_taken_by_Value(
 		0,Current_Value_Ptr,Threshold,-1,&Area_Below,&Total_Area,dset);
-/*
-   Area_Below /= 100.;
-   Area_Above /= 100.;
-   Total_Area /= 100.;
-*/
+
    if( Total_Area != 0 )
    {
 
@@ -4745,11 +4673,6 @@ void __fastcall TMain_Application_Window::Getareaandareaofcurrentvalueaboveandbe
 		Segment_Id,Current_Value_Ptr,Threshold,1,&Area_Above,&Total_Area,dset);
    STUDY->Surfaces_List[STUDY->Current_Surface].calculate_area_taken_by_Value(
 		Segment_Id,Current_Value_Ptr,Threshold,-1,&Area_Below,&Total_Area,dset);
-/*
-   Area_Below /= 100.;
-   Area_Above /= 100.;
-   Total_Area /= 100.;
-*/
 
    if( Total_Area != 0 )
    {
@@ -4874,7 +4797,6 @@ void __fastcall TMain_Application_Window::UpdateReferenceBarpositionwithrespectt
 					Data_Points[i].ECG_Signal.Time_Step_ms );
 
 		// find max
-//		PNUM.find_min_max(&PSimilarity_Vector,&Min,&Max,&Min_Ptr,&Max_Ptr);
 		Peak_Range_Ptr = 10 / STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
 					Data_Points[i].ECG_Signal.Time_Step_ms;
 		Start = 0.1*PSimilarity_Vector.size();
@@ -5072,11 +4994,8 @@ void __fastcall TMain_Application_Window::Deletecurrentdatapointset1Click(TObjec
 
 	update_controls_state();
 }
+
 //---------------------------------------------------------------------------
-
-
-
-
 
 void __fastcall TMain_Application_Window::Changecurrentgeometryname1Click(TObject *Sender)
 {
@@ -5131,17 +5050,7 @@ void __fastcall TMain_Application_Window::Clonecurrentsurface1Click(TObject *Sen
 	else
 	STUDY->Surfaces_List[STUDY->Current_Surface].Name = Name+".1";
 
-//	STUDY->Surfaces_List[STUDY->Current_Surface].Name = "Cloned Geo";
-/*
-	//--------------------------------------------
-	// FILLING OF SURFACE SELECTION COMBOBOX
-	//--------------------------------------------
-	Geometry_Selection_ComboBox->Clear();
-	for(long i=0;i<(signed)STUDY->Surfaces_List.size();i++)
-	Geometry_Selection_ComboBox->AddItem(STUDY->Surfaces_List[i].Name,NULL);
-*/
 	Geometry_Selection_ComboBox->ItemIndex = STUDY->Current_Surface;
-//	Surfaces_CheckListBox->ItemIndex = STUDY->Current_Surface;
 
 	update_controls_state();
 
@@ -5224,8 +5133,6 @@ void __fastcall TMain_Application_Window::Averagefilter1Click(TObject *Sender)
 	}
 }
 //---------------------------------------------------------------------------
-
-
 
 void __fastcall TMain_Application_Window::Deletepath1Click(TObject *Sender)
 {
@@ -5939,69 +5846,6 @@ void TMain_Application_Window::draw_fluoro_image_2D()
 
 		Fluoro_Image_Bimap->Canvas->Pixels[i][j] = (TColor)RGB(B,G,R);
 	}
-/*
-	}
-	else
-	{
-
-	// set which 3D shadow to take:
-	unsigned char* Geo_3D_Image_Data_current;
-
-	if( Fluoro_Image->Registered_Status == 1 )
-		Geo_3D_Image_Data_current = Geo_3D_Image_Data_1;
-
-	if( Fluoro_Image->Registered_Status == 2 )
-		Geo_3D_Image_Data_current = Geo_3D_Image_Data_2;
-
-	// start painting image
-	for (int i=0; i<Fluoro_Image_Bimap->Width; i++)
-	for (int j=0; j<Fluoro_Image_Bimap->Height; j++)
-	{
-		// get RGB values from fluoro image
-		iptr = Fluoro_Image->X_LU+i*scalex;
-		jptr = Fluoro_Image->Y_LU+j*scaley;
-
-		ptr = 3.0*((int)(Fluoro_Image->Fluoro_Image_Height-1-(int)jptr)*
-						 Fluoro_Image->Fluoro_Image_Width + (int)iptr);
-
-		ptr = (int)ptr - (int)ptr%3;
-
-		if( ptr >= 0 && ptr+2 < Fluoro_Image->Fluoro_Image_Data_vector.size() )
-		{
-			R = Fluoro_Image->Fluoro_Image_Data_vector[(int)ptr+0];
-			G = Fluoro_Image->Fluoro_Image_Data_vector[(int)ptr+1];
-			B = Fluoro_Image->Fluoro_Image_Data_vector[(int)ptr+2];
-		}
-		else
-		{
-			R = 0;
-			G = 0;
-			B = 0;
-		}
-
-		// get RGB values from 3D image from Ortho projection
-		iptr = iptr*Geo_3D_Image_Width/Fluoro_Image->Fluoro_Image_Width;
-		jptr = jptr*Geo_3D_Image_Height/Fluoro_Image->Fluoro_Image_Height;
-
-		// get red level of 3D object
-		if( 3*((int)jptr*Geo_3D_Image_Width+(int)iptr)+0 >= 0 )
-		if( 3*((int)jptr*Geo_3D_Image_Width+(int)iptr)+0 <
-			Geo_3D_Image_Width*Geo_3D_Image_Height*4 )
-		{
-		R1 = Geo_3D_Image_Data_current[
-			3*((int)jptr*Geo_3D_Image_Width+(int)iptr)+0];
-		R1 = G + R1*CT_Geo_Intensity_On_Fluoro_Image;
-		}
-		else
-		R1 = G;
-
-		if( R1 > 255 ) R1 = 255;
-
-		Fluoro_Image_Bimap->Canvas->Pixels[i][j] = (TColor)RGB(R1,G,G); // with red 3D shadow
-	}
-
-	} // painting with 3D geo shadow
-*/
 
 	//---------------------------------------------------
 	// Paint registration points
@@ -6286,16 +6130,6 @@ void __fastcall TMain_Application_Window::Scaleimage1Click(TObject *Sender)
 		}
 		else
 		ShowMessage("Distance between marked points must be greater than 0.");
-/*
-		// recalculate position of registration and roving point in 3D space
-		set_registration_point_on_fluoro_image(0);
-		set_registration_point_on_fluoro_image(1);
-		set_registration_point_on_fluoro_image(2);
-		set_registration_point_on_fluoro_image(3);
-*/
-		// reclaculate position of intersection points
-//		STUDY->calculate_ABCRov_intersection_points();
-
 		update_images_table();
 		repaint_3D_panels();
 	}
@@ -7193,6 +7027,7 @@ void __fastcall TMain_Application_Window::Display_Images_In_3D_Panel_CheckBoxCli
 
 void __fastcall TMain_Application_Window::Limit_Image_Display_Bottom_CheckBoxClick(TObject *Sender)
 {
+	if( STUDY->is_current_surface_in_range()  )
 	if( Limit_Image_Display_Bottom_CheckBox->State == cbChecked )
 	{
 		OpenGL_Panel_1.OpenGL_Panel_Display_Parameters.Limit_Images_Display_Bottom = true;
@@ -7212,6 +7047,7 @@ void __fastcall TMain_Application_Window::Limit_Image_Display_Bottom_CheckBoxCli
 void __fastcall TMain_Application_Window::Limit_Image_Display_Top_CheckBoxClick(TObject *Sender)
 
 {
+	if( STUDY->is_current_surface_in_range()  )
 	if( Limit_Image_Display_Top_CheckBox->State == cbChecked )
 	{
 		OpenGL_Panel_1.OpenGL_Panel_Display_Parameters.Limit_Images_Display_Top = true;
@@ -7565,31 +7401,6 @@ void __fastcall TMain_Application_Window::Addsquaresample1Click(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TMain_Application_Window::MenuItem19Click(TObject *Sender)
-{
-	ShowMessage("Feature in development");
-
-//    save_backup_study();
-/*
-	// delete current value
-
-	if( STUDY->is_current_surface_in_range() )
-	if( STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.Current_Map_Value_Name.Length() > 0 )
-	if( MessageDlg("Are you sure you want to delete this value?",
-		mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, 0) == mrYes)
-	{
-
-	STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.remove_value(
-		STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.Current_Map_Value_Name );
-
-	// tu update nodes i data points zrob
-
-	update_controls_state();
-
-	}
-*/
-}
-//---------------------------------------------------------------------------
 
 void __fastcall TMain_Application_Window::MenuItem12Click(TObject *Sender)
 {
@@ -7694,13 +7505,7 @@ void TMain_Application_Window::FULL_MAP_VALUES_UPDATE(int Surface_Ptr)
 	{
 
 	int dset = STUDY->Surfaces_List[Surface_Ptr].Current_Data_Point_Set_Ptr;
-/*
-	STUDY->Surfaces_List[Surface_Ptr].calculate_closest_data_point_to_each_node(
-		dset,STUDY->Surfaces_List[STUDY->Current_Surface].Data_Points_Filling_Threshold_mm);
 
-	STUDY->Surfaces_List[Surface_Ptr].calculate_closest_node_of_each_data_point(
-		dset,STUDY->Surfaces_List[STUDY->Current_Surface].Data_Points_Filling_Threshold_mm);
-*/
 	STUDY->Surfaces_List[Surface_Ptr].calculate_closest_nodes_and_data_points_ALL(dset);
 
 	STUDY->Surfaces_List[Surface_Ptr].interpolate_all_values(0,dset,Progress_Form);
@@ -8192,19 +7997,6 @@ void __fastcall TMain_Application_Window::Createnewmap1Click(TObject *Sender)
 		STUDY->add_empty_surface( Ask_For_Single_Item_Form1->Edit_Box->Text );
 		STUDY->Current_Surface = STUDY->Surfaces_List.size() - 1;
 
-		/*
-		Point_3D P3;
-		randomize();
-		for(int i=0;i<40000;i++)
-		{
-			P3.x = rand()%100;
-			P3.y = rand()%100;
-			P3.z = rand()%100;
-
-			STUDY->Surfaces_List[STUDY->Current_Surface].Geo_3D_Point_Cloud.push_back(P3);
-		}
-		*/
-
 		update_controls_state();
 		repaint_3D_panels();
 	}
@@ -8291,8 +8083,6 @@ AnsiString TMain_Application_Window::get_value_name_from_selection_form()
 
 //---------------------------------------------------------------------------
 
-
-
 void __fastcall TMain_Application_Window::Getdvdtslope1Click(TObject *Sender)
 {
 	if( STUDY->is_current_surface_in_range()  )
@@ -8361,6 +8151,8 @@ void __fastcall TMain_Application_Window::Getdvdtslope1Click(TObject *Sender)
 	}
 }
 
+//---------------------------------------------------------------------------
+
 void __fastcall TMain_Application_Window::Set_Sample_ButtonClick(TObject *Sender)
 {
 	for(int S=0;S<STUDY->Surfaces_List.size();S++)
@@ -8379,6 +8171,7 @@ void __fastcall TMain_Application_Window::Set_Sample_ButtonClick(TObject *Sender
 
 void __fastcall TMain_Application_Window::Phase_Movie_Mode_CheckBoxClick(TObject *Sender)
 {
+	if( STUDY->is_current_surface_in_range() )
 	if( Phase_Movie_Mode_CheckBox->State == cbChecked &&
 		STUDY->Surfaces_List[0].Map_Values.get_value_ptr("Instantaneous phase") < 0 )
 	{
@@ -8411,6 +8204,8 @@ void __fastcall TMain_Application_Window::Phase_Movie_Mode_CheckBoxClick(TObject
 
 void __fastcall TMain_Application_Window::Movie_Start_ButtonClick(TObject *Sender)
 {
+	if( STUDY->is_current_surface_in_range() )
+	{
 	Phase_Movie_Flag = true;
 
 	while( Phase_Movie_Flag )
@@ -8438,6 +8233,7 @@ void __fastcall TMain_Application_Window::Movie_Start_ButtonClick(TObject *Sende
 	Application->ProcessMessages();
 
 	}
+    }
 }
 //---------------------------------------------------------------------------
 
@@ -8446,12 +8242,6 @@ void __fastcall TMain_Application_Window::Movie_Stop_ButtonClick(TObject *Sender
 	Phase_Movie_Flag = false;
 }
 //---------------------------------------------------------------------------
-
-
-
-
-
-
 
 void __fastcall TMain_Application_Window::Removedatapointsbelowtop1Click(TObject *Sender)
 
@@ -8499,17 +8289,10 @@ void __fastcall TMain_Application_Window::Removedatapointsbelowtop1Click(TObject
 
 	}
 }
+
 //---------------------------------------------------------------------------
 
-
-
-
-
-
-
-
 void __fastcall TMain_Application_Window::Getmicrofractionation1Click(TObject *Sender)
-
 {
 	int dset = STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr;
 	int dp = STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Ptr;
@@ -8728,12 +8511,8 @@ void __fastcall TMain_Application_Window::Showhistogramofspatialgradientofcurren
 
    }
 }
+
 //---------------------------------------------------------------------------
-
-
-
-
-
 
 void __fastcall TMain_Application_Window::Getsegmentwithmaxvalue1Click(TObject *Sender)
 {
@@ -8751,10 +8530,8 @@ void __fastcall TMain_Application_Window::Getsegmentwithmaxvalue1Click(TObject *
 
    }
 }
+
 //---------------------------------------------------------------------------
-
-
-
 
 void __fastcall TMain_Application_Window::GetareaandareaofcurrentvaluewithinrangePERSEGMENT1Click(TObject *Sender)
 {
@@ -8833,12 +8610,6 @@ void __fastcall TMain_Application_Window::Getareaandareaofcurrentvaluewithinrang
    }
 }
 //---------------------------------------------------------------------------
-
-
-
-
-
-
 
 void __fastcall TMain_Application_Window::Showdatasetinfo1Click(TObject *Sender)
 {
@@ -9004,68 +8775,6 @@ void __fastcall TMain_Application_Window::Leaveonly1stmapvisible1Click(TObject *
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TMain_Application_Window::ImportablationpointslistLydiacsvformatv21Click(TObject *Sender)
-{
-	ShowMessage("Assumptions: 'RFSessionNumber' columm B, 'SequenceNumber' column D, 'FTI' column M, xyz columns N,O,P");
-
-	double v;
-	int dset;
-	char string[2000];
-	long TInt;
-	Ablation_Point_Class ABL_Point;
-	AnsiString AS;
-	long Counter;
-	ABL_Point.Identifier = -1;
-
-	OpenDialog->Title = "Load file";
-	OpenDialog->FilterIndex = 0;
-	ifstream df,df1,df2;
-
-	if( OpenDialog->Execute() )
-	{
-
-	vector<Ablation_Point_Class> Ablation_Points_List;
-	std::vector <Row_vec> Table;
-
-	Table = Utils.load_rectangular_csv_file_to_grid(OpenDialog->FileName);
-
-	for(long row=1;row<(signed)Table.size();row++)
-	{
-		ABL_Point.Identifier_ID =   Table[row].Elements[1].Trim().ToInt();
-		ABL_Point.Identifier_Hash = Table[row].Elements[3].Trim().ToInt();
-
-		ABL_Point.DurationTime = Table[row].Elements[6].Trim().ToDouble();
-
-		if( Table[row].Elements[7].Trim() != "" ) ABL_Point.GeneratorMedianPower_W = Table[row].Elements[7].Trim().ToDouble();
-		if( Table[row].Elements[8].Trim() != "" ) ABL_Point.AverageForce = Table[row].Elements[8].Trim().ToDouble();
-		if( Table[row].Elements[9].Trim() != "" ) ABL_Point.DirectSenseImpedanceBase_Ohm = Table[row].Elements[9].Trim().ToDouble();
-		if( Table[row].Elements[10].Trim() != "" ) ABL_Point.DirectSenseImpedanceMin_Ohm = Table[row].Elements[10].Trim().ToDouble();
-		if( Table[row].Elements[11].Trim() != "" ) ABL_Point.DirectSenseImpedanceDrop_Ohm = Table[row].Elements[11].Trim().ToDouble();
-
-		ABL_Point.FTI = Table[row].Elements[12].Trim().ToDouble();
-
-		ABL_Point.x = Table[row].Elements[13].Trim().ToDouble();
-		ABL_Point.y = Table[row].Elements[14].Trim().ToDouble();
-		ABL_Point.z = Table[row].Elements[15].Trim().ToDouble();
-
-		ABL_Point.Original_x = ABL_Point.x;
-		ABL_Point.Original_y = ABL_Point.y;
-		ABL_Point.Original_z = ABL_Point.z;
-
-		Ablation_Points_List.push_back(ABL_Point);
-	}
-
-	STUDY->Surfaces_List[STUDY->Current_Surface].Ablation_Points_List = Ablation_Points_List;
-
-	if(Echo)
-	ShowMessage(IntToStr( (int)Ablation_Points_List.size() ) + " points loaded.");
-
-	} // if dialog execute
-
-
-}
-
-//---------------------------------------------------------------------------
 
 void __fastcall TMain_Application_Window::ABCtoABCfitting1Click(TObject *Sender)
 {
@@ -9278,9 +8987,6 @@ void __fastcall TMain_Application_Window::ImportDxLmap1Click(TObject *Sender)
    }
 
 }
-//---------------------------------------------------------------------------
-
-
 
 //---------------------------------------------------------------------------
 
@@ -9333,84 +9039,6 @@ void TMain_Application_Window::create_new_dpset(AnsiString Name)
 
 //---------------------------------------------------------------------------
 
-void __fastcall TMain_Application_Window::Importmatlabadvancedfile1Click(TObject *Sender)
-{
-/*
-   bool Append = perform_pre_import_queries();
-
-	OpenDialog->Title = "Select matlab file";
-	OpenDialog->FilterIndex = 0;
-
-	if( OpenDialog->Execute() )
-	{
-
-	Progress_Form->clear();
-	Progress_Form->add_text("File selected: " + OpenDialog->FileName);
-	Progress_Form->Show();
-	Application->ProcessMessages();
-
-	AnsiString Path = Utils.get_string_before_last_occurence_of_specified_string(OpenDialog->FileName,"\\");
-
-	//------------------------------------------------------
-	// 1. Convert to intermediate file
-	//------------------------------------------------------
-	AnsiString quote = "\"";
-
-	AnsiString Command = "cmd /C export_afcam.exe " + quote + OpenDialog->FileName + quote;
-	ShowMessage(Command);
-	system( (Command).c_str() );
-
-	//FileName
-
-	//------------------------------------------------------
-	// 2. Open intermediate file
-	//------------------------------------------------------
-	AnsiString IntermediateFileName = GetCurrentDir() + "\\A.intermediate_file_for_EPLabWorks.txt";
-	AnsiString Result = Data_IO_Object.import_rhythmia_file(IntermediateFileName,STUDY,Progress_Form,Append);
-
-	if( Result == "Import completed" )
-	{
-		STUDY->Current_Surface = 0;
-
-		Progress_Form->add_text("Initialization...");
-		Progress_Form->Show();
-		Application->ProcessMessages();
-
-		STUDY->Current_Surface = STUDY->Surfaces_List.size()-1;
-		STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr =0;
-		int dset = 0;
-
-		bool Downsample_Flag  = false;
-		post_import_initialization(STUDY->Current_Surface,
-			STUDY->Surfaces_List[STUDY->Current_Surface].Data_Points_Filling_Threshold_mm,Downsample_Flag);
-
-		STUDY->Surfaces_List[STUDY->Current_Surface].interpolate_all_values(0,dset,Progress_Form);
-
-		update_controls_state();
-
-		Main_Application_Window->Cursor = crArrow;
-
-		if( MessageDlg("Center map?",
-		mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, 0) == mrYes)
-		if( STUDY->is_current_surface_in_range() )
-			STUDY->Surfaces_List[STUDY->Current_Surface].center_geometry_and_data_points();
-
-		Progress_Form->add_text("Import completed. Press CLOSE to continue." );
-		Progress_Form->Show();
-		Application->ProcessMessages();
-
-		repaint_3D_panels();
-	}
-	else
-	{
-		Progress_Form->Hide();
-		ShowMessage(Result);
-	}
-
-   }
-*/
-}
-//---------------------------------------------------------------------------
 
 
 

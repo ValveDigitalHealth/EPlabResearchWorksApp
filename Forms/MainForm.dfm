@@ -80,10 +80,6 @@ object Main_Application_Window: TMain_Application_Window
     TabOrder = 2
     object TabSheet_Main: TTabSheet
       Caption = 'Main'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label_p1: TLabel
         Left = 3
         Top = 2
@@ -246,10 +242,6 @@ object Main_Application_Window: TMain_Application_Window
     object TabSheet2: TTabSheet
       Caption = 'Segmentation'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label3: TLabel
         Left = 2
         Top = 29
@@ -390,10 +382,6 @@ object Main_Application_Window: TMain_Application_Window
     end
     object GroupedEGMs: TTabSheet
       Caption = 'Grouped id egms'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object All_EGMs_PaintBox: TPaintBox
         Left = 39
         Top = 32
@@ -418,10 +406,6 @@ object Main_Application_Window: TMain_Application_Window
     object ECGChannels: TTabSheet
       Caption = 'ECG'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ECG_Channels_PaintBox: TPaintBox
         Left = 47
         Top = 40
@@ -446,10 +430,6 @@ object Main_Application_Window: TMain_Application_Window
     object ExtraChannels: TTabSheet
       Caption = 'Extra channels'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Extra_Channels_PaintBox: TPaintBox
         Left = 55
         Top = 48
@@ -474,10 +454,6 @@ object Main_Application_Window: TMain_Application_Window
     object ImagesPage: TTabSheet
       Caption = 'Histology'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Fluoro_Image_Paint_Box: TPaintBox
         Left = 22
         Top = 170
@@ -576,10 +552,6 @@ object Main_Application_Window: TMain_Application_Window
     object TabSheet1: TTabSheet
       Caption = 'Tools'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label4: TLabel
         Left = 3
         Top = 28
@@ -699,17 +671,6 @@ object Main_Application_Window: TMain_Application_Window
         object ImportALLmapsfromCARTOexportfolder1: TMenuItem
           Caption = 'Import ALL maps from CARTO export folder'
           OnClick = ImportALLmapsfromCARTOexportfolder1Click
-        end
-      end
-      object ImportRhythmiadata1: TMenuItem
-        Caption = 'Import Rhythmia data'
-        object Importmatlabadvancedfile1: TMenuItem
-          Caption = 'Import matlab advanced file'
-          OnClick = Importmatlabadvancedfile1Click
-        end
-        object ImportablationpointslistLydiacsvformatv21: TMenuItem
-          Caption = 'Import ablation points list (custom csv format)'
-          OnClick = ImportablationpointslistLydiacsvformatv21Click
         end
       end
       object Otherimports1: TMenuItem
@@ -1604,7 +1565,6 @@ object Main_Application_Window: TMain_Application_Window
     end
     object MenuItem19: TMenuItem
       Caption = 'Delete current value'
-      OnClick = MenuItem19Click
     end
   end
 end

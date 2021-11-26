@@ -150,7 +150,6 @@ class TMain_Application_Window : public TForm
 	TMenuItem *N3;
 	TMenuItem *Centerallgeometries1;
 	TMenuItem *ImportCARTOdata1;
-	TMenuItem *ImportRhythmiadata1;
 	TMenuItem *ImportCARTOexportfolder1;
 	TMenuItem *N4;
 	TMenuItem *ools1;
@@ -395,7 +394,6 @@ class TMain_Application_Window : public TForm
 	TMenuItem *ShowhistogramofspatialgradientofcurrentvalueOFCURRENTSEGMENT1;
 	TMenuItem *Reclaculatenormals1;
 	TMenuItem *Leaveonly1stmapvisible1;
-	TMenuItem *ImportablationpointslistLydiacsvformatv21;
 	TMenuItem *RegisterABCABCgeometries1;
 	TMenuItem *ABCtoABCfitting1;
 	TMenuItem *ABCtoABCfitting2;
@@ -406,7 +404,6 @@ class TMain_Application_Window : public TForm
 	TMenuItem *Exportcurrentdatapointegms1;
 	TMenuItem *ImportDxLmap1;
 	TMenuItem *ImportSegment1;
-	TMenuItem *Importmatlabadvancedfile1;
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
@@ -595,7 +592,6 @@ class TMain_Application_Window : public TForm
 	void __fastcall Createuniformelevation1Click(TObject *Sender);
 	void __fastcall Upsamplemesh1Click(TObject *Sender);
 	void __fastcall Addsquaresample1Click(TObject *Sender);
-	void __fastcall MenuItem19Click(TObject *Sender);
 	void __fastcall MenuItem12Click(TObject *Sender);
 	void __fastcall MenuItem17Click(TObject *Sender);
 	void __fastcall Changedatapointtype1Click(TObject *Sender);
@@ -643,14 +639,12 @@ class TMain_Application_Window : public TForm
 	void __fastcall Smoothnormalswithinspecifiedrange1Click(TObject *Sender);
 	void __fastcall Reclaculatenormals1Click(TObject *Sender);
 	void __fastcall Leaveonly1stmapvisible1Click(TObject *Sender);
-	void __fastcall ImportablationpointslistLydiacsvformatv21Click(TObject *Sender);
 	void __fastcall ABCtoABCfitting1Click(TObject *Sender);
 	void __fastcall CenterALLEXCPEPTFIRSTgeometriessimultaneously1Click(TObject *Sender);
 	void __fastcall Exportvaluesatgeometrynodes1Click(TObject *Sender);
 	void __fastcall N67Click(TObject *Sender);
 	void __fastcall Exportcurrentdatapointegms1Click(TObject *Sender);
 	void __fastcall ImportDxLmap1Click(TObject *Sender);
-	void __fastcall Importmatlabadvancedfile1Click(TObject *Sender);
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
@@ -735,10 +729,6 @@ class TMain_Application_Window : public TForm
 	Signals_Display_Parameters ECG_Channels_Box_Parameters;
 	Signals_Display_Parameters Extra_Channels_Box_Parameters;
 	Signals_Display_Parameters FImage_Box_Parameters;
-
-	void read_app_version();
-
-	AnsiString EPLAB_App_Version;
 
 	//-----------------------------------------------------------
 	// segmentation support

@@ -404,37 +404,5 @@ template void Computational_Module_Class::detect_single_activation<float>(
 			long *Activation_Ptr,double Time_Step_ms);
 
 //----------------------------------------------------------------------------------------
-/*
-
-void Computational_Module_Class::reposition_reference_bar_according_to_V_wave(STUDY_Class *STUDY,
-		TProgress_Form *Progress_Form,vector<double> *V_Wave, int V_Wave_Source)
-{
-	//--------------------------------------------------------
-	// 1. Create similarity coef vector
-	//--------------------------------------------------------
-	double v=0;
-	std::vector <double> Sim_Vector;
-	Sim_Vector.assign( ,v);
-
-	for(long i=0;i<Data_Items[Selected_Data_Item_1]->Filtered_Signal.size();i++)
-	Sim_Vector[i] = 0;
-
-	// Calculate sim vector
-	for(long i=0;i<Data_Items[Selected_Data_Item_1]->Filtered_Signal.size();i++)
-	if( i-0.5*V_Wave_Size >= 0 )
-	if( i+0.5*V_Wave_Size < Data_Items[Selected_Data_Item_1]->Filtered_Signal.size() )
-	Sim_Vector[i] = std::pow(Numerical_Library_Obj.get_similarity_coefficient(
-		&Data_Items[Selected_Data_Item_1]->Filtered_Signal,V_Wave,
-		i-0.5*V_Wave_Size,i+0.5*V_Wave_Size,0,V_Wave_Size),2);
-
-	// find peaks in sim vector
-	vector <long> Peaks_Vector;
-	Peaks_Vector = Numerical_Library_Obj.calculate_peak_positions
-		(Sim_Vector,Data_Items[Selected_Data_Item_1]->Voltage_Values.size(),0.8);
-
-}
-*/
-
-//----------------------------------------------------------------------------------------
 
 

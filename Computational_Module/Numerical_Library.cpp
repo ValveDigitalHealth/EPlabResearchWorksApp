@@ -42,95 +42,7 @@ Numerical_Library::Numerical_Library()
 
 }
 
-//------------------------------------------------------------------
-void Numerical_Library::circ_rtest(std::vector<double>* Angle_Data, double* p_val,double* z_stat)
-{
-//
-//   Computes Rayleigh test for non-uniformity of circular data.
-//   H0: the population is uniformly distributed around the circle
-//   HA: the populatoin is not distributed uniformly around the circle
-//   Assumption: the distribution has maximally one mode and the data is
-//   sampled from a von Mises distribution!
-//
-//   Input:
-//     Angle_Data	sample of angles in radians
-//
-//   Output:
-//     pval  p-value of Rayleigh's test
-//     z     value of the z-statistic
-//
-// PHB 7/6/2008
-//
-// References:
-//   Statistical analysis of circular data, N. I. Fisher
-//   Topics in circular statistics, S. R. Jammalamadaka et al.
-//   Biostatistical Analysis, J. H. Zar
-//
-// Circular Statistics Toolbox for Matlab
-
-// By Philipp Berens, 2009
-// berens@tuebingen.mpg.de - www.kyb.mpg.de/~berens/circStat.html
-
-    double r =  circ_r(Angle_Data);
-    double n = Angle_Data[0].size();
-
-    // compute Rayleigh's R (equ. 27.1)
-    double R = n*r;
-
-    // compute Rayleigh's z (equ. 27.2)
-    z_stat[0] = R*R / n;
-
-    // compute p value using approxation in Zar, p. 617
-    p_val[0] = exp(sqrt(1+4*n+4*(n*n-R*R))-(1+2*n));
-}
-
 //---------------------------------------------------------------------------
-
-double Numerical_Library::circ_r(std::vector<double>* Angle_Data)
-{
-//   function r = circ_r(alpha)
-//   Computes mean resultant std::vector length for circular data.
-//
-//   Input:
-//     alpha	sample of angles in radians
-//
-//   Output:
-//     r		mean resultant length
-//
-// PHB 7/6/2008
-//
-// References:
-//   Statistical analysis of circular data, N.I. Fisher
-//   Topics in circular statistics, S.R. Jammalamadaka et al.
-//   Biostatistical Analysis, J. H. Zar
-//
-// Circular Statistics Toolbox for Matlab
-
-// By Philipp Berens, 2009
-// berens@tuebingen.mpg.de - www.kyb.mpg.de/~berens/circStat.html
-
-    //  compute sum of cos and sin of angles
-    // r = sum(exp(i*alpha));
-    if( Angle_Data[0].size() > 0 )
-    {
-
-    double S_Sum=0,C_Sum=0;
-    for(unsigned long i=0;i<Angle_Data[0].size();i++)
-    {
-        S_Sum += sin(Angle_Data[0][i]);
-        C_Sum += cos(Angle_Data[0][i]);
-    }
-
-    // obtain length
-    // r = abs(r)./sum(w);
-    return sqrt( S_Sum*S_Sum + C_Sum*C_Sum )/(double)(Angle_Data[0].size());
-
-    }
-	else
-	return 1000000;
-}
-
-//--------------------------------------------------------------------------
 
 void Numerical_Library::find_max_peak_with_max_slopes(
 	std::vector<double> *Signal,long Start, long Stop,double* Max, long *Max_Ptr,int Slope_Range_Ptr)
@@ -407,12 +319,6 @@ double Numerical_Library::get_percentile_from_histogram(std::vector<long>* Histo
     {
 		while( CHisto[Box] < Percentile )
             Box++;
-
-		// find ratio
-//        if( CHisto[Box]-CHisto[Box-1] != 0 && Box-1>=0)
-//		Ratio = (Percentile -CHisto[Box-1] )/(CHisto[Box]-CHisto[Box-1]);
-//		else
-//		Ratio = -1000;
 
 		// find ratio
 		if( Box+1 < Size )
@@ -878,17 +784,6 @@ double Numerical_Library::get_micro_fractionation(
 	return AvC/Counter;
 	else
     return 0;
-/*
-	calculate_max_min_vec_double_ranged(
-	&FSignal,
-	0.1*FSignal.size(),
-	0.9*FSignal.size(), &Min, &Max);
-
-	if(Max!=0)
-	return Min/Max;
-	else
-	return 0;
-*/
 
 	}
 
@@ -963,17 +858,6 @@ double Numerical_Library::get_phase_synchronization(
 
 		Coherence = sqrt( Sins*Sins + Coss*Coss )/(double)(Length-absDelay);
 	}
-/*
-	if( Take_80_Perc_Flag )
-	{
-		for(long t=0.1*Length;t<=0.9*Length;t++)
-		{
-			Sins += sin((double)n*S1[t]-(double)m*S2[t]);
-			Coss += cos((double)n*S1[t]-(double)m*S2[t]);
-		}
-		Coherence = sqrt( Sins*Sins + Coss*Coss )/(double)(0.8*Length);
-	}
- */
 
 	return Coherence;
 
@@ -1408,7 +1292,7 @@ std::vector <double> Numerical_Library::Butt_low_20_3th_order(std::vector <doubl
 
     //--------------------------------------------
     if( ! Inverse )
-    //--------------------------------------------
+	//--------------------------------------------
     {
 
     gain = 4.553605266e+03;
@@ -1427,33 +1311,7 @@ std::vector <double> Numerical_Library::Butt_low_20_3th_order(std::vector <doubl
         Result.push_back(y4[3]);
 	  }
 
-/*
-	for(long k = 0; k < Signal[0].size(); k ++ )
-	{
-		x4[0] = x4[1];
-		x4[1] = x4[2];
-		x4[2] = x4[3];
-		x4[3] = Signal[0][k] / gain;
-
-		y4[0] = y4[1];
-		y4[1] = y4[2];
-		y4[2] = y4[3];
-		y4[3] =
-	   (  1 * x4[0])
-	 + (  3 * x4[1])
-	 + (  3 * x4[2])
-	 + (  1 * x4[3])
-
-	 + ( 0.8837484610 * y4[0])
-	 + ( -2.7604268125 * y4[1])
-	 + ( 2.8764564523 * y4[2]);
-
-		Result.push_back(y4[3]);
-    }
-*/
-
-
-    return Result;
+	return Result;
 
     }
 
@@ -1470,38 +1328,13 @@ std::vector <double> Numerical_Library::Butt_low_20_3th_order(std::vector <doubl
         x4[2] = x4[3];
         x4[3] = Signal[0][Signal[0].size()-1-k] / gain;
         y4[0] = y4[1];
-        y4[1] = y4[2];
+		y4[1] = y4[2];
         y4[2] = y4[3];
         y4[3] =   (x4[0] + x4[3]) + 3 * (x4[1] + x4[2])
                      + (  0.7776385602 * y4[0]) + ( -2.5282312191 * y4[1])
-                     + (  2.7488358092 * y4[2]);
-        Result.push_back(y4[3]);
-      }
-
-    /*
-	for(long k = 0; k < Signal[0].size(); k ++ )
-	{
-		x4[0] = x4[1];
-		x4[1] = x4[2];
-		x4[2] = x4[3];
-		x4[3] = Signal[0][Signal[0].size()-1-k] / gain;
-
-		y4[0] = y4[1];
-		y4[1] = y4[2];
-		y4[2] = y4[3];
-		y4[3] =
-	   (  1 * x4[0])
-	 + (  3 * x4[1])
-	 + (  3 * x4[2])
-	 + (  1 * x4[3])
-
-	 + ( 0.8837484610 * y4[0])
-	 + ( -2.7604268125 * y4[1])
-	 + ( 2.8764564523 * y4[2]);
-
+					 + (  2.7488358092 * y4[2]);
 		Result.push_back(y4[3]);
-	}
-    */
+	  }
 
     // inverse result
 	for(long k=0;k<(signed)Result.size();k++)
@@ -1714,55 +1547,6 @@ double Numerical_Library::correlation_coef_vec_different_size(
 	else
 	return 0;
 
-/*
-	if( Start_Position_in_vec1 >= 0 && Start_Position_in_vec1 < vec1[0].size() &&
-		vec2[0].size() > 0 &&
-		Start_Position_in_vec1 + vec2[0].size() < vec1[0].size() ) // V wave is witihn v1 vector
-	{
-
-	long n = vec2[0].size();
-
-	double av1,av2;
-	double SD1,SD2;
-
-	av1 = 0.0;
-	SD1 = 0.0;
-	for(long k=Start_Position_in_vec1;k<Start_Position_in_vec1+n;k++)
-		av1 += vec1[0][k];
-	av1 /= (double)n;
-
-	for(long k=Start_Position_in_vec1;k<Start_Position_in_vec1+n;k++)
-		SD1 += pow(vec1[0][k]-av1,2.0);
-
-	SD1 = sqrt(SD1/(double)n);
-
-	av2 = 0;
-	SD2 = 0;
-	for(long k=0;k<n;k++)
-		av2 += vec2[0][k];
-	av2 /= (double)n;
-
-	for(long k=0;k<n;k++)
-		SD2 += pow(vec2[0][k]-av2,2.0);
-
-	SD2 = sqrt(SD2/(double)n);
-
-	// 2. calculate covariance
-	double IFG = 0;
-	for(long k=0;k<n;k++)
-		IFG += (vec1[0][Start_Position_in_vec1+k]-av1)*(vec2[0][k]-av2);
-
-	// 3. calculate correlation
-	if( SD1 != 0 && SD2 != 0 )
-		IFG = IFG/((double)(n)*SD1*SD2);
-	else
-		IFG = 0.0;
-
-	return IFG;
-	}
-	else
-	return NOT_POSSIBLE_TO_CALCULATE_VALUE;
-*/
 }
 
 //------------------------------------------------------------------------------------------------------
@@ -1817,10 +1601,6 @@ double Numerical_Library::covariance_coef_vec_different_size(
 		squareSum_Y = squareSum_Y + vec2[0][i] * vec2[0][i];
 	}
 
-	// use formula for calculating correlation coefficient.
-//	double corr = (double )(n * sum_XY - sum_X * sum_Y)
-//				  / sqrt((n * squareSum_X - sum_X * sum_X)
-//					  * (n * squareSum_Y - sum_Y * sum_Y));
 	double covariance = (double )(n * sum_XY - sum_X * sum_Y);
 
 	return covariance;
@@ -1942,7 +1722,6 @@ std::vector <long> Numerical_Library::calculate_peak_positions_vec(
 			{
 				// ok, we have a beginning of R!!!
 				R_begin = counter;
-//                prev_max = current_max;
 				current_max = -1000;
 
 				// search for end...
@@ -2036,7 +1815,7 @@ std::vector <long> Numerical_Library::calculate_peak_positions(double* values,lo
 				while( values[ counter ] > R_Threshold_Up &&
                             counter < n-1 )
                 {
-                    if( values[ counter ] > current_max )
+					if( values[ counter ] > current_max )
 					{
 						current_max = values[ counter ];
                         max_ptr = counter;
@@ -2166,10 +1945,9 @@ int Numerical_Library::get_triangle_based_CV(
 			B_x = N1_x; B_y = N1_y; B_z = N1_z; LAT_B = LAT_N1;
 		}
 
-    double OA,OB,AB,cos_teta,tOB,tOA,sin_teta;
-    double tg_alfa,cos_alfa,tg_beta,cos_beta;
-//    double alfa,beta,tg_alfa,cos_alfa,tg_beta,cos_beta;
-    double CV=0;
+	double OA,OB,AB,cos_teta,tOB,tOA,sin_teta;
+	double tg_alfa,cos_alfa,tg_beta,cos_beta;
+	double CV=0;
 
         OA = sqrt( std::pow(O_x-A_x,2)+
                    std::pow(O_y-A_y,2)+
@@ -2386,7 +2164,7 @@ void Numerical_Library::rotate_vector
     ty = y[0];
     tz = z[0];
     s = sin(angle);
-    c = cos(angle);
+	c = cos(angle);
 
     if( which_axis == 1 ) // x
     {
@@ -2430,38 +2208,6 @@ long Numerical_Library::get_min_difference(long T,std::vector <long> *Vec)
 }
 
 //---------------------------------------------------------------------------
-/*
-template <class T1>
-std::vector <T1> Numerical_Library::resample(std::vector <T1> *X, long Start, long Stop, long Target_Length)
-{
-	std::vector <T1> Y;
-	long Xs = Stop-Start; // X[0].size();
-	long L,R;
-	double Pos,v,vL,vP;
-
-	for(long i=0;i<Target_Length;i++)
-	{
-		L = Start+floor((double)i/(double)Target_Length*Xs);
-		Pos = Start+(double)i/(double)Target_Length*Xs - L;
-		R = L+1;
-
-		if( L < X[0].size() && R < X[0].size() )
-		{
-			vL = X[0][L];
-			vP = X[0][R];
-			v = (1-Pos)*vL + Pos*vP;
-		}
-		else
-		v = 0;
-
-		Y.push_back(v);
-	}
-
-
-	return Y;
-}
-*/
-//---------------------------------------------------------------------------
 
 double Numerical_Library::Dot_Product(Point_3D* A,Point_3D* B)
 {
@@ -2476,8 +2222,6 @@ double Numerical_Library::get_distance_between_3D_point_and_triangle(
 													  double T2x,double T2y,double T2z,
 													  double T3x,double T3y,double T3z )
 {
-// https://www.geometrictools.com/GTEngine/Include/Mathematics/GteDistPointTriangleExact.h
-// https://www.geometrictools.com/Documentation/DistancePoint3Triangle3.pdf
 	Point_3D diff;
 	diff.x = Px - T1x;
 	diff.y = Py - T1y;
@@ -2538,7 +2282,7 @@ double Numerical_Library::get_distance_between_3D_point_and_triangle(
                         t1 = one;
                     }
                     else  // E20
-                    {
+					{
                         t1 = -b1 / a11;
 					}
                 }
@@ -2568,8 +2312,8 @@ double Numerical_Library::get_distance_between_3D_point_and_triangle(
 				t0 = zero;
             }
             else if (-b0 >= a00)  // V1
-            {
-                t0 = one;
+			{
+				t0 = one;
             }
             else  // E01
             {
@@ -2728,22 +2472,8 @@ double Numerical_Library::get_non_zero_mean(double v1, double v2)
 void Numerical_Library::correlation_coef_vec(std::vector <double> *vec1,
 	std::vector <double> *vec2, double* corr)
 {
-/*
-	double av, cov, sd1, sd2;
-
-	covariance_vec(vec1,vec2,&cov);
-	stdev_cor_vec(vec1,&av,&sd1);
-	stdev_cor_vec(vec2,&av,&sd2);
-
-	if(sd1!=0 && sd2!=0 )
-	corr[0] = cov/(sd1*sd2);
-	else
-	corr[0] = -1000.0;
-*/
 	if( vec1[0].size() == vec2[0].size() )
 	{
-
-	// taken from: https://www.geeksforgeeks.org/program-find-correlation-coefficient/
 
 	double sum_X = 0, sum_Y = 0, sum_XY = 0;
 	double squareSum_X = 0, squareSum_Y = 0;
@@ -2984,9 +2714,6 @@ std::complex<double> Numerical_Library::CWT(std::vector<double> *Data,long Start
 	if(L<0 || R > Stop-Start )
 		return 0.0;
 
-//	if( a==0)
-//	ShowMessage("a==0 in CWT - PnumLib");
-
 	for(long i=L;i<R;i++)
 	{
 		time = i*timestep;
@@ -3003,10 +2730,8 @@ std::complex<double> Numerical_Library::morlet_wavelet(double t)
 {
 	std::complex<double> v;
 	double expv = exp(-0.5*t*t);
-v.real(cos(5.5*t)*expv);
-v.imag(sin(5.5*t)*expv);
-    //v._Val[0] = cos(5.5*t)*expv;
-    //v._Val[1] = sin(5.5*t)*expv;
+	v.real(cos(5.5*t)*expv);
+	v.imag(sin(5.5*t)*expv);
 
 	return v;
 }
@@ -3144,7 +2869,6 @@ std::vector <double> Numerical_Library::normalize_signal(
 		if(max!=min)
 		{
 			a = 1.0/(max-min);
-//			a = 1.0/(max);
 			b = -min*a;
 		}
 		else
@@ -3185,7 +2909,6 @@ std::vector <double> Numerical_Library::normalize_signal(
 	if(max!=min)
 	{
 			a = 1.0/(max-min);
-//			a = 1.0/(max);
 			b = -min*a;
 	}
 	else
@@ -3372,29 +3095,28 @@ std::vector <double> Numerical_Library::calculate_NAVX_CAFE(long Start,long Stop
 	{
 		Found = 0;
         max = 0;
-        max_ptr = -1;
-        for(long k=1;k<Duration;k++)
-        if( -(Signal[0][i+k]-Signal[0][i+k-1]) > Downstroke_Threshold )
-        {
-            max = -(Signal[0][i+k]-Signal[0][i+k-1]);
-            max_ptr = i+k;
-            Found = 1;
-        }
+		max_ptr = -1;
+		for(long k=1;k<Duration;k++)
+		if( -(Signal[0][i+k]-Signal[0][i+k-1]) > Downstroke_Threshold )
+		{
+			max = -(Signal[0][i+k]-Signal[0][i+k-1]);
+			max_ptr = i+k;
+			Found = 1;
+		}
 	}
 
 	if( Found == 1 )
-    vNAVX_Positions_In_Signal.push_back(max_ptr);
+	vNAVX_Positions_In_Signal.push_back(max_ptr);
 
-    } // locating activations
+	} // locating activations
 
-    // calculate CAFE as mean interval
-    for(long j=1;j<(signed)vNAVX_Positions_In_Signal.size();j++)
-    if( vNAVX_Positions_In_Signal[j-1] > Start &&
+	// calculate CAFE as mean interval
+	for(long j=1;j<(signed)vNAVX_Positions_In_Signal.size();j++)
+	if( vNAVX_Positions_In_Signal[j-1] > Start &&
 		vNAVX_Positions_In_Signal[j-1] < Stop )
-    if( vNAVX_Positions_In_Signal[j] > Start &&
-        vNAVX_Positions_In_Signal[j] < Stop )
-//    if( vNAVX_Positions_In_Signal[j]-vNAVX_Positions_In_Signal[j-1] < 500 )
-    {
+	if( vNAVX_Positions_In_Signal[j] > Start &&
+		vNAVX_Positions_In_Signal[j] < Stop )
+	{
         Sum += vNAVX_Positions_In_Signal[j]-vNAVX_Positions_In_Signal[j-1];
 		counter++;
     }
@@ -3629,22 +3351,6 @@ void Numerical_Library::fit_line_diff_phi_offsets(double* x, double* y, long sta
 
 //------------------------------------------------------------------------------
 
-void Numerical_Library::find_crossing_point_3D_parametric_lines(
-			Parametric_3D_line Line1,
-			Parametric_3D_line Line2,
-			double* Distance,
-			Point_3D Crossing_Point )
-{
-	// distance function: C(t1,t2)=(x1(t1)-x2(t2))^2+(y1-y2)^2+(z1-z2)^2
-	// crossing point is when dC/dt1=dC/dt2=0
-	// from this condition t1 and t2 are found giving value of C(t1,t2) and
-	// coordinates of the crossing
-
-
-}
-
-//--------------------------------------------------------------------------------
-
 bool Numerical_Library::find_perpendicular_parametric_line_from_3_points(
 		Point_3D Point_A, // coordinates of the points
 		Point_3D Point_B, // line will go through point A
@@ -3839,91 +3545,8 @@ Vector3d TV;
 	Alpha[0] = alpha;
 	Beta[0] = beta;
 	Gamma[0] = gamma;
-
-	/* https://gamedev.stackexchange.com/questions/28781/easy-way-to-project-point-onto-triangle-or-plane
-	// u=P2?P1
-	Eigen::Vector3f u = triangle_vertex_1 - triangle_vertex_0;
-	// v=P3?P1
-	Eigen::Vector3f v = triangle_vertex_2 - triangle_vertex_0;
-	// n=u×v
-	Eigen::Vector3f n = u.cross(v);
-	// w=P?P1
-	Eigen::Vector3f w = query_point - triangle_vertex_0;
-
-	// Barycentric coordinates of the projection P?of P onto T:
-	// ?=[(u×w)?n]/n²
-	float gamma = u.cross(w).dot(n) / n.dot(n);
-	// ?=[(w×v)?n]/n²
-	float beta = w.cross(v).dot(n) / n.dot(n);
-	float alpha = 1 - gamma - beta;
-	// The point P? lies inside T if:
-	return ((0 <= alpha) && (alpha <= 1) &&
-			(0 <= beta)  && (beta  <= 1) &&
-			(0 <= gamma) && (gamma <= 1));
-
-	*/
 }
 
-//---------------------------------------------------------------------------
-/* ten wyzej dziala, zostawilem ponizszy kod anyway, dla referencji
-
-bool Numerical_Library::rayTriangleIntersect(
-	const Vec3f &orig, const Vec3f &dir,
-	const Vec3f &v0, const Vec3f &v1, const Vec3f &v2,
-	float &t)
-{
-// https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution
-
-    // compute plane's normal
-    Vec3f v0v1 = v1 - v0;
-    Vec3f v0v2 = v2 - v0;
-    // no need to normalize
-    Vec3f N = v0v1.crossProduct(v0v2); // N
-    float area2 = N.length();
-
-    // Step 1: finding P
-
-    // check if ray and plane are parallel ?
-    float NdotRayDirection = N.dotProduct(dir);
-    if (fabs(NdotRayDirection) < kEpsilon) // almost 0
-        return false; // they are parallel so they don't intersect !
-
-	// compute d parameter using equation 2
-    float d = N.dotProduct(v0);
-
-    // compute t (equation 3)
-	t = (N.dotProduct(orig) + d) / NdotRayDirection;
-    // check if the triangle is in behind the ray
-    if (t < 0) return false; // the triangle is behind
-
-	// compute the intersection point using equation 1
-    Vec3f P = orig + t * dir;
-
-    // Step 2: inside-outside test
-	Vec3f C; // vector perpendicular to triangle's plane
-
-    // edge 0
-    Vec3f edge0 = v1 - v0;
-    Vec3f vp0 = P - v0;
-    C = edge0.crossProduct(vp0);
-    if (N.dotProduct(C) < 0) return false; // P is on the right side
-
-    // edge 1
-    Vec3f edge1 = v2 - v1;
-    Vec3f vp1 = P - v1;
-    C = edge1.crossProduct(vp1);
-    if (N.dotProduct(C) < 0)  return false; // P is on the right side
-
-    // edge 2
-	Vec3f edge2 = v0 - v2;
-    Vec3f vp2 = P - v2;
-    C = edge2.crossProduct(vp2);
-    if (N.dotProduct(C) < 0) return false; // P is on the right side;
-
-    return true; // this ray hits the triangle
-}
-*/
-//---------------------------------------------------------------------------
 //---------------------------------------------------------------------------
 
 unsigned char Numerical_Library::ToByte(bool Bits[8])
@@ -4037,543 +3660,5 @@ double Numerical_Library::sign(double val)
 
 //---------------------------------------------------------------------------
 
-std::vector<int> Numerical_Library::create_01_signal_from_egm(
-	std::vector<double> *Signal_1,std::vector<Local_Activation_Class> *Activations_Positions,int Width_samples)
-{
-	std::vector<int> Result;
-	int tmp=0;
-	Result.assign(Signal_1[0].size(),tmp);
 
-	for(long t=0;t<Activations_Positions[0].size()-1;t++)
-	if(Activations_Positions[0][t].Timing_In_EGM_ptr >= 0 && Activations_Positions[0][t].Timing_In_EGM_ptr + Width_samples < Result.size() )
-	{
-		for(int w=0;w<Width_samples;w++)
-		Result[Activations_Positions[0][t].Timing_In_EGM_ptr+w]=1;
-	}
 
-	return Result;
-}
-
-//---------------------------------------------------------------------------
-
-std::vector<int> Numerical_Library::binary2asdf(std::vector<int> *V)
-{
-	std::vector<int> Result;
-
-	for(long t=0;t<V[0].size();t++)
-	if(V[0][t] == 1 )
-	{
-		Result.push_back(t+1);
-	}
-
-	return Result;
-}
-
-//---------------------------------------------------------------------------
-
-void Numerical_Library::get_Transfer_Entropy(
-	std::vector<int> *Binary_Signal_1,
-	std::vector<int> *Binary_Signal_2,
-	double* TE_00,double* TE_01,double* TE_10,double* TE_11,
-	int y_delay)
-{
-	const size_t series_count = 2;
-	double *te_result;
-	int **all_series;
-
-	std::vector<int> asdf_1 = binary2asdf(Binary_Signal_1);
-	std::vector<int> asdf_2 = binary2asdf(Binary_Signal_2);
-
-	const int duration = Binary_Signal_1[0].size(); // length of the raw egm signal
-
-	size_t* series_lengths = (size_t*)malloc(sizeof(size_t) * series_count);
-
-	series_lengths[0] = asdf_1.size();
-	series_lengths[1] = asdf_2.size();
-
-	all_series = (int**)malloc(sizeof(int*) * series_count);
-	for (int i = 0; i < series_count; ++i)
-		all_series[i] = (int*)malloc(sizeof(int) * series_lengths[i]);
-
-//	ofstream as1,as2;
-//	as1.open("C:\\A_01_asdf.csv");
-//	as2.open("C:\\B_01_asdf.csv");
-
-	for(long i=0;i<asdf_1.size();i++)
-	{
-		all_series[0][i]=asdf_1[i];
-//		as1 << asdf_1[i] << endl;
-	}
-
-	for(long i=0;i<asdf_2.size();i++)
-	{
-		all_series[1][i]=asdf_2[i];
-//		as2 << asdf_2[i] << endl;
-	}
-
-//	as1.close();
-//	as2.close();
-
-	// Create result matrix
-	te_result = (double*)malloc(sizeof(double) * series_count * series_count);
-
-	transent_1(all_series, series_count,series_lengths,
-			   y_delay, duration,te_result);
-
-	TE_00[0] = te_result[0];
-	TE_01[0] = te_result[1];
-	TE_10[0] = te_result[2];
-	TE_11[0] = te_result[3];
-
-	// w release sprawdz czy sa dobre wartosci
-//	ShowMessage(FloatToStr(TE_00[0])+","+FloatToStr(TE_01[0])+","+FloatToStr(TE_10[0])+","+FloatToStr(TE_11[0]));
-
-	// Clean up
-	for(long i = 0; i < series_count; ++i)
-	free(all_series[i]);
-
-	free(all_series);
-	free(te_result);
-}
-
-//---------------------------------------------------------------------------
-/*
-int read_int(FILE *fp) {
-  unsigned char buffer[4];
-  fread(buffer, 1, 4, fp);
-  return (((int)buffer[0] << 24) | ((int)buffer[1] << 16) | ((int)buffer[2] << 8) | (int)buffer[3]);
-}
-
-// ===========================================================================
-*/
-/*
-int main(int argc, char *argv[]) {
-
-  FILE *fp;
-  size_t i, j;
-  size_t series_count;
-  size_t x_order, y_order;
-  int  y_delay, duration;
-  int  **all_series;
-  double *te_result;
-
-  if (argc < 4) {
-	printf("Usage: transent series_file results_file y_delay [x_order] [y_order]\n");
-	return (0);
-  }
-
-  // Read in time series
-  fp = fopen(argv[1], "r");
-  duration = read_int(fp), series_count = read_int(fp);
-
-  all_series = (int **)malloc(sizeof(int *) * series_count);
-
-  size_t* series_lengths = (size_t*)malloc(sizeof(size_t) * series_count);
-
-  for (i = 0; i < series_count; ++i)
-  {
-	series_lengths[i] = read_int(fp) + 1; // +1 for terminator
-	all_series[i] = (int *)malloc(sizeof(int ) * series_lengths[i]);
-  }
-
-  for (i = 0; i < series_count; ++i)
-  {
-	for (j = 0; j < series_lengths[i] - 1; ++j)
-	{
-	  all_series[i][j] = read_int(fp);
-    }
-
-	all_series[i][j] = duration + 1; // terminator
-  }
-
-  fclose(fp);
-
-  // Extract arguments
-  y_delay = (int )atoi(argv[3]);
-
-  if (argc > 4) {
-    x_order = (size_t)atoi(argv[4]);
-  }
-  else {
-    x_order = 1;
-  }
-
-  if (argc > 5) {
-	y_order = (size_t)atoi(argv[5]);
-  }
-  else {
-	y_order = 1;
-  }
-
-  // Create result matrix
-	te_result = (double*)malloc(sizeof(double) * series_count * series_count);
-
-  // Do calculation
-  if ((x_order == 1) && (y_order == 1)) {
-	transent_1(all_series, series_count,
-			   series_lengths,
-			   y_delay, duration,
-			   te_result);
-  } else {
-    transent_ho(all_series, series_count,
-				series_lengths,
-                x_order, y_order,
-                y_delay, duration,
-                te_result);
-  }
-
-  fp = fopen(argv[2], "w");
-
-  for (i = 0; i < series_count; ++i) {
-    for (j = 0; j < series_count; ++j) {
-      fprintf(fp, "%e ", te_result[(i * series_count) + j]);
-	}
-
-    fprintf(fp, "\n");
-  }
-
-  fclose(fp);
-
-  // Clean up
-  for (i = 0; i < series_count; ++i) {
-	free(all_series[i]);
-  }
-
-  free(all_series);
-  free(series_lengths);
-  free(te_result);
-
-  return (0);
-}
-
-*/
-
-//---------------------------------------------------------------------------------------
-
-/* Computes the first-order transfer entropy matrix for all pairs. */
-void Numerical_Library::transent_1(int  **all_series, const size_t series_count,
- const size_t *series_lengths,
- const int  y_delay,
- const int  duration,
- double *te_result)
-{
-
-  /* Constants */
-  const size_t x_order = 1, y_order = 1,
-			   num_series = 3,
-               num_counts = 8,
-               num_x = 4,
-               num_y = 2;
-
-  /* Locals */
-  int  counts[num_counts];
-  uint64_t code;
-  size_t k, l, idx, c1, c2;
-  double te_final, prob_1, prob_2, prob_3;
-
-  int  *ord_iter[num_series];
-  int  *ord_end[num_series];
-
-  int  ord_times[num_series];
-  int  ord_shift[num_series];
-
-  const size_t window = y_order + y_delay;
-  const int  end_time = duration - window + 1;
-  int  cur_time, next_time;
-
-  /* Calculate TE */
-  int  *i_series, *j_series;
-  size_t i_size, j_size;
-  size_t i, j;
-
-  for (i = 0; i < series_count; ++i) {
-    for (j = 0; j < series_count; ++j) {
-
-      /* Extract series */
-      i_size = series_lengths[i];
-	  i_series = all_series[i];
-
-      j_size = series_lengths[j];
-      j_series = all_series[j];
-
-      /* Order is x^(k+1), y^(l) */
-	  idx = 0;
-
-      /* x^(k+1) */
-      for (k = 0; k < (x_order + 1); ++k) {
-        ord_iter[idx] = i_series;
-        ord_end[idx] = i_series + i_size;
-		ord_shift[idx] = (window - 1) - k;
-
-		while (*(ord_iter[idx]) < ord_shift[idx] + 1) {
-          ++(ord_iter[idx]);
-        }
-
-        ord_times[idx] = *(ord_iter[idx]) - ord_shift[idx];
-        ++idx;
-      }
-
-	  /* y^(l) */
-      for (k = 0; k < y_order; ++k) {
-        ord_iter[idx] = j_series;
-        ord_end[idx] = j_series + j_size;
-        ord_shift[idx] = (window - 1) - y_delay -k;
-
-        while (*(ord_iter[idx]) < ord_shift[idx] + 1) {
-          ++(ord_iter[idx]);
-        }
-
-        ord_times[idx] = *(ord_iter[idx]) - ord_shift[idx];
-        ++idx;
-      }
-
-      /* Count spikes */
-      memset(counts, 0, sizeof(int ) * num_counts);
-
-      /* Get minimum next time bin */
-	  cur_time = ord_times[0];
-	  for (k = 1; k < num_series; ++k) {
-        if (ord_times[k] < cur_time) {
-		  cur_time = ord_times[k];
-        }
-      }
-
-      while (cur_time <= end_time) {
-
-        code = 0;
-        next_time = end_time + 1;
-
-        /* Calculate hash code for this time bin */
-        for (k = 0; k < num_series; ++k) {
-          if (ord_times[k] == cur_time) {
-            code |= 1 << k;
-
-			/* Next spike for this neuron */
-			++(ord_iter[k]);
-
-            if (ord_iter[k] == ord_end[k]) {
-              ord_times[k] = end_time + 1;
-            }
-            else {
-              ord_times[k] = *(ord_iter[k]) - ord_shift[k];
-            }
-          }
-
-		  /* Find minimum next time bin */
-          if (ord_times[k] < next_time) {
-            next_time = ord_times[k];
-          }
-        }
-
-        ++(counts[code]);
-        cur_time = next_time;
-
-      } /* while spikes left */
-
-      /* Fill in zero count */
-	  counts[0] = end_time;
-      for (k = 1; k < num_counts; ++k) {
-        counts[0] -= counts[k];
-      }
-
-      /* ===================================================================== */
-
-      /* Use counts to calculate TE */
-      te_final = 0;
-
-      /* Order is x^(k), y^(l), x(n+1) */
-      for (k = 0; k < num_counts; ++k) {
-        prob_1 = (double)counts[k] / (double)end_time;
-
-		if (prob_1 == 0) {
-		  continue;
-		}
-
-        prob_2 = (double)counts[k] / (double)(counts[k] + counts[k ^ 1]);
-
-        c1 = 0;
-        c2 = 0;
-
-		for (l = 0; l < num_y; ++l) {
-          idx = (k & (num_x - 1)) + (l << (x_order + 1));
-          c1 += counts[idx];
-          c2 += (counts[idx] + counts[idx ^ 1]);
-        }
-
-        prob_3 = (double)c1 / (double)c2;
-
-        te_final += (prob_1 * log2(prob_2 / prob_3));
-      }
-
-	  te_result[(j * series_count) + i] = te_final;
-
-    } /* for j */
-
-  } /* for i */
-
-} /* transent_1 */
-
-//---------------------------------------------------------------------------------------
-
-/* Computes the higher-order transfer entropy matrix for all pairs. */
-void Numerical_Library::transent_ho(int  **all_series, const size_t series_count,
- const size_t *series_lengths,
- const size_t x_order, const size_t y_order,
- const int  y_delay,
- const int  duration,
- double *te_result)
-{
-
-  /* Constants */
-  const size_t num_series = 1 + y_order + x_order,
-			   num_counts = (size_t)pow(2, num_series),
-			   num_x = (size_t)pow(2, x_order + 1),
-			   num_y = (size_t)pow(2, y_order);
-
-  /* Locals */
-  int  *counts = (int *)malloc(sizeof(int ) * num_counts);
-  uint64_t code;
-  size_t k, l, idx, c1, c2;
-  double te_final, prob_1, prob_2, prob_3;
-
-  int  *ord_iter[num_series];
-  int  *ord_end[num_series];
-
-  int  ord_times[num_series];
-  int  ord_shift[num_series];
-
-  const size_t window = (y_order + y_delay) > (x_order + 1) ? (y_order + y_delay) : (x_order + 1);
-  const int  end_time = duration - window + 1;
-  int  cur_time, next_time;
-
-  /* Calculate TE */
-  int  *i_series, *j_series;
-  size_t i_size, j_size;
-  size_t i, j;
-
-  for (i = 0; i < series_count; ++i) {
-    for (j = 0; j < series_count; ++j) {
-
-      /* Extract series */
-      i_size = series_lengths[i];
-      i_series = all_series[i];
-
-      j_size = series_lengths[j];
-      j_series = all_series[j];
-
-      /* Order is x^(k+1), y^(l) */
-	  idx = 0;
-
-      /* x^(k+1) */
-      for (k = 0; k < (x_order + 1); ++k) {
-        ord_iter[idx] = i_series;
-		ord_end[idx] = i_series + i_size;
-        ord_shift[idx] = (window - 1) - k;
-
-        while (*(ord_iter[idx]) < ord_shift[idx] + 1) {
-          ++(ord_iter[idx]);
-        }
-
-        ord_times[idx] = *(ord_iter[idx]) - ord_shift[idx];
-        ++idx;
-      }
-
-      /* y^(l) */
-      for (k = 0; k < y_order; ++k) {
-        ord_iter[idx] = j_series;
-        ord_end[idx] = j_series + j_size;
-        ord_shift[idx] = -k;
-        ord_times[idx] = *(ord_iter[idx]) - ord_shift[idx];
-        ++idx;
-	  }
-
-      /* Count spikes */
-      memset(counts, 0, sizeof(int ) * num_counts);
-
-      /* Get minimum next time bin */
-      cur_time = ord_times[0];
-      for (k = 1; k < num_series; ++k) {
-        if (ord_times[k] < cur_time) {
-          cur_time = ord_times[k];
-        }
-      }
-
-      while (cur_time <= end_time) {
-
-        code = 0;
-        next_time = end_time + 1;
-
-        /* Calculate hash code for this time bin */
-        for (k = 0; k < num_series; ++k) {
-          if (ord_times[k] == cur_time) {
-            code |= 1 << k;
-
-            /* Next spike for this neuron */
-            ++(ord_iter[k]);
-
-            if (ord_iter[k] == ord_end[k]) {
-			  ord_times[k] = end_time + 1;
-            }
-            else {
-              ord_times[k] = *(ord_iter[k]) - ord_shift[k];
-            }
-          }
-
-		  /* Find minimum next time bin */
-          if (ord_times[k] < next_time) {
-            next_time = ord_times[k];
-          }
-        }
-
-        ++(counts[code]);
-        cur_time = next_time;
-
-      } /* while spikes left */
-
-	  /* Fill in zero count */
-	  counts[0] = end_time;
-      for (k = 1; k < num_counts; ++k) {
-        counts[0] -= counts[k];
-      }
-
-      /* ===================================================================== */
-
-      /* Use counts to calculate TE */
-      te_final = 0;
-
-      /* Order is x^(k), y^(l), x(n+1) */
-      for (k = 0; k < num_counts; ++k) {
-        prob_1 = (double)counts[k] / (double)end_time;
-
-        if (prob_1 == 0) {
-          continue;
-        }
-
-        prob_2 = (double)counts[k] / (double)(counts[k] + counts[k ^ 1]);
-
-        c1 = 0;
-        c2 = 0;
-
-        for (l = 0; l < num_y; ++l) {
-          idx = (k & (num_x - 1)) + (l << (x_order + 1));
-          c1 += counts[idx];
-		  c2 += (counts[idx] + counts[idx ^ 1]);
-        }
-
-        prob_3 = (double)c1 / (double)c2;
-
-        te_final += (prob_1 * log2(prob_2 / prob_3));
-      }
-
-      te_result[(j * series_count) + i] = te_final;
-
-    } /* for j */
-
-  } /* for i */
-
-  /* Clean up */
-  free(counts);
-
-} /* transent_ho */
-
-//---------------------------------------------------------------------------------------

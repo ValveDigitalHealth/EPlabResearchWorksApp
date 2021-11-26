@@ -189,7 +189,6 @@ class Surface_Class
 	// GEOMETRY MANIPULATION FUNCTIONS
 	//----------------------------------------------------------------------------
 	//----------------------------------------------------------------------------
-	void remove_smaller_disjointed_surface_parts();
 	void remove_surface_related_with_specific_segment(int Segment_Id);
 	long node_xyz_present(std::vector<Geometry_Vertex> *Node_Set,double x, double y, double z);
 

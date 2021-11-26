@@ -33,10 +33,6 @@ class Butterworth_BandPass_Filter
 	std::vector<double> ComputeNumCoeffs_v2(int FilterOrder,double Lcutoff, double Ucutoff);
 	std::vector<double> ComputeDenCoeffs( int FilterOrder,double Lcutoff, double Ucutoff );
 
-//	double* ComputeNumCoeffs_v2(int FilterOrder,double Lcutoff, double Ucutoff,double *DenC);
-//	double* ComputeNumCoeffs(int FilterOrder); // to be removed
-//	double* ComputeDenCoeffs( int FilterOrder,double Lcutoff, double Ucutoff );
-
 	void filter(int np, double *x, double *y);
 
 	std::vector <double> filter(std::vector <double> *Signal,bool Inverse);

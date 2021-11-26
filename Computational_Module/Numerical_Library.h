@@ -78,16 +78,6 @@ class Numerical_Library
 
 	Butterworth_BandPass_Filter Butt_Filter;
 
-	//------------------------------------------------------------
-	//------------------------------------------------------------
-	// STATISTICAL TESTS
-	//------------------------------------------------------------
-	//------------------------------------------------------------
-
-	// Rayleigh test for circular uniformity
-	void circ_rtest(std::vector<double>* Angle_Data, double* p_val,double* z_stat);
-	double circ_r(std::vector<double>* Angle_Data);
-
 	//---------------------------------------------------------------------------
 	// min max calculations
 	//---------------------------------------------------------------------------
@@ -350,12 +340,6 @@ class Numerical_Library
 							 double* a, double* b, double* F, double* R);
 
 
-	void find_crossing_point_3D_parametric_lines(
-			Parametric_3D_line Line1,
-			Parametric_3D_line Line2,
-			double* Distance,
-			Point_3D Crossing_Point );
-
 	bool find_perpendicular_parametric_line_from_3_points(
 		Point_3D Point_A, // coordinates of the points
 		Point_3D Point_B, // line will go through point A
@@ -394,31 +378,6 @@ class Numerical_Library
 
 	double sign(double val);
 
-	//-------------------------------------------------------------------------------
-	// transfer entropy support
-	//-------------------------------------------------------------------------------
-	std::vector<int> create_01_signal_from_egm(
-		std::vector<double> *Signal_1,std::vector<Local_Activation_Class> *Activations_Positions,int Width_samples);
-
-	std::vector<int> binary2asdf(std::vector<int> *V);
-
-	void get_Transfer_Entropy(std::vector<int> *Binary_Signal_1,std::vector<int> *Binary_Signal_2,
-		double* TE_00,double* TE_01,double* TE_10,double* TE_11,int y_delay);
-
-	void transent_1(TimeType **all_series, const size_t series_count,
-		 const size_t *series_lengths,
-		 const TimeType y_delay,
-		 const TimeType duration,
-		 double *te_result);
-
-	void transent_ho(TimeType **all_series, const size_t series_count,
-		 const size_t *series_lengths,
-		 const size_t x_order, const size_t y_order,
-		 const TimeType y_delay,
-		 const TimeType duration,
-		 double *te_result);
-
-// ===========================================================================
 
 };
 

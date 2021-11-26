@@ -22,6 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE. */
 //---------------------------------------------------------------------------
 
+// Note: these are functions setting/getting value from node/data point: (put here for convenience)
 // 		Surface_Node_Set[i].set_value(Data_Point_Set_Ptr,Value_Id,value);
 //		Data_Point_Set[dset].Data_Points[dp].get_value(Val_Name,Map_Values.get_values_table_ref());
 
@@ -418,7 +419,7 @@ int Surface_Class::calculate_normals()
     //-------------------------------------------
 	// Calculate normals to the triangles
     //-------------------------------------------
-    float normal[3];
+	float normal[3];
     float v1[3], v2[3];
 	double d,x1,y1,z1,x2,y2,z2,x3,y3,z3;
 	double Product_Sum=0;
@@ -542,7 +543,7 @@ int Surface_Class::smooth_map_geometry()
 
 	}
 
-    return 1;
+	return 1;
 }
 
 //---------------------------------------------------------------------------
@@ -580,106 +581,8 @@ int Surface_Class::smooth_map_value(int Data_Point_Set_Ptr,int Value_Id)
 		Surface_Node_Set[i].set_value(Data_Point_Set_Ptr,Value_Id, av /Counter);
 	}
 
-    return 1;
+	return 1;
 }
-
-//---------------------------------------------------------------------------
-
-void Surface_Class::remove_smaller_disjointed_surface_parts()
-{
-/*
-	int Current_Segmnent_Id;
-	int Sth_Done;
-	vector <int> Nodes_List;
-
-
-    // Set nodes flags as -1 (not belonging to any segment)
-	for(unsigned long i=0;i<Surface_Node_Set.size();i++)
-	Surface_Node_Set[i].Flag_A = -1;
-
-    // make walks until all nodes are flagged
-    Current_Segmnent_Id = 1;
-    Sth_Done = 1;
-    while( Sth_Done > 0 )
-    {
-
-	Sth_Done = -1;
-
-    for(unsigned long i=0;i<Surface_Node_Set.size();i++)
-    if( Surface_Node_Set[i].Flag_A == -1)
-    {
-
-        // set seed
-		Nodes_List.clear();
-		Nodes_List.push_back(i);
-        Surface_Node_Set[i].Flag_A = Current_Segmnent_Id;
-
-		// Make walk
-        while( Nodes_List.size() > 0 )
-        {
-
-		Surface_Node_Set[Nodes_List[0]].Flag_A = Current_Segmnent_Id;
-
-        for(unsigned long k=0;k<Surface_Node_Set[Nodes_List[0]].Neighbors.size();k++)
-        if( Surface_Node_Set[Surface_Node_Set[Nodes_List[0]].Neighbors[k]].Flag_A
-			 != Current_Segmnent_Id )
-		{
-            Nodes_List.push_back(Surface_Node_Set[Nodes_List[0]].Neighbors[k]);
-            Surface_Node_Set[Surface_Node_Set[Nodes_List[0]].Neighbors[k]].Flag_A
-                = Current_Segmnent_Id;
-        }
-
-        // erase processed node
-		Nodes_List.erase( &Nodes_List[0] );
-
-        }
-
-        Current_Segmnent_Id++;
-        Sth_Done = 1;
-    }
-
-
-    } // while sth done
-
-    if( Current_Segmnent_Id > 1 )
-	{
-
-	// Calculate histogram of the segments sizes and find the biggest segment
-	long* Segments_Size_Histo; // number of nodes in each surface segment
-	long max_segment,Max_Value_On_Map,Histo_Length = 0.5*Surface_Node_Set.size();
-	Segments_Size_Histo = new long[ Histo_Length ];
-
-	for(unsigned long i=0;i<Histo_Length;i++)
-	Segments_Size_Histo[i] = 0;
-
-	for(unsigned long i=0;i<Surface_Node_Set.size();i++)
-	if( Surface_Node_Set[i].Flag_A >= 0)
-	Segments_Size_Histo[Surface_Node_Set[i].Flag_A]++;
-
-	Max_Value_On_Map = 0;
-	for(unsigned long i=0;i<Histo_Length;i++)
-	if( Max_Value_On_Map < Segments_Size_Histo[i] )
-	{
-		max_segment = i;
-		Max_Value_On_Map = Segments_Size_Histo[i];
-	}
-
-	// Set all nodes except biggest segment as removed
-	for(unsigned long i=0;i<Surface_Node_Set.size();i++)
-	if( Surface_Node_Set[i].Flag_A != max_segment)
-	Surface_Node_Set[i].Removed_Geometry_Vertex_Flag = ON;
-
-	// set all triangles containing removed nodes as removed
-	for(unsigned long i=0;i<Surface_Triangle_Set.size();i++)
-	if( Surface_Node_Set[ Surface_Triangle_Set[i].Nodes[0] ].Removed_Geometry_Vertex_Flag == ON ||
-		Surface_Node_Set[ Surface_Triangle_Set[i].Nodes[1] ].Removed_Geometry_Vertex_Flag == ON ||
-		Surface_Node_Set[ Surface_Triangle_Set[i].Nodes[2] ].Removed_Geometry_Vertex_Flag == ON )
-	Surface_Triangle_Set[i].Removed_Flag = ON;
-
-	}
-*/
-}
-
 
 //------------------------------------------------------------------------------
 
@@ -1336,7 +1239,7 @@ AnsiString Surface_Class::calculate_electric_dispersion_map(int Data_Point_Set_I
 	//--------------------------------------------------
 	//--------------------------------------------------
 	{
-//xxx
+
 	int Activity_Range_ptr = Disp_Range_ms/TimeStep_ms; // width of the red region
 	int Base_AFCL_ptr = Base_AFCL_ms / TimeStep_ms;
 
@@ -1375,10 +1278,6 @@ AnsiString Surface_Class::calculate_electric_dispersion_map(int Data_Point_Set_I
 	for(long j=0;j<(signed)GroupList.size();j++)
 	for(long loc=0;loc<Data_Point_Set[Data_Point_Set_Id].Data_Points[GroupList[j]].Roving_Signal.
 		Local_Activations.Local_Activations_vec.size();loc++)
-//	if( Data_Point_Set[Data_Point_Set_Id].Data_Points[GroupList[j]].Roving_Signal.
-//		Local_Activations.Local_Activations_vec[loc].Timing_In_EGM_ptr > Base_AFCL_ptr &&
-//		Data_Point_Set[Data_Point_Set_Id].Data_Points[GroupList[j]].Roving_Signal.
-//		Local_Activations.Local_Activations_vec[loc].Timing_In_EGM_ptr < EGM_Length-Base_AFCL_ptr )
 	for(long tt=Data_Point_Set[Data_Point_Set_Id].Data_Points[GroupList[j]].Roving_Signal.
 		Local_Activations.Local_Activations_vec[loc].Timing_In_EGM_ptr-Activity_Range_ptr;
 			tt<Data_Point_Set[Data_Point_Set_Id].Data_Points[GroupList[j]].Roving_Signal.
@@ -1415,114 +1314,6 @@ AnsiString Surface_Class::calculate_electric_dispersion_map(int Data_Point_Set_I
 
 	} // alg == 1
 
-
-	//--------------------------------------------------
-	//--------------------------------------------------
-	//--------------------------------------------------
-	if( Algorithm == 2 ) // based on surface activity mapping
-	//--------------------------------------------------
-	//--------------------------------------------------
-	//--------------------------------------------------
-	{
-/*
-	int Activity_Range_ptr = Disp_Range_ms/TimeStep_ms; // width of the red region
-	int Base_AFCL_ptr = Base_AFCL_ms / TimeStep_ms;
-
-	calculate_AFCL_map(Data_Point_Set_Id,Base_AFCL_ms,Comp_Module_Ptr);
-
-	//--------------------------------------------------
-	// go through all data points
-	//--------------------------------------------------
-	for(long i=0;i<(signed)Data_Point_Set[Data_Point_Set_Id].Data_Points.size();i++)
-	if( !PNUM.is_value_present_in_vector_long(&Processed_DP_Groups_Ids,
-			Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Identifier ) )
-	{
-
-	Progress_Form->replace_last_line_with_text("Calculating electric dispersion (alg3:surface), processing dp: " + IntToStr((int)i) + "/" +
-			IntToStr((int)(Data_Point_Set[Data_Point_Set_Id].Data_Points.size())) );
-	Progress_Form->Show();
-	Application->ProcessMessages();
-
-	Group_Id = Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Identifier;
-	Processed_DP_Groups_Ids.push_back(Group_Id);
-
-	// create list of data points with given group_id
-	GroupList.clear();
-	for(long dp=0;dp<Data_Point_Set[Data_Point_Set_Id].Data_Points.size();dp++)
-	if( Data_Point_Set[Data_Point_Set_Id].Data_Points[dp].Identifier == Group_Id )
-	GroupList.push_back(dp);
-
-	for(long rr=0;rr<EGM_Length;rr++)
-	Silence_Vector[rr]=1;
-
-	//--------------------------------------------------
-	// 1. Map which nodes belong to the group
-	//--------------------------------------------------
-
-	//-----------
-	// go through data points only belonging to the group
-	//-----------
-	for(long j=0;j<(signed)GroupList.size();j++)
-	for(long loc=0;loc<Data_Point_Set[Data_Point_Set_Id].Data_Points[GroupList[j]].Roving_Signal.
-		Local_Activations.Local_Activations_vec.size();loc++)
-//	if( Data_Point_Set[Data_Point_Set_Id].Data_Points[GroupList[j]].Roving_Signal.
-//		Local_Activations.Local_Activations_vec[loc].Timing_In_EGM_ptr > Base_AFCL_ptr &&
-//		Data_Point_Set[Data_Point_Set_Id].Data_Points[GroupList[j]].Roving_Signal.
-//		Local_Activations.Local_Activations_vec[loc].Timing_In_EGM_ptr < EGM_Length-Base_AFCL_ptr )
-	for(long tt=Data_Point_Set[Data_Point_Set_Id].Data_Points[GroupList[j]].Roving_Signal.
-		Local_Activations.Local_Activations_vec[loc].Timing_In_EGM_ptr-Activity_Range_ptr;
-			tt<Data_Point_Set[Data_Point_Set_Id].Data_Points[GroupList[j]].Roving_Signal.
-		Local_Activations.Local_Activations_vec[loc].Timing_In_EGM_ptr+Activity_Range_ptr;tt++)
-	if( tt >= 0 && tt < Silence_Vector.size() )
-	Silence_Vector[tt]=0;
-
-	//--------------------------------------------------
-	// 2. Calculate "silence vectors" for each node
-	//--------------------------------------------------
-
-
-
-	}
-
-	//--------------------------------------------------
-	// 3. Calculate master silence vector based on all per-node silence vectors
-	//--------------------------------------------------
-	for( nodes )
-	for( time )
-	if( node[n].Silence_Vector[t] == 1 ) // silence time pont
-	Silence_Vector[t]=0; // master silence vector marked
-
-
-	SUM=0;
-	for(long t=0;t<Silence_Vector.size();t++)
-	if( Silence_Vector[t] == 1 )
-		SUM++;
-
-	if( Silence_Vector.size() != 0 )
-	SUM /= (double) Silence_Vector.size();
-
-	Continuous_Activity_Ratio = 1-SUM;
-
-	if( GroupList.size() <= 2 )
-	{
-		Continuous_Activity_Ratio = 0;
-		for(long rr=0;rr<EGM_Length;rr++) Silence_Vector[rr]=1;
-	}
-
-	// assign results: silence_vector and COR value
-	for(long k=0;k<(signed)GroupList.size();k++)
-	{
-	Data_Point_Set[Data_Point_Set_Id].Data_Points[GroupList[k]].set_value(
-				 Value_Desc.Value_Name, Continuous_Activity_Ratio,Map_Values.get_values_table_ref() );
-	Data_Point_Set[Data_Point_Set_Id].Data_Points[GroupList[k]].Roving_Signal.Silence_Vector = Silence_Vector;
-	}
-
-
-	} // through data points
-
-*/
-	} // alg == 2
-
 	// interpolate map
 	Progress_Form->add_text("Interpolating map...");
 	interpolate_specific_value(0,Data_Point_Set_Id,Map_Ptr,
@@ -1532,6 +1323,7 @@ AnsiString Surface_Class::calculate_electric_dispersion_map(int Data_Point_Set_I
 }
 
 //------------------------------------------------------------------------------
+
 AnsiString Surface_Class::calculate_conduction_velocity(int Base_Map_Value_Ptr)
 {
 	AnsiString Base_Map_Value_Name =
@@ -1667,18 +1459,6 @@ AnsiString Surface_Class::calculate_conduction_velocity(int Base_Map_Value_Ptr)
 		Surface_Node_Set[i].set_value(Current_Data_Point_Set_Ptr,
 								CV_map_Ptr,NOT_POSSIBLE_TO_CALCULATE_VALUE);
 	}
-/*
-	// mark non-computed nodes as removed
-	for(unsigned long i=0;i<Surface_Node_Set.size();i++)
-	if( Surface_Node_Set[i].get_value(Current_Data_Point_Set_Ptr,CV_map_Ptr) == 0 )
-	{
-		Surface_Node_Set[i].Removed_Geometry_Vertex_Flag = 1;
-		for(unsigned long k=0;k<Surface_Node_Set[i].Neig_Triangles.size();k++)
-		Surface_Triangle_Set[ Surface_Node_Set[i].Neig_Triangles[k] ].Removed_Flag = ON;
-	}
-*/
-
-	// interpolate
 
 	// transfer CV to data points
 	long node_ptr;
@@ -2137,9 +1917,6 @@ int Surface_Class::calculate_area_taken_by_Value_within_range(int Seg_No,int Val
 	if( (Seg_No != 0 && Surface_Triangle_Set[i].Segment_Id == Seg_No) || Seg_No == 0 )
 	if( Surface_Triangle_Set[i].Removed_Flag != ON )
 	if( triangle_values_valid_specific_value(i,Val_Id) )
-//	if( Surface_Node_Set[Surface_Triangle_Set[i].Nodes[0]].Type != SCAR_TYPE )
-//	if( Surface_Node_Set[Surface_Triangle_Set[i].Nodes[1]].Type != SCAR_TYPE )
-//	if( Surface_Node_Set[Surface_Triangle_Set[i].Nodes[2]].Type != SCAR_TYPE )
 	{
 
 	v1 = Surface_Node_Set[Surface_Triangle_Set[i].Nodes[0]].get_value(DP_Set,Val_Id);
@@ -2181,9 +1958,6 @@ int Surface_Class::calculate_area_taken_by_Value(int Seg_No,int Val_Id,
 	if( (Seg_No != 0 && Surface_Triangle_Set[i].Segment_Id == Seg_No) || Seg_No == 0 )
 	if( Surface_Triangle_Set[i].Removed_Flag != ON )
 	if( triangle_values_valid_specific_value(i,Val_Id) )
-//	if( Surface_Node_Set[Surface_Triangle_Set[i].Nodes[0]].Type != SCAR_TYPE )
-//	if( Surface_Node_Set[Surface_Triangle_Set[i].Nodes[1]].Type != SCAR_TYPE )
-//	if( Surface_Node_Set[Surface_Triangle_Set[i].Nodes[2]].Type != SCAR_TYPE )
 	{
 
 	v1 = Surface_Node_Set[Surface_Triangle_Set[i].Nodes[0]].get_value(DP_Set,Val_Id);
@@ -2547,8 +2321,6 @@ void Surface_Class::interpolate_all_values(int Algorithm_Type, int Data_Point_Se
 				interpolate_one_value_one_step(V,&Interpolate_Process_Flag,Data_Point_Set_Ptr);
 			}
 
-//            ShowMessage("interpolation steps="+IntToStr(ss));
-
 		} // res > 0
 
 	} // "diffusion" interpolation
@@ -2765,7 +2537,7 @@ int Surface_Class::generate_square_sample(TProgress_Form *Progress_Form,
 
 	// top row
 	if( i-1>=0 && j+1<Square_Height ) Surface_Node_Set[n].Neighbors.push_back(Pointer[i-1][j+1]);
-    if( j+1<Square_Height )     Surface_Node_Set[n].Neighbors.push_back(Pointer[i][j+1]);
+	if( j+1<Square_Height )     Surface_Node_Set[n].Neighbors.push_back(Pointer[i][j+1]);
     if( i+1<Square_Width && j+1<Square_Height ) Surface_Node_Set[n].Neighbors.push_back(Pointer[i+1][j+1]);
 
 
@@ -2806,8 +2578,6 @@ int Surface_Class::generate_square_sample(TProgress_Form *Progress_Form,
 	Map_Values.set_current_value_according_to_name(SEGMENTATION_VALUE_NAME);
 
 	initialize_surface(Progress_Form);
-
-//	center_geometry_and_data_points();
 
 	return OK_RESULT;
 }
@@ -2987,19 +2757,6 @@ double Surface_Class::get_path_length(long Node_1,long Node_2)
 
 void Surface_Class::initiate_propagation(int Region_Code,long Seed_Node_Ptr)
 {
-/*
-	if( STUDY.is_current_surface_in_range() )
-	if( STUDY.Surfaces_List[STUDY.Current_Surface].Pointed_Triangle >= 0 )
-	{
-
-	STUDY.Surfaces_List[STUDY.Current_Surface].initiate_propagation(
-		Segments_Info.get_segment_id(LV_ANTERIOR_SEGMENT_NAME),
-		STUDY.Surfaces_List[STUDY.Current_Surface].Surface_Triangle_Set[
-			STUDY.Surfaces_List[STUDY.Current_Surface].Pointed_Triangle].Nodes[0]);
-
-	repaint_3D_panels();
-	}
-*/
 	if( Seed_Node_Ptr >= 0 &&
 		Seed_Node_Ptr < Surface_Node_Set.size() )
 	{
@@ -3039,18 +2796,6 @@ void Surface_Class::initiate_propagation(int Region_Code,long Seed_Node_Ptr)
 //---------------------------------------------------------------------------
 void Surface_Class::propagate_region_one_step(int Region_Code)
 {
-/*
-	if( STUDY.is_current_surface_in_range() )
-	if( STUDY.Surfaces_List[STUDY.Current_Surface].Pointed_Triangle >= 0 )
-	{
-
-	STUDY.Surfaces_List[STUDY.Current_Surface].propagate_region_one_step(
-		Segments_Info.get_segment_id(LV_ANTERIOR_SEGMENT_NAME) );
-
-	repaint_3D_panels();
-	}
-*/
-
 	//--------------------------------------------------------
 	// main propagation
 	//--------------------------------------------------------
@@ -3227,12 +2972,6 @@ void Surface_Class::downsample_mesh(AnsiString AppPath, double Ratio,TProgress_F
 	//------------------------------
 	AnsiString quote = "\"";
 	AnsiString Command = "cmd /C " + quote + " " + quote + AppPath + "simplify_mesh.exe" + " " + quote + " " + quote + CurrentDir +"\\simplify_mesh_tmp.txt" + quote + " " + quote + CurrentDir +"\\simplify_mesh_result_tmp.txt"+ quote + " " + FloatToStr(Ratio) + quote;
-/*
-ShowMessage(Command);
-ofstream dd("command.txt");
-dd << Command.c_str();
-dd.close();
-*/
 	system( (Command).c_str() );
 
 	//------------------------------
@@ -3301,125 +3040,6 @@ dd.close();
 
 	}
 
-/*           this version of code uses app directory for temp mesh files
-
-//	AnsiString CurrentDir = GetCurrentDir();
-//	SetCurrentDir(AppPath);
-
-	// update progress form
-	Progress_Form->add_text("Max geo nodes number exceeded, simplifying mesh...");
-	Progress_Form->Show();
-	Application->ProcessMessages();
-
-	//------------------------------
-	// 1. save geo to obj file
-	//------------------------------
-	ofstream df( (AppPath+"simplify_mesh_tmp.txt").c_str());
-//	ofstream df( (CurrentDir+"\\simplify_mesh_tmp.txt").c_str());
-
-	if( !df.is_open() )
-	ShowMessage("cant create mesh geo file (surface.cpp)");
-
-	long Old_N_Number = Surface_Node_Set.size();
-
-	for(long n=0;n<(signed)Surface_Node_Set.size();n++)
-	{
-		df <<"v ";
-		df << Surface_Node_Set[n].x << " ";
-		df << Surface_Node_Set[n].y << " ";
-		df << Surface_Node_Set[n].z << " ";
-		df << endl;
-	}
-
-	for(long n=0;n<(signed)Surface_Triangle_Set.size();n++)
-	{
-		df <<"f ";
-		df << Surface_Triangle_Set[n].Nodes[0]+1 << " ";
-		df << Surface_Triangle_Set[n].Nodes[1]+1 << " ";
-		df << Surface_Triangle_Set[n].Nodes[2]+1 << " ";
-		df << endl;
-	}
-	df.close();
-
-	//------------------------------
-	// 2. run simplify .exe
-	//------------------------------
-	AnsiString quote = "\"";
-//	AnsiString Command = "cmd /C " + quote + quote + AppPath + "simplify_mesh.exe" + quote + " " + quote + CurrentDir+"\\simplify_mesh_tmp.txt" + quote + " " + quote + CurrentDir+"\\simplify_mesh_result_tmp.txt"+ quote + " " + FloatToStr(Ratio) + " > " + quote + CurrentDir+"\\simplify.out.txt" + quote + quote;
-	AnsiString Command = "cmd /C " + quote + quote + AppPath + "simplify_mesh.exe" + " " + quote + AppPath +"\\simplify_mesh_tmp.txt" + quote + " " + quote + AppPath +"\\simplify_mesh_result_tmp.txt"+ quote + " " + FloatToStr(Ratio) + quote;
-
-	system( (Command).c_str() );
-
-	//------------------------------
-	// 3. load mesh
-	//------------------------------
-	FILE* fn;
-	if ((fn = fopen((AppPath+"simplify_mesh_result_tmp.txt").c_str(), "rb")) == NULL)
-//	if ((fn = fopen((CurrentDir+"\\simplify_mesh_result_tmp.txt").c_str(), "rb")) == NULL)
-	{
-		ShowMessage( "Output file mesh decimation not found! (surface.cpp)");
-	}
-	else
-	{
-
-	Surface_Node_Set.clear();
-	Surface_Triangle_Set.clear();
-	Geometry_Vertex N;
-	Geometry_Triangle T;
-	T.Segment_Id = -1;
-	char line[1000];
-	memset ( line,0,1000 );
-	long n1,n2,n3;
-
-	while(fgets( line, 1000, fn ) != NULL)
-	{
-			if ( line[0] == 'v' )
-			{
-				if ( line[1] == ' ' )
-				if(sscanf(line,"v %lf %lf %lf",
-					&N.x,&N.y,&N.z)==3)
-				{
-					Surface_Node_Set.push_back(N);
-				}
-			}
-
-			if ( line[0] == 'f' )
-			{
-				if(sscanf(line,"f %d %d %d",&n1,&n2,&n3)==3)
-				{
-					T.Nodes[0] = n1-1;
-					T.Nodes[1] = n2-1;
-					T.Nodes[2] = n3-1;
-					Surface_Triangle_Set.push_back(T);
-				}
-			}
-	}
-	fclose(fn);
-
-	long New_N_Number = Surface_Node_Set.size();
-
-	for(long i=0;i<(signed)Surface_Node_Set.size();i++)
-	{
-		Surface_Node_Set[i].Original_x = Surface_Node_Set[i].x;
-		Surface_Node_Set[i].Original_y = Surface_Node_Set[i].y;
-		Surface_Node_Set[i].Original_z = Surface_Node_Set[i].z;
-	}
-
-	// update progress form
-	Progress_Form->add_text("Geometry nodes number decreased from " + FloatToStr(Old_N_Number) + " to " + FloatToStr(New_N_Number) + "...");
-	Progress_Form->Show();
-	Application->ProcessMessages();
-
-	// Update neigs and triangles neigs
-	find_neig_nodes_and_neig_triangles();
-	smooth_map_geometry(); // !!!!!!!!!!!!!!!!!!!!!
-	calculate_normals();
-
-//	SetCurrentDir(CurrentDir);
-
-	}
-*/
-
 }
 
 //---------------------------------------------------------------------------
@@ -3459,11 +3079,9 @@ double Surface_Class::get_volume()
 	my = (ry0 + ry1 + ry2)/3.0;
 	mz = (rz0 + rz1 + rz2)/3.0;
 
-//    dv = Surface_Triangle_Set[i].Direction*
-	dv = 1*
-						(mx*Surface_Triangle_Set[i].tmp_vec[0] +
-						 my*Surface_Triangle_Set[i].tmp_vec[1] +
-						 mz*Surface_Triangle_Set[i].tmp_vec[2] )/3.0;
+	dv = (mx*Surface_Triangle_Set[i].tmp_vec[0] +
+		  my*Surface_Triangle_Set[i].tmp_vec[1] +
+		mz*Surface_Triangle_Set[i].tmp_vec[2] )/3.0;
 
 	Volume = Volume + dv;
 
@@ -3567,44 +3185,6 @@ void Surface_Class::rescale_geometry_to_reach_specified_volume(double Target_Vol
 		Surface_Node_Set[n].z *= Target_scaling_factor;
 	}
 
-/*
-
-	double Best_Fit=-1,Min_Volume_Diff=100000000;
-	for(double Scaling_Factor=0.995;Scaling_Factor<1.005;Scaling_Factor+=0.0001)
-	{
-		for(unsigned long n=0;n<Surface_Node_Set.size();n++)
-		{
-			Surface_Node_Set[n].x *= Scaling_Factor;
-			Surface_Node_Set[n].y *= Scaling_Factor;
-			Surface_Node_Set[n].z *= Scaling_Factor;
-		}
-
-		Rescaled_Volume = get_volume();
-
-		if( fabs(Rescaled_Volume - Target_Volume) < Min_Volume_Diff )
-		{
-			Min_Volume_Diff = fabs(Rescaled_Volume - Target_Volume);
-			Best_Fit = Scaling_Factor;
-		}
-
-		// restore original coordinates
-		for(unsigned long n=0;n<Surface_Node_Set.size();n++)
-		{
-			Surface_Node_Set[n].x = Surface_Node_Set[n].tmpx;
-			Surface_Node_Set[n].y = Surface_Node_Set[n].tmpy;
-			Surface_Node_Set[n].z = Surface_Node_Set[n].tmpz;
-		}
-	}
-
-	// do final rescaling
-	for(unsigned long n=0;n<Surface_Node_Set.size();n++)
-	{
-		Surface_Node_Set[n].x *= Best_Fit;
-		Surface_Node_Set[n].y *= Best_Fit;
-		Surface_Node_Set[n].z *= Best_Fit;
-	}
-
-*/
 }
 
 //---------------------------------------------------------------------------
@@ -4565,20 +4145,6 @@ double Surface_Class::get_euclidean_distance_between_nodes(long n1, long n2)
 
 bool Surface_Class::node_values_valid(long Node_Ptr)
 {
-/*
-	bool Valid = false;
-
-	if( !Surface_Node_Set[Node_Ptr].Removed_Geometry_Vertex_Flag )
-	if( Surface_Node_Set[Node_Ptr].Closest_Data_Point_Id >= 0 )
-	if( data_points_set_ptr_in_range() )
-	if( Data_Point_Set[Current_Data_Point_Set_Ptr].Data_Points[
-		Surface_Node_Set[Node_Ptr].Closest_Data_Point_Id].
-					get_value(Map_Values.Current_Map_Value_Name,
-						Map_Values.get_values_table_ref()) != NOT_POSSIBLE_TO_CALCULATE_VALUE )
-	Valid = true;
-
-	return Valid;
-*/
 	int Value_Id = Map_Values.get_value_ptr(Map_Values.Current_Map_Value_Name);
 	bool Valid = false;
 
@@ -4594,20 +4160,6 @@ bool Surface_Class::node_values_valid(long Node_Ptr)
 
 bool Surface_Class::node_values_valid_specific_value(long Node_Ptr,long Val_Ptr)
 {
-/*
-	bool Valid = false;
-
-	if( !Surface_Node_Set[Node_Ptr].Removed_Geometry_Vertex_Flag )
-	if( Surface_Node_Set[Node_Ptr].Closest_Data_Point_Id >= 0 )
-	if( data_points_set_ptr_in_range() )
-	if( Data_Point_Set[Current_Data_Point_Set_Ptr].Data_Points[
-		Surface_Node_Set[Node_Ptr].Closest_Data_Point_Id].
-					get_value(Map_Values.get_value_name_according_to_ptr(Val_Ptr),
-						Map_Values.get_values_table_ref()) != NOT_POSSIBLE_TO_CALCULATE_VALUE )
-	Valid = true;
-
-	return Valid;
-*/
 	bool Valid = false;
 
 	if( data_points_set_ptr_in_range() )
