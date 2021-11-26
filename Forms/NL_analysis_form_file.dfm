@@ -915,7 +915,6 @@ object NL_Analysis_Form: TNL_Analysis_Form
         Margins.Bottom = 2
         Caption = 'Based on peaks'
         TabOrder = 1
-        OnClick = PercOcc_Rec_ButtonClick
       end
       object SPP_Edit: TEdit
         Left = 351
@@ -1182,7 +1181,6 @@ object NL_Analysis_Form: TNL_Analysis_Form
         Margins.Bottom = 2
         Caption = 'Recalculate'
         TabOrder = 4
-        OnClick = TPMPC_ButtonClick
       end
       object WS1_Edit: TEdit
         Left = 281
@@ -2000,7 +1998,6 @@ object NL_Analysis_Form: TNL_Analysis_Form
         Margins.Top = 2
         Margins.Right = 2
         Margins.Bottom = 2
-        OnMouseDown = Synchronization_Matrix_PaintBoxMouseDown
         OnPaint = Synchronization_Matrix_PaintBoxPaint
       end
       object Label51: TLabel
@@ -2067,7 +2064,6 @@ object NL_Analysis_Form: TNL_Analysis_Form
         Margins.Bottom = 2
         Caption = 'Calculate SYNCH table'
         TabOrder = 1
-        OnClick = Calculate_Synch_Table_ButtonClick
       end
       object Sych_Results_RichEdit: TRichEdit
         Left = 2
@@ -2527,7 +2523,6 @@ object NL_Analysis_Form: TNL_Analysis_Form
         Margins.Bottom = 2
         Caption = 'Calculate 1-1 recurrence (pair)'
         TabOrder = 3
-        OnClick = Recurrence_Pair_ButtonClick
       end
     end
     object TabSheet2: TTabSheet

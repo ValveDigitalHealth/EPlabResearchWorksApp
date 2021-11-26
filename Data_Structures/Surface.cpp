@@ -158,6 +158,125 @@ int Surface_Class::save_object_to_stream(ofstream* File,TProgress_Form *Progress
 	Utils.save_String_to_File(File, "Surface");
 
 	//-------------------------
+	int version = 10;
+	//-------------------------
+
+	File->write((char*)&version, sizeof (int));
+
+	Progress_Form->add_text("Saving values table...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Map_Values.save_object_to_stream(File);
+
+	Progress_Form->add_text("Saving surface nodes...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Items_Number = Surface_Node_Set.size();
+	File->write((char*)&Items_Number, sizeof (int));
+	for(long i=0;i<Items_Number;i++)
+	Surface_Node_Set[i].save_object_to_stream(File);
+
+	Progress_Form->add_text("Saving surface triangles...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Items_Number = Surface_Triangle_Set.size();
+	File->write((char*)&Items_Number, sizeof (int));
+	for(long i=0;i<Items_Number;i++)
+	Surface_Triangle_Set[i].save_object_to_stream(File);
+
+	Progress_Form->add_text("Saving data point sets...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Items_Number = Data_Point_Set.size();
+	File->write((char*)&Items_Number, sizeof (int));
+	for(long i=0;i<Items_Number;i++)
+	Data_Point_Set[i].save_object_to_stream(File);
+
+	PASO_IS_Point_Set.save_object_to_stream(File);
+	PASO_PM_Point_Set.save_object_to_stream(File);
+
+	Progress_Form->add_text("Saving auxiliary data...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Utils.save_String_to_File(File,Name);
+
+	File->write((char*)&Geometry_Type, sizeof (int));
+
+	File->write((char*)&Apex_Node_Ptr, sizeof (long));
+	File->write((char*)&Septal_Anterior_Node_Ptr, sizeof (long));
+	File->write((char*)&Septal_Lateral_Node_Ptr, sizeof (long));
+	File->write((char*)&Anterior_Lateral_Node_Ptr, sizeof (long));
+
+	File->write((char*)&Ap_SA_Intermediate, sizeof (long));
+	File->write((char*)&Ap_SL_Intermediate, sizeof (long));
+	File->write((char*)&Ap_AL_Intermediate, sizeof (long));
+
+	File->write((char*)&Ant_Intermediate, sizeof (long));
+	File->write((char*)&Sept_Intermediate, sizeof (long));
+	File->write((char*)&Lat_Intermediate, sizeof (long));
+
+	int Size = Ablation_Points_List.size();
+	File->write((char*)&Size, sizeof (int));
+	for(int i=0;i<Size;i++)
+	Ablation_Points_List[i].save_object_to_stream(File);
+
+	Size = Labels.size();
+	File->write((char*)&Size, sizeof (int));
+	for(int i=0;i<Size;i++)
+	Labels[i].save_object_to_stream(File);
+
+	File->write((char*)&Path_Start, sizeof (long));
+	File->write((char*)&Path_Intermediate, sizeof (long));
+	File->write((char*)&Path_End, sizeof (long));
+
+	Progress_Form->add_text("Saving images...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Images_Set.save_object_to_stream(File);
+
+	// 3 Points located on surface used for image registration
+	Registration_Point_A.save_object_to_stream(File);
+	Registration_Point_B.save_object_to_stream(File);
+	Registration_Point_C.save_object_to_stream(File);
+	File->write((char*)&Point_A_Located, sizeof (bool));
+	File->write((char*)&Point_B_Located, sizeof (bool));
+	File->write((char*)&Point_C_Located, sizeof (bool));
+	Registration_Point_A_normal.save_object_to_stream(File); // normals are used in displaying name
+	Registration_Point_B_normal.save_object_to_stream(File);
+	Registration_Point_C_normal.save_object_to_stream(File);
+
+	File->write((char*)&Mapping_System_Source, sizeof (int));
+
+	File->write((char*)&Translation_Vector_X, sizeof (double));
+	File->write((char*)&Translation_Vector_Y, sizeof (double));
+	File->write((char*)&Translation_Vector_Z, sizeof (double));
+
+	float tmp;
+	File->write((char*)&Connectivity_Matrix.X, sizeof (long));
+	File->write((char*)&Connectivity_Matrix.Y, sizeof (long));
+	for(long n1=0;n1<Connectivity_Matrix.X;n1++)
+	for(long n2=0;n2<Connectivity_Matrix.Y;n2++)
+	{
+		tmp = Connectivity_Matrix.get_value(n1,n2);
+		File->write((char*)&tmp, sizeof (float));
+	}
+
+	File->write((char*)&Data_Points_Filling_Threshold_mm, sizeof (double));
+
+	return 1;
+
+/*
+	int Items_Number;
+
+	Utils.save_String_to_File(File, "Surface");
+
+	//-------------------------
 	int version = 11;
 	//-------------------------
 
@@ -260,12 +379,14 @@ int Surface_Class::save_object_to_stream(ofstream* File,TProgress_Form *Progress
 	File->write((char*)&Data_Points_Filling_Threshold_mm, sizeof (double));
 
 	return 1;
+*/
 }
 
 //---------------------------------------------------------------------------
 
 int Surface_Class::load_object_from_stream(ifstream* File,TProgress_Form *Progress_Form)
 {
+/*
 	int Items_Number;
 	int version;
 
@@ -404,6 +525,1112 @@ int Surface_Class::load_object_from_stream(ifstream* File,TProgress_Form *Progre
 	} // v11
 
 	return -1;
+*/
+
+	int Items_Number;
+	int version;
+
+	AnsiString AS = Utils.load_String_from_File(File);
+	if( AS != "Surface" )
+	{
+		ShowMessage("Corrupted file - loading surface segment");
+		return -1;
+	}
+
+	File->read((char*)&version, sizeof (int));
+
+	if( version == 10 )
+	{
+
+	Progress_Form->add_text("Loading values table...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+	Map_Values.load_object_from_stream(File);
+
+	Progress_Form->add_text("Loading surface nodes...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Node_Set.clear();
+	Geometry_Vertex Node_item;
+	Surface_Node_Set.assign(Items_Number,Node_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Node_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface nodes loaded.");
+
+	Progress_Form->add_text("Loading triangles set...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Triangle_Set.clear();
+	Geometry_Triangle Triangle_item;
+	Surface_Triangle_Set.assign(Items_Number,Triangle_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Triangle_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface triangles loaded.");
+
+	Progress_Form->add_text("Loading data points sets...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Data_Point_Set.clear();
+	Data_Point_Set_Class Data_Point_Set_Class_item;
+	Data_Point_Set.assign(Items_Number,Data_Point_Set_Class_item);
+	for(long i=0;i<Items_Number;i++)
+	Data_Point_Set[i].load_object_from_stream(File);
+
+	Progress_Form->add_text(IntToStr(Items_Number) + " data point sets loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	PASO_IS_Point_Set.load_object_from_stream(File);
+	PASO_PM_Point_Set.load_object_from_stream(File);
+
+	Progress_Form->add_text("Loading auxiliary data...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Name= Utils.load_String_from_File(File);
+
+	File->read((char*)&Geometry_Type, sizeof (int));
+
+	File->read((char*)&Apex_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Anterior_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Lateral_Node_Ptr, sizeof (long));
+
+	File->read((char*)&Anterior_Lateral_Node_Ptr, sizeof (long));
+
+	File->read((char*)&Ap_SA_Intermediate, sizeof (long));
+	File->read((char*)&Ap_SL_Intermediate, sizeof (long));
+	File->read((char*)&Ap_AL_Intermediate, sizeof (long));
+
+	File->read((char*)&Ant_Intermediate, sizeof (long));
+	File->read((char*)&Sept_Intermediate, sizeof (long));
+	File->read((char*)&Lat_Intermediate, sizeof (long));
+
+	int Size;
+
+	File->read((char*)&Size, sizeof (int));
+	Ablation_Points_List.clear();
+	Ablation_Point_Class Ablation_Point_Class_Item;
+	Ablation_Points_List.assign(Size,Ablation_Point_Class_Item);
+	for(int i=0;i<Size;i++)
+	Ablation_Points_List[i].load_object_from_stream(File);
+
+	File->read((char*)&Size, sizeof (int));
+	Labels.clear();
+	Label_Class Label_Class_Item;
+	Labels.assign(Size,Label_Class_Item);
+	for(int i=0;i<Size;i++)
+	Labels[i].load_object_from_stream(File);
+
+	File->read((char*)&Path_Start, sizeof (long));
+	File->read((char*)&Path_Intermediate, sizeof (long));
+	File->read((char*)&Path_End, sizeof (long));
+
+	Progress_Form->add_text("Auxiliary data loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Progress_Form->add_text("Loading images...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Images_Set.load_object_from_stream(File);
+
+	// 3 Points located on surface used for image registration
+	Registration_Point_A.load_object_from_stream(File);
+	Registration_Point_B.load_object_from_stream(File);
+	Registration_Point_C.load_object_from_stream(File);
+	File->read((char*)&Point_A_Located, sizeof (bool));
+	File->read((char*)&Point_B_Located, sizeof (bool));
+	File->read((char*)&Point_C_Located, sizeof (bool));
+	Registration_Point_A_normal.load_object_from_stream(File); // normals are used in displaying name
+	Registration_Point_B_normal.load_object_from_stream(File);
+	Registration_Point_C_normal.load_object_from_stream(File);
+
+	File->read((char*)&Mapping_System_Source, sizeof (int));
+
+	File->read((char*)&Translation_Vector_X, sizeof (double));
+	File->read((char*)&Translation_Vector_Y, sizeof (double));
+	File->read((char*)&Translation_Vector_Z, sizeof (double));
+
+	long X,Y;
+	float tmp;
+	File->read((char*)&X, sizeof (long));
+	File->read((char*)&Y, sizeof (long));
+	Connectivity_Matrix.create_matrix(X,Y);
+	for(long n1=0;n1<X;n1++)
+	for(long n2=0;n2<Y;n2++)
+	{
+		File->read((char*)&tmp, sizeof (float));
+		Connectivity_Matrix.set_value(n1,n2,tmp);
+	}
+
+	File->read((char*)&Data_Points_Filling_Threshold_mm, sizeof (double));
+
+	return 1;
+
+	} // v10
+
+
+	if( version == 9 )
+	{
+
+	Progress_Form->add_text("Loading values table...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+	Map_Values.load_object_from_stream(File);
+
+	Progress_Form->add_text("Loading surface nodes...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Node_Set.clear();
+	Geometry_Vertex Node_item;
+	Surface_Node_Set.assign(Items_Number,Node_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Node_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface nodes loaded.");
+
+	Progress_Form->add_text("Loading triangles set...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Triangle_Set.clear();
+	Geometry_Triangle Triangle_item;
+	Surface_Triangle_Set.assign(Items_Number,Triangle_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Triangle_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface triangles loaded.");
+
+	Progress_Form->add_text("Loading data points sets...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Data_Point_Set.clear();
+	Data_Point_Set_Class Data_Point_Set_Class_item;
+	Data_Point_Set.assign(Items_Number,Data_Point_Set_Class_item);
+	for(long i=0;i<Items_Number;i++)
+	Data_Point_Set[i].load_object_from_stream(File);
+
+	Progress_Form->add_text(IntToStr(Items_Number) + " data point sets loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	PASO_IS_Point_Set.load_object_from_stream(File);
+	PASO_PM_Point_Set.load_object_from_stream(File);
+
+	Progress_Form->add_text("Loading auxiliary data...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Name= Utils.load_String_from_File(File);
+
+	File->read((char*)&Geometry_Type, sizeof (int));
+
+	File->read((char*)&Apex_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Anterior_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Lateral_Node_Ptr, sizeof (long));
+
+	File->read((char*)&Anterior_Lateral_Node_Ptr, sizeof (long));
+
+	File->read((char*)&Ap_SA_Intermediate, sizeof (long));
+	File->read((char*)&Ap_SL_Intermediate, sizeof (long));
+	File->read((char*)&Ap_AL_Intermediate, sizeof (long));
+
+	File->read((char*)&Ant_Intermediate, sizeof (long));
+	File->read((char*)&Sept_Intermediate, sizeof (long));
+	File->read((char*)&Lat_Intermediate, sizeof (long));
+
+	int Size;
+
+	File->read((char*)&Size, sizeof (int));
+	Ablation_Points_List.clear();
+	Ablation_Point_Class Ablation_Point_Class_Item;
+	Ablation_Points_List.assign(Size,Ablation_Point_Class_Item);
+	for(int i=0;i<Size;i++)
+	Ablation_Points_List[i].load_object_from_stream(File);
+
+	File->read((char*)&Size, sizeof (int));
+	Labels.clear();
+	Label_Class Label_Class_Item;
+	Labels.assign(Size,Label_Class_Item);
+	for(int i=0;i<Size;i++)
+	Labels[i].load_object_from_stream(File);
+
+	File->read((char*)&Path_Start, sizeof (long));
+	File->read((char*)&Path_Intermediate, sizeof (long));
+	File->read((char*)&Path_End, sizeof (long));
+
+	Progress_Form->add_text("Auxiliary data loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Progress_Form->add_text("Loading images...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Images_Set.load_object_from_stream(File);
+
+	// 3 Points located on surface used for image registration
+	Registration_Point_A.load_object_from_stream(File);
+	Registration_Point_B.load_object_from_stream(File);
+	Registration_Point_C.load_object_from_stream(File);
+	File->read((char*)&Point_A_Located, sizeof (bool));
+	File->read((char*)&Point_B_Located, sizeof (bool));
+	File->read((char*)&Point_C_Located, sizeof (bool));
+	Registration_Point_A_normal.load_object_from_stream(File); // normals are used in displaying name
+	Registration_Point_B_normal.load_object_from_stream(File);
+	Registration_Point_C_normal.load_object_from_stream(File);
+
+	File->read((char*)&Mapping_System_Source, sizeof (int));
+
+	File->read((char*)&Translation_Vector_X, sizeof (double));
+	File->read((char*)&Translation_Vector_Y, sizeof (double));
+	File->read((char*)&Translation_Vector_Z, sizeof (double));
+
+	long X,Y;
+	float tmp;
+	File->read((char*)&X, sizeof (long));
+	File->read((char*)&Y, sizeof (long));
+	Connectivity_Matrix.create_matrix(X,Y);
+	for(long n1=0;n1<X;n1++)
+	for(long n2=0;n2<Y;n2++)
+	{
+		File->read((char*)&tmp, sizeof (float));
+		Connectivity_Matrix.set_value(n1,n2,tmp);
+	}
+
+	return 1;
+
+	} // v9
+
+	if( version == 8 )
+	{
+
+	Progress_Form->add_text("Loading values table...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+	Map_Values.load_object_from_stream(File);
+
+	Progress_Form->add_text("Loading surface nodes...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Node_Set.clear();
+	Geometry_Vertex Node_item;
+	Surface_Node_Set.assign(Items_Number,Node_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Node_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface nodes loaded.");
+
+	Progress_Form->add_text("Loading triangles set...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Triangle_Set.clear();
+	Geometry_Triangle Triangle_item;
+	Surface_Triangle_Set.assign(Items_Number,Triangle_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Triangle_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface triangles loaded.");
+
+	Progress_Form->add_text("Loading data points sets...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Data_Point_Set.clear();
+	Data_Point_Set_Class Data_Point_Set_Class_item;
+	Data_Point_Set.assign(Items_Number,Data_Point_Set_Class_item);
+	for(long i=0;i<Items_Number;i++)
+	Data_Point_Set[i].load_object_from_stream(File);
+
+	Progress_Form->add_text(IntToStr(Items_Number) + " data point sets loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	PASO_IS_Point_Set.load_object_from_stream(File);
+	PASO_PM_Point_Set.load_object_from_stream(File);
+
+	Progress_Form->add_text("Loading auxiliary data...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Name= Utils.load_String_from_File(File);
+
+	File->read((char*)&Geometry_Type, sizeof (int));
+
+	File->read((char*)&Apex_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Anterior_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Lateral_Node_Ptr, sizeof (long));
+
+	File->read((char*)&Anterior_Lateral_Node_Ptr, sizeof (long));
+
+	File->read((char*)&Ap_SA_Intermediate, sizeof (long));
+	File->read((char*)&Ap_SL_Intermediate, sizeof (long));
+	File->read((char*)&Ap_AL_Intermediate, sizeof (long));
+
+	File->read((char*)&Ant_Intermediate, sizeof (long));
+	File->read((char*)&Sept_Intermediate, sizeof (long));
+	File->read((char*)&Lat_Intermediate, sizeof (long));
+
+	int Size;
+
+	File->read((char*)&Size, sizeof (int));
+	Ablation_Points_List.clear();
+	Ablation_Point_Class Ablation_Point_Class_Item;
+	Ablation_Points_List.assign(Size,Ablation_Point_Class_Item);
+	for(int i=0;i<Size;i++)
+	Ablation_Points_List[i].load_object_from_stream(File);
+
+	File->read((char*)&Size, sizeof (int));
+	Labels.clear();
+	Label_Class Label_Class_Item;
+	Labels.assign(Size,Label_Class_Item);
+	for(int i=0;i<Size;i++)
+	Labels[i].load_object_from_stream(File);
+
+	File->read((char*)&Path_Start, sizeof (long));
+	File->read((char*)&Path_Intermediate, sizeof (long));
+	File->read((char*)&Path_End, sizeof (long));
+
+	Progress_Form->add_text("Auxiliary data loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Progress_Form->add_text("Loading images...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Images_Set.load_object_from_stream(File);
+
+	// 3 Points located on surface used for image registration
+	Registration_Point_A.load_object_from_stream(File);
+	Registration_Point_B.load_object_from_stream(File);
+	Registration_Point_C.load_object_from_stream(File);
+	File->read((char*)&Point_A_Located, sizeof (bool));
+	File->read((char*)&Point_B_Located, sizeof (bool));
+	File->read((char*)&Point_C_Located, sizeof (bool));
+	Registration_Point_A_normal.load_object_from_stream(File); // normals are used in displaying name
+	Registration_Point_B_normal.load_object_from_stream(File);
+	Registration_Point_C_normal.load_object_from_stream(File);
+
+	File->read((char*)&Mapping_System_Source, sizeof (int));
+
+	File->read((char*)&Translation_Vector_X, sizeof (double));
+	File->read((char*)&Translation_Vector_Y, sizeof (double));
+	File->read((char*)&Translation_Vector_Z, sizeof (double));
+
+	return 1;
+
+	} // v8
+
+	if( version == 7 )
+	{
+
+	Progress_Form->add_text("Loading values table...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+	Map_Values.load_object_from_stream(File);
+
+	Progress_Form->add_text("Loading surface nodes...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Node_Set.clear();
+	Geometry_Vertex Node_item;
+	Surface_Node_Set.assign(Items_Number,Node_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Node_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface nodes loaded.");
+
+	Progress_Form->add_text("Loading triangles set...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Triangle_Set.clear();
+	Geometry_Triangle Triangle_item;
+	Surface_Triangle_Set.assign(Items_Number,Triangle_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Triangle_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface triangles loaded.");
+
+	Progress_Form->add_text("Loading data points sets...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Data_Point_Set.clear();
+	Data_Point_Set_Class Data_Point_Set_Class_item;
+	Data_Point_Set.assign(Items_Number,Data_Point_Set_Class_item);
+	for(long i=0;i<Items_Number;i++)
+	Data_Point_Set[i].load_object_from_stream(File);
+
+	Progress_Form->add_text(IntToStr(Items_Number) + " data point sets loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	PASO_IS_Point_Set.load_object_from_stream(File);
+	PASO_PM_Point_Set.load_object_from_stream(File);
+
+	Progress_Form->add_text("Loading auxiliary data...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Name= Utils.load_String_from_File(File);
+
+	File->read((char*)&Geometry_Type, sizeof (int));
+
+	File->read((char*)&Apex_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Anterior_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Lateral_Node_Ptr, sizeof (long));
+	File->read((char*)&Anterior_Lateral_Node_Ptr, sizeof (long));
+
+	File->read((char*)&Ap_SA_Intermediate, sizeof (long));
+	File->read((char*)&Ap_SL_Intermediate, sizeof (long));
+	File->read((char*)&Ap_AL_Intermediate, sizeof (long));
+
+	File->read((char*)&Ant_Intermediate, sizeof (long));
+	File->read((char*)&Sept_Intermediate, sizeof (long));
+	File->read((char*)&Lat_Intermediate, sizeof (long));
+
+	int Size;
+
+	File->read((char*)&Size, sizeof (int));
+	Ablation_Points_List.clear();
+	Ablation_Point_Class Ablation_Point_Class_Item;
+	Ablation_Points_List.assign(Size,Ablation_Point_Class_Item);
+	for(int i=0;i<Size;i++)
+	Ablation_Points_List[i].load_object_from_stream(File);
+
+	File->read((char*)&Size, sizeof (int));
+	Labels.clear();
+	Label_Class Label_Class_Item;
+	Labels.assign(Size,Label_Class_Item);
+	for(int i=0;i<Size;i++)
+	Labels[i].load_object_from_stream(File);
+
+	File->read((char*)&Path_Start, sizeof (long));
+	File->read((char*)&Path_Intermediate, sizeof (long));
+	File->read((char*)&Path_End, sizeof (long));
+
+	Progress_Form->add_text("Auxiliary data loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Progress_Form->add_text("Loading images...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Images_Set.load_object_from_stream(File);
+
+	// 3 Points located on surface used for image registration
+	Registration_Point_A.load_object_from_stream(File);
+	Registration_Point_B.load_object_from_stream(File);
+	Registration_Point_C.load_object_from_stream(File);
+	File->read((char*)&Point_A_Located, sizeof (bool));
+	File->read((char*)&Point_B_Located, sizeof (bool));
+	File->read((char*)&Point_C_Located, sizeof (bool));
+	Registration_Point_A_normal.load_object_from_stream(File); // normals are used in displaying name
+	Registration_Point_B_normal.load_object_from_stream(File);
+	Registration_Point_C_normal.load_object_from_stream(File);
+
+	File->read((char*)&Mapping_System_Source, sizeof (int));
+
+	return 1;
+
+	} // v7
+
+	if( version == 6 )
+	{
+
+	Progress_Form->add_text("Loading values table...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+	Map_Values.load_object_from_stream(File);
+
+	Progress_Form->add_text("Loading surface nodes...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Node_Set.clear();
+	Geometry_Vertex Node_item;
+	Surface_Node_Set.assign(Items_Number,Node_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Node_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface nodes loaded.");
+
+	Progress_Form->add_text("Loading triangles set...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Triangle_Set.clear();
+	Geometry_Triangle Triangle_item;
+	Surface_Triangle_Set.assign(Items_Number,Triangle_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Triangle_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface triangles loaded.");
+
+	Progress_Form->add_text("Loading data points sets...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Data_Point_Set.clear();
+	Data_Point_Set_Class Data_Point_Set_Class_item;
+	Data_Point_Set.assign(Items_Number,Data_Point_Set_Class_item);
+	for(long i=0;i<Items_Number;i++)
+	Data_Point_Set[i].load_object_from_stream(File);
+
+	Progress_Form->add_text(IntToStr(Items_Number) + " data point sets loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	PASO_IS_Point_Set.load_object_from_stream(File);
+	PASO_PM_Point_Set.load_object_from_stream(File);
+
+	Progress_Form->add_text("Loading auxiliary data...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Name= Utils.load_String_from_File(File);
+
+	File->read((char*)&Geometry_Type, sizeof (int));
+
+	File->read((char*)&Apex_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Anterior_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Lateral_Node_Ptr, sizeof (long));
+	File->read((char*)&Anterior_Lateral_Node_Ptr, sizeof (long));
+
+	File->read((char*)&Ap_SA_Intermediate, sizeof (long));
+	File->read((char*)&Ap_SL_Intermediate, sizeof (long));
+	File->read((char*)&Ap_AL_Intermediate, sizeof (long));
+
+	File->read((char*)&Ant_Intermediate, sizeof (long));
+	File->read((char*)&Sept_Intermediate, sizeof (long));
+	File->read((char*)&Lat_Intermediate, sizeof (long));
+
+	int Size;
+
+	File->read((char*)&Size, sizeof (int));
+	Ablation_Points_List.clear();
+	Ablation_Point_Class Ablation_Point_Class_Item;
+	Ablation_Points_List.assign(Size,Ablation_Point_Class_Item);
+	for(int i=0;i<Size;i++)
+	Ablation_Points_List[i].load_object_from_stream(File);
+
+	File->read((char*)&Size, sizeof (int));
+	Labels.clear();
+	Label_Class Label_Class_Item;
+	Labels.assign(Size,Label_Class_Item);
+	for(int i=0;i<Size;i++)
+	Labels[i].load_object_from_stream(File);
+
+	File->read((char*)&Path_Start, sizeof (long));
+	File->read((char*)&Path_Intermediate, sizeof (long));
+	File->read((char*)&Path_End, sizeof (long));
+
+	Progress_Form->add_text("Auxiliary data loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Progress_Form->add_text("Loading images...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Images_Set.load_object_from_stream(File);
+
+	// 3 Points located on surface used for image registration
+	Registration_Point_A.load_object_from_stream(File);
+	Registration_Point_B.load_object_from_stream(File);
+	Registration_Point_C.load_object_from_stream(File);
+	File->read((char*)&Point_A_Located, sizeof (bool));
+	File->read((char*)&Point_B_Located, sizeof (bool));
+	File->read((char*)&Point_C_Located, sizeof (bool));
+	Registration_Point_A_normal.load_object_from_stream(File); // normals are used in displaying name
+	Registration_Point_B_normal.load_object_from_stream(File);
+	Registration_Point_C_normal.load_object_from_stream(File);
+
+	return 1;
+
+	} // v6
+
+	if( version == 5 )
+	{
+
+	Progress_Form->add_text("Loading values table...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+	Map_Values.load_object_from_stream(File);
+
+	Progress_Form->add_text("Loading surface nodes...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Node_Set.clear();
+	Geometry_Vertex Node_item;
+	Surface_Node_Set.assign(Items_Number,Node_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Node_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface nodes loaded.");
+
+	Progress_Form->add_text("Loading triangles set...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Triangle_Set.clear();
+	Geometry_Triangle Triangle_item;
+	Surface_Triangle_Set.assign(Items_Number,Triangle_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Triangle_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface triangles loaded.");
+
+	Progress_Form->add_text("Loading data points sets...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Data_Point_Set.clear();
+	Data_Point_Set_Class Data_Point_Set_Class_item;
+	Data_Point_Set.assign(Items_Number,Data_Point_Set_Class_item);
+	for(long i=0;i<Items_Number;i++)
+	Data_Point_Set[i].load_object_from_stream(File);
+
+	Progress_Form->add_text(IntToStr(Items_Number) + " data point sets loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	PASO_IS_Point_Set.load_object_from_stream(File);
+	PASO_PM_Point_Set.load_object_from_stream(File);
+
+	Progress_Form->add_text("Loading auxiliary data...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Name= Utils.load_String_from_File(File);
+
+	File->read((char*)&Geometry_Type, sizeof (int));
+
+	File->read((char*)&Apex_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Anterior_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Lateral_Node_Ptr, sizeof (long));
+	File->read((char*)&Anterior_Lateral_Node_Ptr, sizeof (long));
+
+	File->read((char*)&Ap_SA_Intermediate, sizeof (long));
+	File->read((char*)&Ap_SL_Intermediate, sizeof (long));
+	File->read((char*)&Ap_AL_Intermediate, sizeof (long));
+
+	File->read((char*)&Ant_Intermediate, sizeof (long));
+	File->read((char*)&Sept_Intermediate, sizeof (long));
+	File->read((char*)&Lat_Intermediate, sizeof (long));
+
+	int Size;
+	File->read((char*)&Size, sizeof (int));
+	Ablation_Points_List.clear();
+	Ablation_Point_Class Ablation_Point_Class_Item;
+	Ablation_Points_List.assign(Size,Ablation_Point_Class_Item);
+	for(int i=0;i<Size;i++)
+	Ablation_Points_List[i].load_object_from_stream(File);
+
+	File->read((char*)&Path_Start, sizeof (long));
+	File->read((char*)&Path_Intermediate, sizeof (long));
+	File->read((char*)&Path_End, sizeof (long));
+
+	Progress_Form->add_text("Auxiliary data loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Progress_Form->add_text("Loading images...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Images_Set.load_object_from_stream(File);
+
+	// 3 Points located on surface used for image registration
+	Registration_Point_A.load_object_from_stream(File);
+	Registration_Point_B.load_object_from_stream(File);
+	Registration_Point_C.load_object_from_stream(File);
+	File->read((char*)&Point_A_Located, sizeof (bool));
+	File->read((char*)&Point_B_Located, sizeof (bool));
+	File->read((char*)&Point_C_Located, sizeof (bool));
+	Registration_Point_A_normal.load_object_from_stream(File); // normals are used in displaying name
+	Registration_Point_B_normal.load_object_from_stream(File);
+	Registration_Point_C_normal.load_object_from_stream(File);
+
+	return 1;
+
+	} // v5
+
+	if( version == 4 )
+	{
+
+	Progress_Form->add_text("Loading values table...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+	Map_Values.load_object_from_stream(File);
+
+	Progress_Form->add_text("Loading surface nodes...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Node_Set.clear();
+	Geometry_Vertex Node_item;
+	Surface_Node_Set.assign(Items_Number,Node_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Node_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface nodes loaded.");
+
+	Progress_Form->add_text("Loading triangles set...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Triangle_Set.clear();
+	Geometry_Triangle Triangle_item;
+	Surface_Triangle_Set.assign(Items_Number,Triangle_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Triangle_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface triangles loaded.");
+
+	Progress_Form->add_text("Loading data points sets...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Data_Point_Set.clear();
+	Data_Point_Set_Class Data_Point_Set_Class_item;
+	Data_Point_Set.assign(Items_Number,Data_Point_Set_Class_item);
+	for(long i=0;i<Items_Number;i++)
+	Data_Point_Set[i].load_object_from_stream(File);
+
+	Progress_Form->add_text(IntToStr(Items_Number) + " data point sets loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	PASO_IS_Point_Set.load_object_from_stream(File);
+	PASO_PM_Point_Set.load_object_from_stream(File);
+
+	Progress_Form->add_text("Loading auxiliary data...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Name= Utils.load_String_from_File(File);
+
+	File->read((char*)&Geometry_Type, sizeof (int));
+
+	File->read((char*)&Apex_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Anterior_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Lateral_Node_Ptr, sizeof (long));
+	File->read((char*)&Anterior_Lateral_Node_Ptr, sizeof (long));
+
+	File->read((char*)&Ap_SA_Intermediate, sizeof (long));
+	File->read((char*)&Ap_SL_Intermediate, sizeof (long));
+	File->read((char*)&Ap_AL_Intermediate, sizeof (long));
+
+	File->read((char*)&Ant_Intermediate, sizeof (long));
+	File->read((char*)&Sept_Intermediate, sizeof (long));
+	File->read((char*)&Lat_Intermediate, sizeof (long));
+
+	int Size;
+	File->read((char*)&Size, sizeof (int));
+	Ablation_Points_List.clear();
+	Ablation_Point_Class Ablation_Point_Class_Item;
+	Ablation_Points_List.assign(Size,Ablation_Point_Class_Item);
+	for(int i=0;i<Size;i++)
+	Ablation_Points_List[i].load_object_from_stream(File);
+
+	File->read((char*)&Path_Start, sizeof (long));
+	File->read((char*)&Path_Intermediate, sizeof (long));
+	File->read((char*)&Path_End, sizeof (long));
+
+	Progress_Form->add_text("Auxiliary data loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Progress_Form->add_text("Loading images...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Images_Set.load_object_from_stream(File);
+
+	return 1;
+
+	} // v4
+
+	if( version == 3 )
+	{
+
+	Progress_Form->add_text("Loading values table...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+	Map_Values.load_object_from_stream(File);
+
+	Progress_Form->add_text("Loading surface nodes...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Node_Set.clear();
+	Geometry_Vertex Node_item;
+	Surface_Node_Set.assign(Items_Number,Node_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Node_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface nodes loaded.");
+
+	Progress_Form->add_text("Loading triangles set...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Triangle_Set.clear();
+	Geometry_Triangle Triangle_item;
+	Surface_Triangle_Set.assign(Items_Number,Triangle_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Triangle_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface triangles loaded.");
+
+	Progress_Form->add_text("Loading data points sets...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Data_Point_Set.clear();
+	Data_Point_Set_Class Data_Point_Set_Class_item;
+	Data_Point_Set.assign(Items_Number,Data_Point_Set_Class_item);
+	for(long i=0;i<Items_Number;i++)
+	Data_Point_Set[i].load_object_from_stream(File);
+
+	Progress_Form->add_text(IntToStr(Items_Number) + " data point sets loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	PASO_IS_Point_Set.load_object_from_stream(File);
+	PASO_PM_Point_Set.load_object_from_stream(File);
+
+	Progress_Form->add_text("Loading auxiliary data...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Name= Utils.load_String_from_File(File);
+
+	File->read((char*)&Geometry_Type, sizeof (int));
+
+	File->read((char*)&Apex_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Anterior_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Lateral_Node_Ptr, sizeof (long));
+	File->read((char*)&Anterior_Lateral_Node_Ptr, sizeof (long));
+
+	File->read((char*)&Ap_SA_Intermediate, sizeof (long));
+	File->read((char*)&Ap_SL_Intermediate, sizeof (long));
+	File->read((char*)&Ap_AL_Intermediate, sizeof (long));
+
+	File->read((char*)&Ant_Intermediate, sizeof (long));
+	File->read((char*)&Sept_Intermediate, sizeof (long));
+	File->read((char*)&Lat_Intermediate, sizeof (long));
+
+	int Size;
+	File->read((char*)&Size, sizeof (int));
+	Ablation_Points_List.clear();
+	Ablation_Point_Class Ablation_Point_Class_Item;
+	Ablation_Points_List.assign(Size,Ablation_Point_Class_Item);
+	for(int i=0;i<Size;i++)
+	Ablation_Points_List[i].load_object_from_stream(File);
+
+	File->read((char*)&Path_Start, sizeof (long));
+	File->read((char*)&Path_Intermediate, sizeof (long));
+	File->read((char*)&Path_End, sizeof (long));
+
+	Progress_Form->add_text("Auxiliary data loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	return 1;
+
+	} // v3
+
+	if( version == 2 )
+	{
+
+	Progress_Form->add_text("Loading values table...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+	Map_Values.load_object_from_stream(File);
+
+	Progress_Form->add_text("Loading surface nodes...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Node_Set.clear();
+	Geometry_Vertex Node_item;
+	Surface_Node_Set.assign(Items_Number,Node_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Node_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface nodes loaded.");
+
+	Progress_Form->add_text("Loading triangles set...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Triangle_Set.clear();
+	Geometry_Triangle Triangle_item;
+	Surface_Triangle_Set.assign(Items_Number,Triangle_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Triangle_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface triangles loaded.");
+
+	Progress_Form->add_text("Loading data points sets...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Data_Point_Set.clear();
+	Data_Point_Set_Class Data_Point_Set_Class_item;
+	Data_Point_Set.assign(Items_Number,Data_Point_Set_Class_item);
+	for(long i=0;i<Items_Number;i++)
+	Data_Point_Set[i].load_object_from_stream(File);
+
+	Progress_Form->add_text(IntToStr(Items_Number) + " data point sets loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Name= Utils.load_String_from_File(File);
+
+	File->read((char*)&Geometry_Type, sizeof (int));
+
+	File->read((char*)&Apex_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Anterior_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Lateral_Node_Ptr, sizeof (long));
+	File->read((char*)&Anterior_Lateral_Node_Ptr, sizeof (long));
+
+	File->read((char*)&Ap_SA_Intermediate, sizeof (long));
+	File->read((char*)&Ap_SL_Intermediate, sizeof (long));
+	File->read((char*)&Ap_AL_Intermediate, sizeof (long));
+
+	File->read((char*)&Ant_Intermediate, sizeof (long));
+	File->read((char*)&Sept_Intermediate, sizeof (long));
+	File->read((char*)&Lat_Intermediate, sizeof (long));
+
+	int Size;
+	File->read((char*)&Size, sizeof (int));
+	Ablation_Points_List.clear();
+	Ablation_Point_Class Ablation_Point_Class_Item;
+	Ablation_Points_List.assign(Size,Ablation_Point_Class_Item);
+	for(int i=0;i<Size;i++)
+	Ablation_Points_List[i].load_object_from_stream(File);
+
+	File->read((char*)&Path_Start, sizeof (long));
+	File->read((char*)&Path_Intermediate, sizeof (long));
+	File->read((char*)&Path_End, sizeof (long));
+
+	Progress_Form->add_text("Auxiliary data loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	return 1;
+
+	} // v2
+
+	if( version == 1 )
+	{
+
+	Progress_Form->add_text("Loading values table...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+	Map_Values.load_object_from_stream(File);
+
+	Progress_Form->add_text("Loading surface nodes...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Node_Set.clear();
+	Geometry_Vertex Node_item;
+	Surface_Node_Set.assign(Items_Number,Node_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Node_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface nodes loaded.");
+
+	Progress_Form->add_text("Loading triangles set...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Surface_Triangle_Set.clear();
+	Geometry_Triangle Triangle_item;
+	Surface_Triangle_Set.assign(Items_Number,Triangle_item);
+	for(long i=0;i<Items_Number;i++)
+	Surface_Triangle_Set[i].load_object_from_stream(File);
+	Progress_Form->add_text(IntToStr(Items_Number) + " surface triangles loaded.");
+
+	Progress_Form->add_text("Loading data points sets...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	File->read((char*)&Items_Number, sizeof (int));
+	Data_Point_Set.clear();
+	Data_Point_Set_Class Data_Point_Set_Class_item;
+	Data_Point_Set.assign(Items_Number,Data_Point_Set_Class_item);
+	for(long i=0;i<Items_Number;i++)
+	Data_Point_Set[i].load_object_from_stream(File);
+
+	Progress_Form->add_text(IntToStr(Items_Number) + " data point sets loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Name= Utils.load_String_from_File(File);
+
+	File->read((char*)&Geometry_Type, sizeof (int));
+
+	File->read((char*)&Apex_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Anterior_Node_Ptr, sizeof (long));
+	File->read((char*)&Septal_Lateral_Node_Ptr, sizeof (long));
+	File->read((char*)&Anterior_Lateral_Node_Ptr, sizeof (long));
+
+	File->read((char*)&Ap_SA_Intermediate, sizeof (long));
+	File->read((char*)&Ap_SL_Intermediate, sizeof (long));
+	File->read((char*)&Ap_AL_Intermediate, sizeof (long));
+
+	File->read((char*)&Ant_Intermediate, sizeof (long));
+	File->read((char*)&Sept_Intermediate, sizeof (long));
+	File->read((char*)&Lat_Intermediate, sizeof (long));
+
+	int Size;
+	File->read((char*)&Size, sizeof (int));
+	Ablation_Points_List.clear();
+	Ablation_Point_Class Ablation_Point_Class_Item;
+	Ablation_Points_List.assign(Size,Ablation_Point_Class_Item);
+	for(int i=0;i<Size;i++)
+	Ablation_Points_List[i].load_object_from_stream(File);
+
+	Progress_Form->add_text("Auxiliary data loaded.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	return 1;
+
+	} // v1
+
+	return -1;
+
 }
 //---------------------------------------------------------------------------
 
@@ -416,11 +1643,11 @@ int Surface_Class::load_object_from_stream(ifstream* File,TProgress_Form *Progre
 int Surface_Class::calculate_normals()
 {
 
-    //-------------------------------------------
+	//-------------------------------------------
 	// Calculate normals to the triangles
-    //-------------------------------------------
+	//-------------------------------------------
 	float normal[3];
-    float v1[3], v2[3];
+	float v1[3], v2[3];
 	double d,x1,y1,z1,x2,y2,z2,x3,y3,z3;
 	double Product_Sum=0;
 

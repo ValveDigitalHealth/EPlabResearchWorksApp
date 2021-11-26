@@ -134,6 +134,8 @@ class Geometry_Vertex
 		double coloured;
 		double tmp_val,tmpx,tmpy,tmpz;
 		float R,G,B;
+        std::vector<char> AVF1,AVF2,AVF3,AVF4;
+
 };
 
 #endif

@@ -83,6 +83,37 @@ int Geometry_Triangle::save_object_to_stream(ofstream* File)
 
 int Geometry_Triangle::load_object_from_stream(ifstream* File)
 {
+/*
+	int version;
+
+	File->read((char*)&version, sizeof (int));
+
+	if( version == 1 )
+	{
+
+	File->read((char*)&Nodes[0], sizeof (long));
+	File->read((char*)&Nodes[1], sizeof (long));
+	File->read((char*)&Nodes[2], sizeof (long));
+
+	File->read((char*)&normal[0], sizeof (float));
+	File->read((char*)&normal[1], sizeof (float));
+	File->read((char*)&normal[2], sizeof (float));
+
+	File->read((char*)&Direction, sizeof (double));
+
+	File->read((char*)&Removed_Flag, sizeof (int));
+
+	File->read((char*)&Segment_Id, sizeof (int));
+
+	File->read((char*)&GroupId, sizeof (int));
+	File->read((char*)&Area_cm2, sizeof (double));
+
+	return 1;
+	} // v1
+
+	return -1;
+*/
+
 	int version;
 
 	File->read((char*)&version, sizeof (int));
@@ -111,7 +142,7 @@ int Geometry_Triangle::load_object_from_stream(ifstream* File)
     } // v1
 
     return -1;
+
 }
 //---------------------------------------------------------------------------
-
 

@@ -426,6 +426,9 @@ class Surface_Class
 	void create_value_based_elevation_in_surface(int Data_Point_Set_Ptr,
 		AnsiString Value_Name,double Threshold, int Direction, double Height_mm);
 
+	// tmp/experimental stuff
+	Matrix_2D Connectivity_Matrix;
+
 };
 
 //---------------------------------------------------------------------------

@@ -279,6 +279,203 @@ int Geometry_Vertex::load_object_from_stream(ifstream* File)
 
 	} // v4
 
+	if( version == 3 )
+	{
+
+	File->read((char*)&x, sizeof (double));
+	File->read((char*)&y, sizeof (double));
+	File->read((char*)&z, sizeof (double));
+
+	File->read((char*)&Original_x, sizeof (double));
+	File->read((char*)&Original_y, sizeof (double));
+	File->read((char*)&Original_z, sizeof (double));
+
+    File->read((char*)&Removed_Geometry_Vertex_Flag, sizeof (bool));
+
+	File->read((char*)&normal[0], sizeof (float));
+	File->read((char*)&normal[1], sizeof (float));
+	File->read((char*)&normal[2], sizeof (float));
+
+    long NN=0,tmpL=0;
+
+	File->read((char*)&NN, sizeof (long));
+	Neighbors.assign(NN,tmpL);
+    for(long i=0;i<NN;i++)
+    File->read((char*)&Neighbors[i], sizeof (long));
+
+	File->read((char*)&NN, sizeof (long));
+	Neig_Triangles.assign(NN,tmpL);
+	for(long i=0;i<NN;i++)
+	File->read((char*)&Neig_Triangles[i], sizeof (long));
+
+	File->read((char*)&Type, sizeof (int));
+	File->read((char*)&Identifier, sizeof (int));
+	File->read((char*)&GroupId, sizeof (int));
+
+	File->read((char*)&Data_Point_Nearby, sizeof (bool));
+
+	int ds1,ds2;
+	double v;
+	File->read((char*)&ds1, sizeof (int));
+
+	for(int i=0;i<ds1;i++)
+	{
+		File->read((char*)&ds2, sizeof (int));
+
+
+		for(int j=0;j<ds2;j++)
+		{
+			File->read((char*)&v, sizeof (double));
+			set_value(i,j,v);
+		}
+	}
+
+	File->read((char*)&Closest_Data_Point_Id, sizeof (long));
+	File->read((char*)&Closest_Data_Point_Id_Unlimited, sizeof (long));
+
+	// Acutus
+	bool btmp=false;
+	long S;
+	File->read((char*)&S, sizeof (long));
+	AVF1.clear();
+	AVF1.assign(S,btmp);
+	for(long i=0;i<S;i++)
+	File->read((char*)&AVF1[i], sizeof (char));
+
+	File->read((char*)&S, sizeof (long));
+	AVF2.clear();
+	AVF2.assign(S,btmp);
+	for(long i=0;i<S;i++)
+	File->read((char*)&AVF2[i], sizeof (char));
+
+	File->read((char*)&S, sizeof (long));
+	AVF3.clear();
+	AVF3.assign(S,btmp);
+	for(long i=0;i<S;i++)
+	File->read((char*)&AVF3[i], sizeof (char));
+
+	File->read((char*)&S, sizeof (long));
+	AVF4.clear();
+	AVF4.assign(S,btmp);
+	for(long i=0;i<S;i++)
+	File->read((char*)&AVF4[i], sizeof (char));
+
+	return 1;
+
+	} // v3
+
+	if( version == 2 )
+	{
+
+	File->read((char*)&x, sizeof (double));
+	File->read((char*)&y, sizeof (double));
+	File->read((char*)&z, sizeof (double));
+
+	File->read((char*)&Original_x, sizeof (double));
+	File->read((char*)&Original_y, sizeof (double));
+	File->read((char*)&Original_z, sizeof (double));
+
+	File->read((char*)&Removed_Geometry_Vertex_Flag, sizeof (bool));
+
+	File->read((char*)&normal[0], sizeof (float));
+	File->read((char*)&normal[1], sizeof (float));
+	File->read((char*)&normal[2], sizeof (float));
+
+	long NN=0,tmpL=0;
+
+	File->read((char*)&NN, sizeof (long));
+	Neighbors.assign(NN,tmpL);
+	for(long i=0;i<NN;i++)
+	File->read((char*)&Neighbors[i], sizeof (long));
+
+	File->read((char*)&NN, sizeof (long));
+	Neig_Triangles.assign(NN,tmpL);
+	for(long i=0;i<NN;i++)
+	File->read((char*)&Neig_Triangles[i], sizeof (long));
+
+	File->read((char*)&Type, sizeof (int));
+	File->read((char*)&Identifier, sizeof (int));
+	File->read((char*)&GroupId, sizeof (int));
+
+	File->read((char*)&Data_Point_Nearby, sizeof (bool));
+
+	int ds1,ds2;
+	double v;
+	File->read((char*)&ds1, sizeof (int));
+
+	for(int i=0;i<ds1;i++)
+	{
+		File->read((char*)&ds2, sizeof (int));
+
+
+		for(int j=0;j<ds2;j++)
+		{
+			File->read((char*)&v, sizeof (double));
+			set_value(i,j,v);
+		}
+	}
+
+	File->read((char*)&Closest_Data_Point_Id, sizeof (long));
+	File->read((char*)&Closest_Data_Point_Id_Unlimited, sizeof (long));
+
+	return 1;
+
+	} // v2
+
+	if( version == 1 )
+	{
+
+	File->read((char*)&x, sizeof (double));
+	File->read((char*)&y, sizeof (double));
+	File->read((char*)&z, sizeof (double));
+
+	File->read((char*)&Original_x, sizeof (double));
+	File->read((char*)&Original_y, sizeof (double));
+	File->read((char*)&Original_z, sizeof (double));
+
+    File->read((char*)&Removed_Geometry_Vertex_Flag, sizeof (bool));
+
+	File->read((char*)&normal[0], sizeof (float));
+	File->read((char*)&normal[1], sizeof (float));
+	File->read((char*)&normal[2], sizeof (float));
+
+	long NN=0,tmpL=0;
+
+	File->read((char*)&NN, sizeof (long));
+	Neighbors.assign(NN,tmpL);
+    for(long i=0;i<NN;i++)
+    File->read((char*)&Neighbors[i], sizeof (long));
+
+	File->read((char*)&NN, sizeof (long));
+	Neig_Triangles.assign(NN,tmpL);
+	for(long i=0;i<NN;i++)
+	File->read((char*)&Neig_Triangles[i], sizeof (long));
+
+	File->read((char*)&Type, sizeof (int));
+	File->read((char*)&Identifier, sizeof (int));
+	File->read((char*)&GroupId, sizeof (int));
+
+	File->read((char*)&Data_Point_Nearby, sizeof (bool));
+
+	int ds1,ds2;
+	double v;
+	File->read((char*)&ds1, sizeof (int));
+
+	for(int i=0;i<ds1;i++)
+	{
+		File->read((char*)&ds2, sizeof (int));
+
+
+		for(int j=0;j<ds2;j++)
+		{
+			File->read((char*)&v, sizeof (double));
+			set_value(i,j,v);
+		}
+	}
+
+	return 1;
+
+	} // v1
 
     return -1;
 }

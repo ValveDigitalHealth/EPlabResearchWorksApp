@@ -58,7 +58,7 @@ int STUDY_Class::save_study(AnsiString StudyPathandName,TProgress_Form *Progress
 	//-------------------------------------------------------------
 	// save signature of the file
 	//-------------------------------------------------------------
-	double Signature = 5555.7777111; // signature of free-source version
+	double Signature = 5555.77771; // signature
 	Study_File.write((char*)&Signature, sizeof (double));
 
 	//-------------------------------------------------------------
@@ -180,7 +180,8 @@ int STUDY_Class::load_study(AnsiString StudyPathandName,TProgress_Form *Progress
 		Progress_Form->add_text("Loading surface " + IntToStr(i+1) + "/" + IntToStr(Items_Number));
 		Progress_Form->Show();
 		Application->ProcessMessages();
-		Surfaces_List[i].load_object_from_stream(&Study_File,Progress_Form);
+		if( Surfaces_List[i].load_object_from_stream(&Study_File,Progress_Form) < 0 )
+		Progress_Form->add_text("Surface version not supported - skipping.");
 	}
 
 	Comp_Module.load_object_from_stream(&Study_File);

@@ -188,11 +188,7 @@ AnsiString Data_IO_Class::import_NavX_DxL_folder(TFileListBox* Data_FileListBox,
 	Value_Description_Class Value_Desc;
 	Value_Desc.Type = VALUE_BASED_ON_DATA_POINTS; // based on data points
 	Value_Desc.Displayed_In_Table = true;
-/*
-	Value_Desc.Value_Name = "ref LAT";
-	Value_Desc.Unit = "ms";
-	Study->Surfaces_List[Study->Current_Surface].Map_Values.add_value(Value_Desc);
-*/
+
 	Value_Desc.Value_Name = "rov LAT";
 	Value_Desc.Unit = "ms";
 	Value_Desc.LAT_Value = true;
@@ -278,7 +274,6 @@ int Data_IO_Class::get_ABL_xyz_from_Locations_file(AnsiString FileNamePath,long 
 	// of this channel at specific time
 	// returns false if xyz not found
 
-	//qt, kosiuk
 	int Start_Pos=-1;
 	int Channel_Id = -1;
 	bool found;
@@ -424,7 +419,7 @@ vector <AnsiString> Data_IO_Class::get_list_of_geo_names_from_NavX_geo(AnsiStrin
 			dfile >>  string;
 			Volumes_Names.push_back((AnsiString)string);
         }
-    }
+	}
 
     if( Volumes_Names.size() > 0)
 	Load_Succesfull[0] = true;
@@ -456,8 +451,6 @@ AnsiString Data_IO_Class::load_navx_geo_file(AnsiString FileName,
 	// reading vertices
 	pugi::xml_node Vertices = it->child("Vertices");
 	long Nodes_Number = Vertices.attribute("number").as_int();
-//	for (pugi::xml_node child = Vertices.first_child(); child; child = Vertices.next_sibling())
-//	if (child.type() == pugi::node_pcdata)
 	pugi::xml_node Vchild = Vertices.first_child();
 
 		AS = (AnsiString)Vchild.value();
@@ -477,8 +470,6 @@ AnsiString Data_IO_Class::load_navx_geo_file(AnsiString FileName,
 			// To save from space at the end of string
 			temp = "";
 		}
-
-		int fd=34;
 
 	// reading triangles
 	pugi::xml_node Polygons = it->child("Polygons");
@@ -668,8 +659,6 @@ AnsiString Data_IO_Class::read_navx_velocity_data_file(AnsiString FileName,
 	if( Rows[i].Elements[0].Trim() == "pt number:")
 	Pt_Number_Pos = i;
 
-//********8
-
 	// Read rov trace name position
 	long Rov_Name_Pos=-1;
 	for(long i=0;i<80;i++)
@@ -699,8 +688,6 @@ AnsiString Data_IO_Class::read_navx_velocity_data_file(AnsiString FileName,
 	for(long i=0;i<80;i++)
 	if( S3_Name_Pos == -1 && Rows[i].Elements[0].Trim() == "S 3 trace:")
 	S3_Name_Pos = i;
-
-//********8
 
 	// rov signal pos
 	long Rov_Sig_Pos = -1;
@@ -743,8 +730,6 @@ AnsiString Data_IO_Class::read_navx_velocity_data_file(AnsiString FileName,
 	long S1_Signal_Lenght = (S2_Sig_Pos-2) - (S1_Sig_Pos+1) +1;
 	long S2_Signal_Lenght = (S3_Sig_Pos-2) - (S2_Sig_Pos+1) +1;
 	long S3_Signal_Lenght = (S3_Sig_Pos_End-1) - (S3_Sig_Pos+1) +1;
-
-//********
 
 	// find ref lat position
 	long Ref_LAT_Pos;
@@ -861,9 +846,6 @@ AnsiString Data_IO_Class::read_navx_velocity_data_file(AnsiString FileName,
 
 		if( Import_File_Version < 5 )
 		{
-//		D.set_value("ref LAT",Rows[Ref_LAT_Pos].Elements[i+1].Trim().ToDouble(),
-//				Study->Surfaces_List[Study->Current_Surface].Map_Values.get_values_table_ref());
-
 		D.set_value("rov LAT",Rows[Rov_LAT_Pos].Elements[i+1].Trim().ToDouble(),
 				Study->Surfaces_List[Study->Current_Surface].Map_Values.get_values_table_ref());
 		}
@@ -873,9 +855,6 @@ AnsiString Data_IO_Class::read_navx_velocity_data_file(AnsiString FileName,
 
 		v1 = Rows[Ref_LAT_Pos].Elements[i+1].Trim().ToDouble(); // in sec
 		v2 = Rows[Rov_LAT_Pos].Elements[i+1].Trim().ToDouble();
-
-//		D.set_value("ref LAT",0,
-//				Study->Surfaces_List[Study->Current_Surface].Map_Values.get_values_table_ref());
 
 		D.set_value("rov LAT",(v2-v1)*1000.0,
 				Study->Surfaces_List[Study->Current_Surface].Map_Values.get_values_table_ref());
@@ -1163,10 +1142,6 @@ AnsiString Data_IO_Class::import_single_CARTO_map(TFileListBox* Data_FileListBox
 	Study->Surfaces_List[Study->Current_Surface].Name = FileNameBase_For_Geometry;
 	Study->Surfaces_List[Study->Current_Surface].Mapping_System_Source = MAPPING_SYSTEM_ORIGIN_CARTO;
 
-//	for( int i=0; i < All_Files_Names.size(); i++ )
-//	if( Utils.is_substring_present( All_Files_Names[i],".mesh") )
-//	if( Utils.is_substring_present( All_Files_Names[i],FileNameBase_For_Geometry) )
-//	{
 		Study->Surfaces_List[Study->Current_Surface].Surface_Node_Set.clear();
 		Study->Surfaces_List[Study->Current_Surface].Surface_Triangle_Set.clear();
 
@@ -1188,14 +1163,12 @@ AnsiString Data_IO_Class::import_single_CARTO_map(TFileListBox* Data_FileListBox
 		df >> String; // =
 		df >> Nodes_Number;
 		Geometry_Vertex N1;
-//		Study->Surfaces_List[Study->Current_Surface].Surface_Node_Set.assign(TInt,N1);
 
 		while(  strcmp(String,"NumTriangle" ) && !df.eof() )
 			df >> String;
 		df >> String; // =
 		df >> Triangles_Number;
 		Geometry_Triangle T1;
-//		Study->Surfaces_List[Study->Current_Surface].Surface_Triangle_Set.assign(TInt,T1);
 
 		// read nodes
 		while(  strcmp(String,"[VerticesSection]" ) && !df.eof() )
@@ -1243,7 +1216,6 @@ AnsiString Data_IO_Class::import_single_CARTO_map(TFileListBox* Data_FileListBox
 		}
 
 		df.close();
-//	}
 
 	// --------------------------------------------------------------------
 	// --------------------------------------------------------------------
@@ -1353,7 +1325,7 @@ AnsiString Data_IO_Class::import_single_CARTO_map(TFileListBox* Data_FileListBox
 
    for(long d=0;d<Data_Points_No;d++)
    {
-// xxx QT
+
 	df.getline(Line,20000); // read line
 	std::istringstream istringstream_Line(Line); // cast to istringstream
 
@@ -1413,28 +1385,6 @@ AnsiString Data_IO_Class::import_single_CARTO_map(TFileListBox* Data_FileListBox
    istringstream_Line >> string;  // point type (defined in "predefined paramets.h" CARTO_TYPES)
    Study->Surfaces_List[Study->Current_Surface].Data_Point_Set[0].Data_Points[Dp_ptr].LabelId = atoi(string);
 
-   /* stuff below not used
-
-   df >> string;  // point label size
-   df >> string;  // point label
-   df >> string;  // label color
-   df >> string;  // T: catheter id
-   df >> string;  // U: not used
-
-   // read additions in v.5
-   if( Car_File_Version >= 5 )
-   {
-	   df >> string;  // V: Wavefront annotation LAT timing
-   }
-
-   // read additions in v.6
-   if( Car_File_Version >= 6 )
-   {
-	   df >> string;  // W: pattern matching v
-	   df >> string;  // X: pattern matching v
-	   df >> string;  // Y: pattern matching v
-   }
-*/
 
    Dp_ptr ++;
 
@@ -1711,9 +1661,7 @@ AnsiString Data_IO_Class::import_single_CARTO_map(TFileListBox* Data_FileListBox
 	Progress_Form->Show();
 	Application->ProcessMessages();
 
-//	AnsiString SitesFilePath = Data_FileListBox->Directory + "\\" + "VisiTagExport\\Sites.txt";
 	AnsiString SitesFilePath = Study->Study_Source_Path + "\\" + "VisiTagExport\\Sites.txt";
-
 
 	abl_df.open(SitesFilePath.c_str());
 
@@ -2120,7 +2068,6 @@ bool Data_IO_Class::export_geo_as_vtk_file(AnsiString FileName,Surface_Class *Su
 	for(long i=0;i<Surface->Surface_Triangle_Set.size();i++)
 	{
 		outputfile << "3 " << Surface->Surface_Triangle_Set[i].Nodes[0] << " " << Surface->Surface_Triangle_Set[i].Nodes[1] << " " << Surface->Surface_Triangle_Set[i].Nodes[2] << endl;
-//		outputfile << "3 " << Surface->Surface_Triangle_Set[i].Nodes[0]+1 << " " << Surface->Surface_Triangle_Set[i].Nodes[1] << " " << Surface->Surface_Triangle_Set[i].Nodes[2] << endl;
 	}
 
 	outputfile.close();
@@ -3056,7 +3003,6 @@ void Data_IO_Class::export_master_NavX_files_Geoff_v1(STUDY_Class *STUDY,
 		TProgress_Form *Progress_Form,AnsiString Path)
 {
    if( STUDY->is_current_surface_in_range() )
-//   if( STUDY->Surfaces_List[STUDY->Current_Surface].data_points_set_ptr_in_range() )
    {
 
    // assumption: it will be always dset=0, navx DxL folder always has just one data point set/map
@@ -3143,9 +3089,6 @@ void Data_IO_Class::export_master_NavX_files_Geoff_v1(STUDY_Class *STUDY,
 			df << STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
 				Data_Points[dp].get_value("rov LAT",
 				STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_values_table_ref()) << S.c_str();
-//			df << STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
-//				Data_Points[dp].get_value("ref LAT",
- //				STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_values_table_ref()) << S.c_str();
 
 			if(it==0)
 			for(long t=0;t<STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].

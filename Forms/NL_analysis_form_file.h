@@ -409,7 +409,6 @@ class TNL_Analysis_Form : public TForm
 	void __fastcall ImportcurrentdataserieYvalue1Click(TObject *Sender);
 	void __fastcall CLs_Labels_Display_CheckBoxClick(TObject *Sender);
 	void __fastcall IndexORTime_RadioGroupClick(TObject *Sender);
-	void __fastcall Calculate_Synch_Table_ButtonClick(TObject *Sender);
 	void __fastcall Synchronization_Matrix_PaintBoxPaint(TObject *Sender);
 
 	void __fastcall r_ceckboxClick(TObject *Sender);
@@ -418,8 +417,6 @@ class TNL_Analysis_Form : public TForm
 	void __fastcall Filter_All_Signals_ButtonClick(TObject *Sender);
 	void __fastcall Det_Peaks_Th_ButtonClick(TObject *Sender);
 	void __fastcall Disp_2nd_Signal_CheckBoxClick(TObject *Sender);
-	void __fastcall Synchronization_Matrix_PaintBoxMouseDown(TObject *Sender, TMouseButton Button,
-		  TShiftState Shift, int X, int Y);
 	void __fastcall Normalze_CheckBoxClick(TObject *Sender);
 	void __fastcall Hilb_Phase_CheckBoxClick(TObject *Sender);
 	void __fastcall P_Map_PaintBoxPaint(TObject *Sender);
@@ -435,7 +432,6 @@ class TNL_Analysis_Form : public TForm
 	void __fastcall Background_grid_CheckBoxClick(TObject *Sender);
 	void __fastcall Raw_Signals_ChartZoom(TObject *Sender);
 	void __fastcall Raw_Signals_ChartUndoZoom(TObject *Sender);
-	void __fastcall Recurrence_Pair_ButtonClick(TObject *Sender);
 	void __fastcall Signals_Display_PaintBoxPaint(TObject *Sender);
 	void __fastcall Signals_Display_PaintBoxMouseMove(TObject *Sender, TShiftState Shift,
           int X, int Y);
@@ -443,7 +439,6 @@ class TNL_Analysis_Form : public TForm
           TShiftState Shift, int X, int Y);
 	void __fastcall Signals_Display_PaintBoxMouseUp(TObject *Sender, TMouseButton Button,
           TShiftState Shift, int X, int Y);
-	void __fastcall PercOcc_Rec_ButtonClick(TObject *Sender);
 	void __fastcall MultiSCale_Recomp_ButtonClick(TObject *Sender);
 	void __fastcall TakeVwavetemplatemorphologycurrentsegment1Click(TObject *Sender);
 	void __fastcall Causality_ButtonClick(TObject *Sender);
@@ -456,7 +451,6 @@ class TNL_Analysis_Form : public TForm
 	void __fastcall MCP_CheckBoxClick(TObject *Sender);
 	void __fastcall Synch_Movie_Pause_ButtonClick(TObject *Sender);
 	void __fastcall Synch_Movie_Start_ButtonClick(TObject *Sender);
-	void __fastcall TPMPC_ButtonClick(TObject *Sender);
 	void __fastcall ExportintervalsSinRecompHilbofalldatapoints1Click(TObject *Sender);
 	void __fastcall CAR_ButtonClick(TObject *Sender);
 	void __fastcall Repaint_All_Signals_ButtonClick(TObject *Sender);

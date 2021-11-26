@@ -95,14 +95,6 @@ class Data_Point
 		return false;
 	}
 
-	// !!!!!!!!!! add to load/save
-	std::vector <int> Phase_Singularities_Present; // presence of PS in time
-
-	// SAVE IT !!!
-	// Used in Template Matching calcualtion
-	int Signal_Used_To_Activation_Detection;
-
-
 	bool is_data_point_value_valid(AnsiString Value_Name, vector <Value_Description_Class> *Values_List);
 
 	//------------------------------------------------------------------
@@ -157,6 +149,10 @@ class Data_Point
 	void calculate_values_in_data_point(std::vector <Value_Description_Class> *Values_List,
 			Computational_Module_Class *Comp_Module);
 
+	// !!!!!!!!!! add to load/save
+	std::vector <int> Phase_Singularities_Present; // presence of PS in time
+	int Signal_Used_To_Activation_Detection;
+
 	//-----------------------------------------------------------
 	// RUNTIME, TEMPORARY VARIABLES
 	//-----------------------------------------------------------
@@ -164,6 +160,8 @@ class Data_Point
 	int Segment_Id;
 	double tmp,tmp1,tmp2;
 	int Flag_A;
+    std::vector<long> Ring;
+
 };
 
 #endif

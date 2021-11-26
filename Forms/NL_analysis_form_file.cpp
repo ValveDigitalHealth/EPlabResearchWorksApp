@@ -278,40 +278,6 @@ void TNL_Analysis_Form::recalculate_current_tab()
 	double min2,max2,av2;
 	Numerical_Library_Obj.calculate_max_min_mean_vec_double(&Data_Vec1,&min1,&max1,&av1);
 	Numerical_Library_Obj.calculate_max_min_mean_vec_double(&Data_Vec2,&min2,&max2,&av2);
-/*
-	// compute volume of phase space
-	double Coarsening = Phase_Space_Resolution_Edit->Text.ToDouble();
-	long N = (max(max1,max2)-min(min1,min2))/Coarsening;  //=500;
-	Matrix_2D Phase_Space;
-
-	if( N > 5000 )
-	ShowMessage("Too big phase space! Increase coarsening. Calculations interrupted.");
-	else
-	if( N > 3 )
-	{
-
-	Phase_Space.create_matrix(N,N);
-
-	Numerical_Library_Obj.create_phase_space_from_2_signals(
-		&Data_Vec1,&Data_Vec2,0,Data_Vec1.size(),Coarsening,Phase_Space,N);
-
-	double Val;
-	Val = Numerical_Library_Obj.get_occupied_volume_of_phase_space_percentage(Phase_Space,N);
-	Volume_Label->Caption = "Perc Occupied= " + FloatToStrF(Val,ffGeneral,5,5);
-
-	Scatter_Chart->Series[0]->Clear();
-	Scatter_Chart->Series[1]->Clear();
-	Scatter_Chart->BottomAxis->Title->Caption = Data_Items[Selected_Data_Item_1]->Name;
-	Scatter_Chart->LeftAxis->Title->Caption = Data_Items[Selected_Data_Item_2]->Name;
-
-	for(long n1=0;n1<N;n1++)
-	for(long n2=0;n2<N;n2++)
-	if( Phase_Space[n1][n2] > 0)
-	Scatter_Chart->Series[0]->AddXY(Coarsening*(n1-N/2),Coarsening*(n2-N/2));
-
-	} // phase space size ok
-
-*/
 
 	} // corrtab open
 
@@ -508,32 +474,6 @@ void TNL_Analysis_Form::repaint_current_tab()
 		Signals_Display_PaintBoxPaint(this);
 	}
 
-/*
-	Av=0; Cnt=0;
-	for(long i=Data_Items[Selected_Data_Item]->Min_Ptr;
-		i<Data_Items[Selected_Data_Item]->Max_Ptr;i++)
-	{
-		Av+= Data_Items[Selected_Data_Item]->Voltage_Values[i];
-		Cnt++;
-	}
-
-	if(Av!=0) Av /= Cnt;
-
-	SD=0;
-	for(long i=Data_Items[Selected_Data_Item]->Min_Ptr;
-		i<Data_Items[Selected_Data_Item]->Max_Ptr;i++)
-	SD += std::pow(Data_Items[Selected_Data_Item]->Voltage_Values[i]-Av,2);
-
-	if(Cnt!=0)
-	SD = sqrt(SD/Cnt);
-
-	Stats_Label->Caption = "Average/SD:  "+ FloatToStrF(Av,ffGeneral,3,2 )+ " / "+FloatToStrF(SD,ffGeneral,3,2 );
-
-	L_Label->Caption = "Length [units]:  "+ IntToStr( (int)(
-			Data_Items[Selected_Data_Item]->Data_X[Data_Items[Selected_Data_Item]->Max_Ptr]-
-			Data_Items[Selected_Data_Item]->Data_X[Data_Items[Selected_Data_Item]->Min_Ptr] ));
-
-*/
 
 	} // if selected item in range
 }
@@ -602,15 +542,6 @@ void TNL_Analysis_Form::fill_wavelet_CL_plots()
 	ISI_RichEdit->Lines[0].Add("DF from ISI[Hz]= "+AnsiString::FloatToStrF(Data_Items[Selected_Data_Item_1]->DF_From_ISI,AnsiString::sffGeneral,3,2));
 	ISI_RichEdit->Lines[0].Add("DF from most freq. ISI[Hz]= "+AnsiString::FloatToStrF(Data_Items[Selected_Data_Item_1]->DF_From_Max_Freq_ISI,AnsiString::sffGeneral,3,2));
 
-/*
-	DWT_filtered_Chart->Title->Text->Clear();
-	DWT_filtered_Chart->Title->Text->Add(
-	 "DF from mean ISI= "+ FloatToStrF(Data_Items[Selected_Data_Item]->DF_From_ISI,AnsiString::sffGeneral,3,2)+
-	 "    DF from most freq. ISI= "+ FloatToStrF(Data_Items[Selected_Data_Item]->DF_From_Max_Freq_ISI,AnsiString::sffGeneral,3,2)+
-	 "    Min ISI= "+ FloatToStrF(Data_Items[Selected_Data_Item]->Min_ISI,AnsiString::sffGeneral,3,2)+
-	 "    Max ISI= " + FloatToStrF(Data_Items[Selected_Data_Item]->Max_ISI,AnsiString::sffGeneral,3,2)+
-	 "    Mean ISI= " + FloatToStrF(Data_Items[Selected_Data_Item]->Average_ISI,AnsiString::sffGeneral,3,2));
-*/
 	} // if in range
 
 }
@@ -760,26 +691,6 @@ void __fastcall TNL_Analysis_Form::Update_CORR_Table_ButtonClick(TObject *Sender
 
 	Numerical_Library_Obj.calculate_max_min_mean_vec_ranged(&Data_Vec1,0,Data_Vec1.size(),&min1,&max1,&av1,&SD);
 	Numerical_Library_Obj.calculate_max_min_mean_vec_ranged(&Data_Vec2,0,Data_Vec1.size(),&min2,&max2,&av2,&SD);
-/*
-	// compute volume of phase space
-	N = (max(max1,max2)-min(min1,min2))/Coarsening;  //=500;
-	Phase_Space = Numerical_Library_Obj.matrix_longs(N,N);
-
-	if( N > 5000 )
-	ShowMessage("Too big phase space! Increase coarsening. Calculations interrupted.");
-	else
-	if( N > 3 )
-	{
-
-	Numerical_Library_Obj.create_phase_space_from_2_signals(
-		&Data_Vec1,&Data_Vec2,0,Data_Vec1.size(),Coarsening,Phase_Space,N);
-
-	Correlation_Matrix[DI1][DI2] =
-			Numerical_Library_Obj.get_occupied_volume_of_phase_space_percentage(
-				Phase_Space,N);
-
-	} // phase space size ok
-*/
 
 	} // through all pairs of signals
 
@@ -795,16 +706,6 @@ void __fastcall TNL_Analysis_Form::Update_CORR_Table_ButtonClick(TObject *Sender
 		if(  Correlation_Matrix[DI1][DI2] < min ) min = Correlation_Matrix[DI1][DI2];
 		}
 	}
-/*
-	ofstream df("Corr_Table.csv");
-	for(long i=0;i<Correlation_Matrix_Size;i++)
-	{
-	for(long j=0;j<Correlation_Matrix_Size;j++)
-		df << Correlation_Matrix[i][j] << ",";
-	df << endl;
-	}
-	df.close();
-*/
 	Range_Label->Caption = "Values spread= "+FloatToStrF(max-min,ffGeneral,3,2 );
 	repaint_current_tab();
 }
@@ -866,57 +767,6 @@ void TNL_Analysis_Form::paint_R_matrix()
 
 void TNL_Analysis_Form::paint_Synchrogram_R_matrix()
 {
-/*
-	if( Data_Items.size() > 0 )
-	if( Synchrogram_Result_Matrix_Size > 0 )
-	if( Synchrogram_Result_Matrix_Size == Data_Items.size() )
-	{
-
-	  // draw result matrix
-	  double wx,c,max=0,min=1000000000;
-	  for(int  i=0; i<Synchrogram_Result_Matrix_Size; i++ )
-	  for(int  j=0; j<Synchrogram_Result_Matrix_Size; j++ )
-	  if (Synchrogram_Result_Matrix[i][j] != 0 )
-	  {
-		  if( max < Synchrogram_Result_Matrix[i][j] ) max = Synchrogram_Result_Matrix[i][j];
-		  if( min > Synchrogram_Result_Matrix[i][j] ) min = Synchrogram_Result_Matrix[i][j];
-	  }
-
-	  if (min==max) { min=0; max=1; }
-
-	  wx = (double)(Synchronization_Matrix_PaintBox->Width) / (double)(Data_Items.size());
-	  Synchronization_Matrix_PaintBox->Canvas->Brush->Color=clBlack;
-	  Synchronization_Matrix_PaintBox->Canvas->FillRect( Rect( 0, 0,
-		Synchronization_Matrix_PaintBox->Width,
-		Synchronization_Matrix_PaintBox->Height));
-
-	  for(int  i=0; i<Synchrogram_Result_Matrix_Size; i++ )
-	  for(int  j=0; j<Synchrogram_Result_Matrix_Size; j++ )
-	  {
-
-	  if( max-min != 0 )
-	  c = 255*(Synchrogram_Result_Matrix[i][j]-min)/(max-min);
-
-	  if( c > 255 ) c = 255;
-	  if( c< 0 ) c = 0;
-
-	  Synchronization_Matrix_PaintBox->Canvas->Brush->Color=(TColor)( RGB(c,c,c) );
-
-	  Synchronization_Matrix_PaintBox->Canvas->FillRect( Rect( i*wx, j*wx, (i+1)*wx, (j+1)*wx ));
-
-	  } // for
-
-	int set1 = Primary_Data_StringGrid->Row-1;
-	int set2 = Secondary_Data_StringGrid->Row;
-
-	int point_size=4;
-	Synchronization_Matrix_PaintBox->Canvas->Pen->Color=clRed;
-	Synchronization_Matrix_PaintBox->Canvas->FillRect( Rect(
-		(set1+0.5)*wx-point_size, (set2+0.5)*wx-point_size,
-		(set1+0.5)*wx+point_size, (set2+0.5)*wx+point_size ));
-
-	}
-*/
 }
 
 //---------------------------------------------------------------------------
@@ -1079,23 +929,22 @@ void __fastcall TNL_Analysis_Form::Raw_Signals_ChartMouseDown(TObject *Sender, T
 //---------------------------------------------------------------------------
 
 void __fastcall TNL_Analysis_Form::Raw_Signals_ChartMouseMove(TObject *Sender, TShiftState Shift,
-          int X, int Y)
+		  int X, int Y)
 {
 	if( Marker_Dragging_Flag == true && Dragged_Series == Raw_Signals_Chart->Series[1] )
 	// To prevent from sliding out of value range
 	if( Dragged_Series->XScreenToValue(X) < Raw_Signals_Chart->Series[0]->MaxXValue() )
 	if( Dragged_Series->XScreenToValue(X) > Raw_Signals_Chart->Series[0]->MinXValue() )
 	// To prevent from moving behind next marker
-    if( Dragged_Value_Index == Dragged_Series->Count()-1 ||
-        Dragged_Series->XScreenToValue(X) < Dragged_Series->XValue[Dragged_Value_Index+1] )
-    // To prevent from moving before previous marker
-    if( Dragged_Value_Index ==  0 ||
-        Dragged_Series->XScreenToValue(X) > Dragged_Series->XValue[Dragged_Value_Index-1] )
+	if( Dragged_Value_Index == Dragged_Series->Count()-1 ||
+		Dragged_Series->XScreenToValue(X) < Dragged_Series->XValue[Dragged_Value_Index+1] )
+	// To prevent from moving before previous marker
+	if( Dragged_Value_Index ==  0 ||
+		Dragged_Series->XScreenToValue(X) > Dragged_Series->XValue[Dragged_Value_Index-1] )
 	{
 
-    Dragged_Series->XValue[Dragged_Value_Index] = Dragged_Series->XScreenToValue(X);
-    update_Peak_Positions_in_Data_Vector();
-//    ISI_CWT_TabSheetShow(this);
+	Dragged_Series->XValue[Dragged_Value_Index] = Dragged_Series->XScreenToValue(X);
+	update_Peak_Positions_in_Data_Vector();
 
     }
 
@@ -1121,17 +970,6 @@ void __fastcall TNL_Analysis_Form::Addmarker1Click(TObject *Sender)
 {
 
     Raw_Signals_ChartDblClick(this);
-/*
-    if( Dragged_Series->XValue[Dragged_Value_Index]+30 < Raw_Signals_Chart->Series[0]->MaxXValue() )
-    {
-        Dragged_Series->AddXY(Dragged_Series->XValue[Dragged_Value_Index]+30,0.0 );
-        update_Peak_Positions_in_Data_Vector();
-//        ISI_CWT_TabSheetShow(this);
-//        Peak_Positions_Calcuated = true;
-    }
-	else
-	ShowMessage("Not enough signal left to put a new marker.");
-*/
 }
 //---------------------------------------------------------------------------
 
@@ -1141,9 +979,6 @@ void __fastcall TNL_Analysis_Form::Removemarker1Click(TObject *Sender)
 	{
 		Dragged_Series->Delete(Dragged_Value_Index);
 		update_Peak_Positions_in_Data_Vector();
-//        ISI_CWT_TabSheetShow(this);
-//        Peak_Positions_Calcuated = true;
-
 	}
 
 }
@@ -1237,7 +1072,7 @@ bool TNL_Analysis_Form::selected_data_items_in_range()
 
 void TNL_Analysis_Form::calculate_ISIs_from_wavelet_peaks(int Selected_Data_Item)
 {
-    if( Selected_Data_Item>=0 && Selected_Data_Item<Data_Items.size() )
+	if( Selected_Data_Item>=0 && Selected_Data_Item<Data_Items.size() )
 	if( Data_Items[Selected_Data_Item]->Peaks_Positions_In_Signal.size() > 1 )
 	{
 
@@ -1299,7 +1134,7 @@ void TNL_Analysis_Form::calculate_ISIs_from_wavelet_peaks(int Selected_Data_Item
 		Data_Items[Selected_Data_Item]->ISI_Histogram[k]=0;
 
 	for(long k=0;k<Data_Items[Selected_Data_Item]->ISIs.size();k++)
-    {
+	{
     long ptr = (Data_Items[Selected_Data_Item]->ISI_Histogram.size()-1)*
 	(Data_Items[Selected_Data_Item]->ISIs[k] - Data_Items[Selected_Data_Item]->Min_ISI)/
 	(Data_Items[Selected_Data_Item]->Max_ISI - Data_Items[Selected_Data_Item]->Min_ISI);
@@ -1326,57 +1161,6 @@ void __fastcall TNL_Analysis_Form::IndexORTime_RadioGroupClick(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TNL_Analysis_Form::Calculate_Synch_Table_ButtonClick(TObject *Sender)
-{
-/*
-	Synchrogram_Result_Matrix_Size = Data_Items.size();
-
-	for(long i=0;i<Synchrogram_Result_Matrix_Size;i++)
-	for(long j=0;j<Synchrogram_Result_Matrix_Size;j++)
-		Synchrogram_Result_Matrix[i][j]=1;
-
-	for(int DI1=0;DI1<Data_Items.size();DI1++)
-	for(int DI2=0;DI2<DI1;DI2++)
-	{
-
-	std::vector <double> Data_Vec1 = get_data_for_analysis(DI1);
-	std::vector <double> Data_Vec2 = get_data_for_analysis(DI2);
-
-	Synchrogram_Result_Matrix[DI1][DI2] = Numerical_Library_Obj.
-		get_phase_synchronization(&Data_Vec1,&Data_Vec2,1,1,true,0);
-
-	} // through all pairs of signals
-
-	double min=MAXDOUBLE,max=-MAXDOUBLE,mean=0,Counter=0;
-	for(int DI1=0;DI1<Synchrogram_Result_Matrix_Size;DI1++)
-	for(int DI2=0;DI2<DI1;DI2++)
-	{
-		Synchrogram_Result_Matrix[DI2][DI1]=Synchrogram_Result_Matrix[DI1][DI2];
-
-		if( DI1 != DI2 )
-		{
-		if(  Synchrogram_Result_Matrix[DI1][DI2] > max ) max = Synchrogram_Result_Matrix[DI1][DI2];
-		if(  Synchrogram_Result_Matrix[DI1][DI2] < min ) min = Synchrogram_Result_Matrix[DI1][DI2];
-
-		mean += Synchrogram_Result_Matrix[DI1][DI2];
-		Counter++;
-		}
-	}
-
-	Min_Synch = min;
-	Max_Synch = max;
-	if( Counter != 0 )
-		mean /= Counter;
-
-	Sych_Results_RichEdit->Lines[0].Clear();
-	Sych_Results_RichEdit->Lines[0].Add("min= "+FloatToStrF(min,ffGeneral,3,2)+"\n max= "+
-		FloatToStrF(max,ffGeneral,3,2)+"\n mean= "+FloatToStrF(mean,ffGeneral,3,2) );
-
-	paint_Synchrogram_R_matrix();
-
-*/
-}
-//---------------------------------------------------------------------------
 void __fastcall TNL_Analysis_Form::Synchronization_Matrix_PaintBoxPaint(TObject *Sender)
 {
 	paint_Synchrogram_R_matrix();
@@ -1723,35 +1507,6 @@ void __fastcall TNL_Analysis_Form::Disp_2nd_Signal_CheckBoxClick(TObject *Sender
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TNL_Analysis_Form::Synchronization_Matrix_PaintBoxMouseDown(TObject *Sender,
-		  TMouseButton Button, TShiftState Shift, int X, int Y)
-{
-/*
-	double wx;
-	if( Data_Items.size() != 0 )
-		wx = (double)(Synchronization_Matrix_PaintBox->Width)
-			/ (double)(Data_Items.size());
-	else
-		wx = 1;
-
-	int i_ptr = (double)X / wx;
-	int j_ptr = (double)Y / wx;
-
-
-	if( i_ptr >= 0 && i_ptr < Synchrogram_Result_Matrix_Size )
-	if( j_ptr >= 0 && j_ptr < Synchrogram_Result_Matrix_Size )
-	{
-
-	Secondary_Data_StringGrid->Row = j_ptr;
-	Primary_Data_StringGrid->Row = i_ptr+1;
-
-	recalculate_current_tab();
-	repaint_current_tab();
-
-	}
-*/
-}
-//---------------------------------------------------------------------------
 
 void __fastcall TNL_Analysis_Form::CorrTable_PaintBoxMouseDown(TObject *Sender, TMouseButton Button,
 		  TShiftState Shift, int X, int Y)
@@ -1817,7 +1572,6 @@ std::vector <double> TNL_Analysis_Form::get_data_for_analysis(int Set_Id)
 	if( Stop <= 0 || Stop >= Data_Items[Set_Id]->Voltage_Values.size() )
 		Stop = Data_Items[Set_Id]->Voltage_Values.size() - 1;
 
-// !!!!!!!!!!!!!!!!!!!!!!!!! 16.II.2018 - not sure how this will affect the program
 	Start = 1;
 	Stop = Data_Items[Set_Id]->Voltage_Values.size()-1;
 
@@ -1838,8 +1592,6 @@ std::vector <double> TNL_Analysis_Form::get_data_for_analysis(int Set_Id)
 	if( Data_Source_RadioGroup->ItemIndex == 3 )
 	for(long i=1;i<(signed)Data_Items[Set_Id]->ISIs.size();i++)
 	Result.push_back(Data_Items[Set_Id]->ISIs[i]);
-//	Result.push_back(Data_Items[Set_Id]->Peaks_Positions_In_Signal[i]-
-//					 Data_Items[Set_Id]->Peaks_Positions_In_Signal[i-1] );
 	}
 
 	return Result;
@@ -1947,14 +1699,6 @@ int TNL_Analysis_Form::calculate_FFT_spectrum(std::vector <double> *Data_Vec, lo
 		Signal_for_FFT_Size/((double)Stop - (double)Start);
 
 	//-----------------------------------------------------------------------
-	// Hanning windowing
-	//-----------------------------------------------------------------------
-/*
-	for(long k=0;k<Signal_for_FFT_Size;k++)
-		Signal_for_FFT[k] *= 0.54-0.46*cos(6.283185307*((double)k-1.0)/
-		((double)Signal_for_FFT_Size-2.0));
-*/
-	//-----------------------------------------------------------------------
 	// perform FFT // (old)
 	//-----------------------------------------------------------------------
 	// FFT object initialized here
@@ -2047,7 +1791,7 @@ int TNL_Analysis_Form::calculate_FFT_spectrum(std::vector <double> *Data_Vec, lo
 //---------------------------------------------------------------------------
 
 double TNL_Analysis_Form::get_FFT_longegral(double Start_Hz,double Stop_Hz,
-    double Coef,long FFT_Data_Length, double* FFT_Vector)
+	double Coef,long FFT_Data_Length, double* FFT_Vector)
 {
     double longegral = 0;
 
@@ -2096,8 +1840,6 @@ void TNL_Analysis_Form::paint_FFT_spectrum()
 
 		FFT_Spectrum_Chart->Series[0]->AddXY(Freq,v);
 	}
-
-//	FFT_Spectrum_Chart->Series[1]->AddXY(DF,Max_DF_Amplitude);
 
 	FFT_Results_RichEdit->Lines[0].Clear();
 	FFT_Results_RichEdit->Lines[0].Add("DF= "+FloatToStrF(DF,ffGeneral,3,2 ));
@@ -2316,45 +2058,6 @@ void __fastcall TNL_Analysis_Form::Raw_Signals_ChartUndoZoom(TObject *Sender)
 //---------------------------------------------------------------------------
 
 
-void __fastcall TNL_Analysis_Form::Recurrence_Pair_ButtonClick(TObject *Sender)
-{
-/*
-	// 1. Allocate diagram
-	Recurrence_Plot_PaintBox->Width = Recurrence_Plot_PaintBox->Height;
-	Recurrence_Diagram.allocate_diagram(Recurrence_Plot_PaintBox->Width);
-
-	Selected_Data_Item_1 = Primary_Data_StringGrid->Row-1;
-	Selected_Data_Item_2 = Secondary_Data_StringGrid->Row;
-
-	if( selected_data_items_in_range() )
-	{
-
-	std::vector <double> Data_Vec1 = get_data_for_analysis(Selected_Data_Item_1);
-	std::vector <double> Data_Vec2 = get_data_for_analysis(Selected_Data_Item_2);
-
-	// 2. Calculate diagram
-	double Threshold = Rec_11_Th_Edit->Text.ToDouble();
-	long Diag_Size = Recurrence_Diagram.get_diagram_size();
-	long ptr1,ptr2;
-
-	for(long t1=0;t1<Diag_Size;t1++)
-	for(long t2=0;t2<Diag_Size;t2++)
-	{
-		ptr1 = (double)t1*(double)Data_Vec1.size()/(double)Diag_Size;
-		ptr2 = (double)t2*(double)Data_Vec2.size()/(double)Diag_Size;
-
-		if( ptr1 > 0 && ptr1 < (signed)Data_Vec1.size() )
-		if( ptr2 > 0 && ptr2 < (signed)Data_Vec2.size() )
-			Recurrence_Diagram.Diagram_Values.set_value(t1,t2,
-				min( fabs(Data_Vec1[ptr1]-Data_Vec2[ptr2]),
-					2*M_PI-fabs(Data_Vec1[ptr1]-Data_Vec2[ptr2]))/M_PI);
-	}
-
-
-	}
-*/
-}
-//---------------------------------------------------------------------------
 
 void __fastcall TNL_Analysis_Form::Signals_Display_PaintBoxPaint(TObject *Sender)
 {
@@ -2371,28 +2074,6 @@ void __fastcall TNL_Analysis_Form::Signals_Display_PaintBoxPaint(TObject *Sender
 	// clear signals box
 	Signals_Window_PaintBox_Bitmap->Canvas->Brush->Color = (TColor)RGB(230,230,230);
 	Signals_Window_PaintBox_Bitmap->Canvas->FillRect(Signals_Display_PaintBox->ClientRect );
-/*
-	//-----------------------------
-	// ELECTRICAL SILENCE VECTOR (based on threshold, for Mario study)
-	//-----------------------------
-	Signals_Window_PaintBox_Bitmap->Canvas->Brush->Color=(TColor)( RGB(255,182,193) );
-	long EGM_Length = Data_Items[0]->Voltage_Values.size();
-
-	if( Silence_Vector.size() > 1 )
-	for(long j=0;j<Signals_Display_PaintBox->Width;j++)
-	{
-
-	ptr1 = Start+(double)j/(double)Signals_Display_PaintBox->Width*(Stop-Start);
-
-	if( ptr1 >= 0 && ptr1 <(signed)Silence_Vector.size() )
-	if( Silence_Vector[ptr1] == 0 )
-	{
-		x1 = j;
-		Signals_Window_PaintBox_Bitmap->Canvas->FillRect(
-			Rect( x1,0,x1+1,Signals_Display_PaintBox->Height ) );
-	}
-	}
-*/
 
 	//-----------------------------
 	// % of CL occupied
@@ -2499,45 +2180,6 @@ void __fastcall TNL_Analysis_Form::Signals_Display_PaintBoxPaint(TObject *Sender
 
 
 
-	//-------------------------------------
-	// CONDUCTION RIPPLES
-	//-------------------------------------
-/*
-	int BS = MS_Edit->Text.ToDouble();
-
-	for(long r=0;r<(signed)Conduction_Ripples.size();r++)
-	for(long p=0;p<(signed)Conduction_Ripples[r].Activation_Ids.size();p++)
-	{
-	long DP = Conduction_Ripples[r].Data_Point_Ids[p];
-	long act = Conduction_Ripples[r].Activation_Ids[p];
-
-	if( DP >= 0 && DP < (signed)Data_Items.size() )
-	if( act >= 0 && act < (signed)Data_Items[DP].Peaks_Positions_In_Signal.size() )
-	{
-
-	Vertical_Spacing = Signals_Display_PaintBox->Height*(double)(DP+1)/(double)(Data_Items.size()+1);
-
-	x1 = (Data_Items[DP].Peaks_Positions_In_Signal[act]-Start)/(Stop-Start)*
-			(double)Signals_Display_PaintBox->Width;
-	y1 = Vertical_Spacing;
-
-	// generate random color
-	double R = 255*((int)(100*(long)r)%3) / 2.0;
-	double G = 255*((int)(100*(long)r)%7) / 6.0;
-	double B = 255*((int)(100*(long)r)%5) / 4.0;
-
-	if( Black_Markers_CheckBox->State == cbChecked )
-	{
-		R = 10; G = 10; B = 10;
-	}
-
-	Signals_Window_PaintBox_Bitmap->Canvas->Brush->Color=(TColor)RGB(R,G,B);
-	// Signals_Window_PaintBox_Bitmap->Canvas->Brush->Color= clRed;
-
-	Signals_Window_PaintBox_Bitmap->Canvas->FillRect( Rect( x1-BS,y1-BS,x1+BS,y1+BS) );
-	}
-	}
-*/
 
 	Signals_Window_PaintBox_Bitmap->Canvas->Pen->Width = 1;
 	Signals_Display_PaintBox->Canvas->Draw(0, 0, Signals_Window_PaintBox_Bitmap);
@@ -2571,7 +2213,7 @@ void __fastcall TNL_Analysis_Form::Signals_Display_PaintBoxMouseMove(TObject *Se
 //---------------------------------------------------------------------------
 
 void __fastcall TNL_Analysis_Form::Signals_Display_PaintBoxMouseDown(TObject *Sender,
-          TMouseButton Button, TShiftState Shift, int X, int Y)
+		  TMouseButton Button, TShiftState Shift, int X, int Y)
 {
    MouseButton = Button;
    MouseStatus = MB_DOWN1;
@@ -2591,171 +2233,6 @@ void __fastcall TNL_Analysis_Form::Signals_Display_PaintBoxMouseUp(TObject *Send
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TNL_Analysis_Form::PercOcc_Rec_ButtonClick(TObject *Sender)
-{
-/*
-	double Block_size = 0.5*PercOcc_Block_Edit->Text.ToDouble()/Data_Items[0]->Time_Step_ms;
-	double Max_LAT_Difference = 100./Data_Items[0]->Time_Step_ms;
-	bool Max_LAT_Difference_Crossed;
-
-	Data_Source_RadioGroup->ItemIndex = 1;
-	Det_Peaks_Th_ButtonClick(this);
-
-	//-----------------------------------------------------------------
-	// 2. Calculate PIVOTING VECTOR
-	//-----------------------------------------------------------------
-	// starting from first point (DP=0) at the moment, later may need to change
-	int score,tmp,DP = 0,PP;
-	long min_diff,min_ptr,diff;
-	Pivoting_Scores.clear();
-	Pivoting_Events_Lengths.clear();
-	Pivoting_Events_Start.clear();
-	double Total_Length;
-	Conduction_Ripple RP;
-	Conduction_Ripples.clear();
-
-	// create masks (to know which activations were already visited)
-	bool flag=false;
-	for(long DP=0;DP<Data_Items.size();DP++)
-		Data_Items[DP].Peaks_Positions_In_Signal_Flags.assign(
-			Data_Items[DP].Peaks_Positions_In_Signal.size(),flag);
-
-	// MAIN FORS
-	for(long DP=0;DP<Data_Items.size();DP++)
-	for(long p=1;p<Data_Items[DP].Peaks_Positions_In_Signal.size()-1;p++)
-	if( !Data_Items[DP].Peaks_Positions_In_Signal_Flags[p] )
-	{
-
-	RP.clear();
-	// initial point
-	RP.Activation_Ids.push_back(p);
-	RP.Data_Point_Ids.push_back(DP);
-
-	score = 0;
-	Total_Length = 0;
-	Data_Items[DP].Peaks_Positions_In_Signal_Flags[p] = true; // visited
-
-	// go forward the catheter
-	PP=p;
-	Max_LAT_Difference_Crossed=false;
-	for(long i=DP;i<(signed)Data_Items.size()-1;i++)
-	if( !Max_LAT_Difference_Crossed )
-	{
-		// find peak position in next electrogram
-		min_diff=100000; min_ptr=-1;
-		for(long p2=0;p2<Data_Items[i+1].Peaks_Positions_In_Signal.size();p2++)
-		if( !Data_Items[i+1].Peaks_Positions_In_Signal_Flags[p2] )
-		{
-			diff = Data_Items[i+1].Peaks_Positions_In_Signal[p2]-
-				   Data_Items[i]->Peaks_Positions_In_Signal[PP];
-			if( fabs(diff) < fabs(min_diff) )
-			{
-				min_diff = diff;
-				min_ptr = p2;
-			}
-		}
-
-		PP = min_ptr;
-
-		if( fabs(min_diff) < Max_LAT_Difference )
-		{
-			Total_Length += min_diff;
-			if( min_diff > 0 )
-				score++;
-			if( min_diff < 0 )
-				score--;
-			Data_Items[i+1].Peaks_Positions_In_Signal_Flags[min_ptr] = true;//visited
-			RP.Activation_Ids.push_back(min_ptr);
-			RP.Data_Point_Ids.push_back(i+1);
-		}
-		else
-		Max_LAT_Difference_Crossed=true;
-
-	} // through all electrodes forward
-
-	// go backward the catheter
-	PP=p;
-	Max_LAT_Difference_Crossed=false;
-	for(long i=DP;i>0;i--)
-	if( !Max_LAT_Difference_Crossed )
-	{
-		// find peak position in next electrogram
-		min_diff=100000; min_ptr=-1;
-		for(long p2=0;p2<Data_Items[i-1].Peaks_Positions_In_Signal.size();p2++)
-		if( !Data_Items[i-1].Peaks_Positions_In_Signal_Flags[p2] )
-		{
-			diff = Data_Items[i]->Peaks_Positions_In_Signal[PP]-
-				   Data_Items[i-1].Peaks_Positions_In_Signal[p2];
-			if( fabs(diff) < fabs(min_diff) )
-			{
-				min_diff = diff;
-				min_ptr = p2;
-			}
-		}
-
-		PP = min_ptr;
-
-		if( fabs(min_diff) < Max_LAT_Difference )
-		{
-			Total_Length += min_diff;
-			if( min_diff > 0 )
-				score++;
-			if( min_diff < 0 )
-				score--;
-			Data_Items[i-1].Peaks_Positions_In_Signal_Flags[min_ptr] = true;//visited
-			RP.Activation_Ids.push_back(min_ptr);
-			RP.Data_Point_Ids.push_back(i-1);
-		}
-		else
-		Max_LAT_Difference_Crossed=true;
-
-	} // through all electrodes forward
-
-	Pivoting_Scores.push_back(fabs(score));
-	Pivoting_Events_Lengths.push_back(Data_Items[0]->Time_Step_ms*fabs(Total_Length));
-	Pivoting_Events_Start.push_back(Data_Items[0]->Time_Step_ms*Data_Items[DP].Peaks_Positions_In_Signal[p]);
-	Conduction_Ripples.push_back(RP);
-
-	} // for all peaks
-
-	//---------------------------------------------------------------
-	// 3. CALCULATE CONTINUOUS ACTIVITY FRACTION
-	//---------------------------------------------------------------
-	std::vector <double> Data_Vec = get_data_for_analysis(0);
-	std::vector <int> Occupancy_Vector;
-	double v=0;
-	Occupancy_Vector.assign(Data_Vec.size(),v);
-
-	for(long d=0;d<(signed)Data_Items.size();d++)
-	for(long p=0;p<(signed)Data_Items[d]->Peaks_Positions_In_Signal.size();p++)
-	for(long t2= Data_Items[d]->Peaks_Positions_In_Signal[p]-Block_size;
-			 t2<=Data_Items[d]->Peaks_Positions_In_Signal[p]+Block_size;t2++)
-	if( t2>=0 && t2 < (signed)Occupancy_Vector.size() )
-		Occupancy_Vector[t2]=1;
-
-	double SUM=0;
-	for(long t=0;t<Occupancy_Vector.size();t++)
-	if( Occupancy_Vector[t] == 1 )
-		SUM++;
-
-	if( Occupancy_Vector.size() != 0 )
-	SUM /= (double) Occupancy_Vector.size();
-
-	Continuous_Activity_Ratio = SUM;
-
-	if( Echo )
-	{
-	RichEdit_Form->RichEdit1->Clear();
-	RichEdit_Form->RichEdit1->Lines[0].Add( "Continuous_Activity_Ratio= "+FloatToStr(Continuous_Activity_Ratio)+"\n\n PIVOTING SCORES:" );
-	for(long p=0;p<Pivoting_Scores.size();p++)
-	RichEdit_Form->RichEdit1->Lines[0].Add( IntToStr((int)Pivoting_Scores[p]) );
-	RichEdit_Form->ShowModal();
-	}
-
-	Signals_Display_PaintBoxPaint(this);
-*/
-}
-//---------------------------------------------------------------------------
 
 
 void __fastcall TNL_Analysis_Form::MultiSCale_Recomp_ButtonClick(TObject *Sender)
@@ -2810,12 +2287,6 @@ void __fastcall TNL_Analysis_Form::MultiSCale_Recomp_ButtonClick(TObject *Sender
 	double a,b,F,RR;
 	Numerical_Library_Obj.fit_line_vertical_offsets_vec(
 		&Number_of_Phase_Transitions,&a, &b, &F, &RR);
-	/*
-	ofstream df("vvv.csv");
-	for(long i=0;i<Number_of_Phase_Transitions.size();i++)
-	df << Number_of_Phase_Transitions[i] << endl;
-	df.close();
-	*/
 
 	Direction_Coef_NPT = a;
 	SCM_Chart->Title->Caption = "Number of phase transitions (a= " +
@@ -2851,117 +2322,6 @@ void __fastcall TNL_Analysis_Form::TakeVwavetemplatemorphologycurrentsegment1Cli
 
 	Raw_Signals_Chart->UndoZoom();
 	Filtered_Signal_Chart->UndoZoom();
-
-//	Data_Items[0].
-
-/*                xxx
-	// Create similarity coef std::vector
-	double* Sim_Vector = new double[Data_Items[Selected_Data_Item_1]->Filtered_Signal.size() ];
-	for(long i=0;i<Data_Items[Selected_Data_Item_1]->Filtered_Signal.size();i++)
-	Sim_Vector[i] = 0;
-
-	// Calculate sim std::vector
-	for(long i=0;i<Data_Items[Selected_Data_Item_1]->Filtered_Signal.size();i++)
-	if( i-0.5*V_Wave_Size >= 0 )
-	if( i+0.5*V_Wave_Size < Data_Items[Selected_Data_Item_1]->Filtered_Signal.size() )
-	Sim_Vector[i] = std::pow(Numerical_Library_Obj.get_similarity_coefficient(
-		&Data_Items[Selected_Data_Item_1]->Filtered_Signal,V_Wave,
-		i-0.5*V_Wave_Size,i+0.5*V_Wave_Size,0,V_Wave_Size),2);
-
-	// find peaks in sim std::vector
-	std::vector <long> Peaks_Vector;
-	Peaks_Vector = Numerical_Library_Obj.calculate_peak_positions
-		(Sim_Vector,Data_Items[Selected_Data_Item_1]->Voltage_Values.size(),0.8);
-
-	// plot results
-	Wavelet_Spectrum_Chart->Series[1]->Clear();
-	Wavelet_Spectrum_Chart->Series[0]->Clear();
-
-	for(long i=0;i<Data_Items[Selected_Data_Item_1]->Voltage_Values.size();i++)
-	Wavelet_Spectrum_Chart->Series[0]->AddXY(i,Sim_Vector[i],"",clBlack);
-
-	ofstream df("sig Peaks std::vector.csv");
-	for(long i=0;i<Peaks_Vector_Size;i++)
-	df << Peaks_Vector[i] << endl;
-	df.close();
-
-	ofstream df2("sig sim_vector.csv");
-	for(long i=0;i<Data_Items[Selected_Data_Item_1]->Voltage_Values.size();i++)
-	df2 << Sim_Vector[i] << endl;
-	df2.close();
-
-//	Data_Items[Selected_Data_Item_1]->Wavelet_Spectrum
-//
-		// plot CWT line
-		Wavelet_Spectrum_Chart->Series[0]->Clear();
-		for(long k=1;k<Data_Items[Selected_Data_Item_1]->Wavelet_Spectrum.size();k++)
-		Wavelet_Spectrum_Chart->Series[0]->AddXY(k*Data_Items[Selected_Data_Item_1]->Time_Step_ms,
-			Data_Items[Selected_Data_Item_1]->Wavelet_Spectrum[k],"",clRed);
-
-		// plot markers
-		Wavelet_Spectrum_Chart->Series[1]->Clear();
-		for(long k=0;k<Data_Items[Selected_Data_Item_1]->Peaks_Positions_In_Signal.size();k++)
-		Wavelet_Spectrum_Chart->Series[1]->AddXY(
-			Data_Items[Selected_Data_Item_1]->Peaks_Positions_In_Signal[k]*
-			Data_Items[Selected_Data_Item_1]->Time_Step_ms,0);
-
-
-	for(long k=0;k<Peaks_Vector.size();k++)
-	Wavelet_Spectrum_Chart->Series[1]->AddXY(Peaks_Vector[k],Sim_Vector[Peaks_Vector[k]],"",clGreen);
-
-	Wavelet_Spectrum_Chart->Series[1]->Marks->Visible = true;
-
-//    Signal_PageControl->ActivePageIndex = 0;
-//    Analysis_PageControl->ActivePageIndex = 1;
-
-*/
-
-/*
-	// remove V waves
-	double y1,y2,x1,x2,a,v;
-	for(long k=0;k<Peaks_Vector_Size;k++)
-	if( Peaks_Vector[k]-0.5*V_Wave_Size >= 0 )
-	if( Peaks_Vector[k]+0.5*V_Wave_Size < Data_Items[Selected_Data_Item_1]->Data_X.size() )
-	for(long i=Peaks_Vector[k]-0.5*V_Wave_Size;i<Peaks_Vector[k]+0.5*V_Wave_Size;i++)
-    {
-
-    if( Filter_Options_Form1->longerpolate_V_Wave_Removal_CheckBox->State == cbChecked )
-	{
-    x1 = Peaks_Vector[k]-0.5*V_Wave_Size;
-    x2 = Peaks_Vector[k]+0.5*V_Wave_Size;
-	y1 = Data_Items[Selected_Data_Item_1]->Data_Vector[(long)x1];
-	y2 = Data_Items[Selected_Data_Item_1]->Data_Vector[(long)x2];
-
-    if(x2-x1 != 0 )
-    a = (y2-y1)/(x2-x1);
-    else
-    a = 0;
-
-    v = a*(i-x1)+y1;
-    }
-    else
-    v = 0.0;
-
-    Data_Items[Selected_Data_Item_1]->Data_Vector[i] = v;
-    Data_Items[Selected_Data_Item_1]->Filtered_Data_Vector[i] = v;
-    }
-*/
-/*
-	Raw_Signals_Chart->Series[0]->Clear();
-	Raw_Signals_Chart->UndoZoom();
-	for(long k=1;k<Data_Items[Selected_Data_Item_1]->Filtered_Data_Length;k++)
-		Raw_Signals_Chart->Series[0]->AddXY(k*Data_Items[Selected_Data_Item_1]->Time_Step_ms,
-			Data_Items[Selected_Data_Item_1]->Filtered_Data_Vector[k],"",clBlack);
-*/
-//    delete [] Peaks_Vector;
-
-/*
-	ShowMessage("Analysis done.");
-
-	}
-	else
-	ShowMessage("Select fragment of signal with V wave smaller than 2000 ms");
-*/
 
 }
 //---------------------------------------------------------------------------
@@ -3250,13 +2610,9 @@ void __fastcall TNL_Analysis_Form::PreprocessandreclaclMPC_ButtonClick(TObject *
 		NL_Analysis_Form->PD_Blanking_Edit->Text = "80";
 		NL_Analysis_Form->PDTW_Edit->Text = "500";
 		NL_Analysis_Form->Det_Peaks_Th_ButtonClick(this);
-		NL_Analysis_Form->PercOcc_Rec_ButtonClick(this);
 
 		NL_Analysis_Form->MPC_Threshold = 0.85;
 		NL_Analysis_Form->MPC_Recalc_ButtonClick(this);
-
-//		NL_Analysis_Form->Sinusoidal_Recomposition_CheckBox->State = cbUnchecked;
-//		NL_Analysis_Form->Hilb_Phase_CheckBox->State = cbUnchecked;
 
 }
 //---------------------------------------------------------------------------
@@ -3287,14 +2643,6 @@ void __fastcall TNL_Analysis_Form::Self_Conv_ButtonClick(TObject *Sender)
 	TChartSeries *LineSeries[100];
 	int Counter=0;
 
-/*
-	Self_Convergence_Chart->RemoveAllSeries();
-	for(long st=Min; st<Max; st+=Step )
-	{
-		LineSeries[0]= new TChartSeries(Self_Convergence_Chart);
-		Self_Convergence_Chart->AddSeries( LineSeries[0] );
-	}
-*/
 	int Convergence_Steps = CnvST_Edit->Text.ToInt();
 	double Period;
 	std::vector <double> Convergent_Values;
@@ -3360,8 +2708,6 @@ void __fastcall TNL_Analysis_Form::OneStarting_convergentSR_ButtonClick(TObject 
 	//-------------------------------------------------------------------------
 	// SELF CONVERGENCE CALCULATIONS
 	//-------------------------------------------------------------------------
-// Data_Items[0]->Time_Step_ms
-
 	double Start = SPC_Edit->Text.ToDouble(); // unit: ms
 	int Convergence_Steps = CnvST_Edit->Text.ToInt();
 	double Period,Period_SD;
@@ -3385,7 +2731,7 @@ void __fastcall TNL_Analysis_Form::OneStarting_convergentSR_ButtonClick(TObject 
 		  detect_peaks_in_signal(Selected_Data_Item_1);
 		  Period = Data_Items[Selected_Data_Item_1]->Average_ISI; // unit: ms
 		  Period_SD = Data_Items[Selected_Data_Item_1]->SD_of_ISI; // unit: ms
-// xxx
+
 		  // plot a point
 		  Self_Convergence_Chart->Series[0]->AddXY(S,Period);
 	}
@@ -3396,7 +2742,6 @@ void __fastcall TNL_Analysis_Form::OneStarting_convergentSR_ButtonClick(TObject 
 	Sinsoidal_Wavelet_Period_Edit->Text = FloatToStr(Data_Items[Selected_Data_Item_1]->Mean_AFCL_From_Convergent_Sinusoidal_Recomposition);
 
 	filter_current_signal();
-	// Filter_All_Signals_ButtonClick(this);
 	detect_peaks_in_signal(Selected_Data_Item_1);
 	}
 }
@@ -3444,67 +2789,6 @@ void __fastcall TNL_Analysis_Form::Synch_Movie_Start_ButtonClick(TObject *Sender
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TNL_Analysis_Form::TPMPC_ButtonClick(TObject *Sender)
-{
-/*
-	long k;
-	double Start;
-	std::vector <double> Data_1;
-	std::vector <double> Data_2;
-
-	if( selected_data_items_in_range() )
-	{
-
-	double ts = Data_Items[Selected_Data_Item_1]->Time_Step_ms;
-	double W_Size = WS1_Edit->Text.ToDouble() / ts;
-	double W_Step = WS2_Edit->Text.ToDouble() / ts;
-	long Basic_Cycle_Length = AFCL_Caus_Edit->Text.ToDouble()/ts;
-	long Electrogram_Type = ECTC_RadioGroup->ItemIndex;  // unpiolar
-
-	if( Data_Items[Selected_Data_Item_1]->Time_Step_ms == 0 ||
-		Data_Items[Selected_Data_Item_2]->Time_Step_ms == 0 )
-	ShowMessage("Time step not set!");
-	else
-	{
-
-	Start = Data_Items[Selected_Data_Item_1]->Min_Ptr;
-
-	long Spectrum_Size = Data_Items[Selected_Data_Item_1]->Filtered_Signal.size()/W_Size;
-	std::vector <double> MPC_Spectrum;
-	MPC_Spectrum.clear();
-	double tmp=0;
-	MPC_Spectrum.assign(Spectrum_Size,tmp);
-
-	MPC_C_Chart1->Series[0]->Clear();
-	CL_CL_MPC_Form->MPC_Chart->Series[0]->Clear();
-
-	for(int k=0;k<Data_Items[Selected_Data_Item_1]->Filtered_Signal.size()/W_Step-1;k++)
-	{
-
-	Start = k*W_Step;
-
-	Data_1.clear();
-	Data_2.clear();
-
-	for(long t=0;t<W_Size;t++)
-	{
-		Data_1.push_back( Data_Items[Selected_Data_Item_1]->Filtered_Signal[Start+t] );
-		Data_2.push_back( Data_Items[Selected_Data_Item_2]->Filtered_Signal[Start+t] );
-	}
-
-	MPC_Spectrum[k] = Numerical_Library_Obj.
-		get_MPC_between_electrograms(&Data_1,&Data_2,Basic_Cycle_Length,Electrogram_Type,0,ts);
-
-	MPC_C_Chart1->Series[0]->AddXY( (Start+0.5*W_Step)*ts, MPC_Spectrum[k]);
-	CL_CL_MPC_Form->MPC_Chart->Series[0]->AddXY( (Start+0.5*W_Step)*ts, MPC_Spectrum[k]);
-
-	}
-
-	}
-	}
-*/
-}
-//---------------------------------------------------------------------------
 
 void __fastcall TNL_Analysis_Form::ExportintervalsSinRecompHilbofalldatapoints1Click(TObject *Sender)
 
@@ -3627,7 +2911,7 @@ void __fastcall TNL_Analysis_Form::Second_Derivative_CheckBoxClick(TObject *Send
 
 {
     if( FilterAllSigs_byDefault_CheckBox->State == cbChecked )
-    Filter_All_Signals_ButtonClick(this);
+	Filter_All_Signals_ButtonClick(this);
     else
 	filter_current_signal();
 	repaint_current_tab();
@@ -3764,8 +3048,6 @@ void __fastcall TNL_Analysis_Form::SelfConvergenceCurrentButtonClick(TObject *Se
 	//-------------------------------------------------------------------------
 	// SELF CONVERGENCE CALCULATIONS
 	//-------------------------------------------------------------------------
-// Data_Items[0]->Time_Step_ms
-
 	double Start = SPC_Edit->Text.ToDouble(); // unit: ms
 	int Convergence_Steps = CnvST_Edit->Text.ToInt();
 	double Period,Period_SD;

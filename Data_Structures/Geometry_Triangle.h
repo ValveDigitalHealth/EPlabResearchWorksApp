@@ -95,8 +95,6 @@ class Geometry_Triangle
 	int save_object_to_stream(ofstream* File);
 	int load_object_from_stream(ifstream* File);
 
-	int load_blink_object_from_stream(ifstream* File);
-
 	std::vector <int> Segmentation_Ids_For_Undo_Feature;
 };
 
