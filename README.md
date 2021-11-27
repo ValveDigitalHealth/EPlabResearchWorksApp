@@ -1,6 +1,8 @@
 # EPlabResearchWorksApp
 App for cardiac EP data analysis
 
+Website: www.eplabworks.com
+Tweeter: https://twitter.com/EplabW
 
 App GUI is based on C++Builder by Embarcadero (https://www.embarcadero.com/). It is possible to obtain free Community license for non-profit use.
 
