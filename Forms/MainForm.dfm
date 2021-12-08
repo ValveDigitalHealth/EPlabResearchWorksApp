@@ -80,6 +80,10 @@ object Main_Application_Window: TMain_Application_Window
     TabOrder = 2
     object TabSheet_Main: TTabSheet
       Caption = 'Main'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label_p1: TLabel
         Left = 3
         Top = 2
@@ -242,6 +246,10 @@ object Main_Application_Window: TMain_Application_Window
     object TabSheet2: TTabSheet
       Caption = 'Segmentation'
       ImageIndex = 1
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label3: TLabel
         Left = 2
         Top = 29
@@ -382,6 +390,10 @@ object Main_Application_Window: TMain_Application_Window
     end
     object GroupedEGMs: TTabSheet
       Caption = 'Grouped id egms'
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object All_EGMs_PaintBox: TPaintBox
         Left = 39
         Top = 32
@@ -406,6 +418,10 @@ object Main_Application_Window: TMain_Application_Window
     object ECGChannels: TTabSheet
       Caption = 'ECG'
       ImageIndex = 2
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object ECG_Channels_PaintBox: TPaintBox
         Left = 47
         Top = 40
@@ -430,6 +446,10 @@ object Main_Application_Window: TMain_Application_Window
     object ExtraChannels: TTabSheet
       Caption = 'Extra channels'
       ImageIndex = 3
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Extra_Channels_PaintBox: TPaintBox
         Left = 55
         Top = 48
@@ -454,6 +474,10 @@ object Main_Application_Window: TMain_Application_Window
     object ImagesPage: TTabSheet
       Caption = 'Histology'
       ImageIndex = 4
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Fluoro_Image_Paint_Box: TPaintBox
         Left = 22
         Top = 170
@@ -552,6 +576,10 @@ object Main_Application_Window: TMain_Application_Window
     object TabSheet1: TTabSheet
       Caption = 'Tools'
       ImageIndex = 5
+      ExplicitLeft = 0
+      ExplicitTop = 0
+      ExplicitWidth = 0
+      ExplicitHeight = 0
       object Label4: TLabel
         Left = 3
         Top = 28
@@ -654,9 +682,16 @@ object Main_Application_Window: TMain_Application_Window
       Caption = 'File'
       object ImportAbbottNavXdata1: TMenuItem
         Caption = 'Import NavX data'
+        object ImportDxLmappreEnsiteX1: TMenuItem
+          Caption = 'Import DxL map (pre Ensite X)'
+          OnClick = ImportDxLmappreEnsiteX1Click
+        end
         object ImportDxLmap1: TMenuItem
           Caption = 'Import DxL map'
           OnClick = ImportDxLmap1Click
+        end
+        object N32: TMenuItem
+          Caption = '-'
         end
         object ImportSegment1: TMenuItem
           Caption = 'Import '#39'Segment'#39

@@ -905,11 +905,10 @@ void TMain_Application_Window::set_Map_Panel_PopupMenu_item_checked_state
 void __fastcall TMain_Application_Window::Displayoptions1Click(TObject *Sender)
 {
 	double ScalingFactor = 4;
+
 	//-------------------------------------------------------------------
 	// data points
 	//-------------------------------------------------------------------
-//	ShowMessage(FloatToStr(OpenGL_Panel_1.OpenGL_Panel_Display_Parameters.Data_Point_Size));
-
 	Display_Options_Form_1->DTS_Edit->Text = FloatToStr(
 		OpenGL_Panel_1.OpenGL_Panel_Display_Parameters.Text_Dist_From_Geo);
 
@@ -1188,47 +1187,6 @@ void __fastcall TMain_Application_Window::Displayoptions1Click(TObject *Sender)
 		{ Annotation_Box.ECG=true; Counter++; }
 		else
 		Annotation_Box.ECG=false;
-
-/*		//
-		if( Annotation_Box.LC && Annotation_Box.REF_1 && Annotation_Box.REF_2 && Annotation_Box.ECG )
-		{ Annotation_Box.LC_Pos = 0.2; Annotation_Box.REF_1_Pos = 0.4; Annotation_Box.REF_2_Pos = 0.6; Annotation_Box.ECG_Pos = 0.8; }
-
-		if( Annotation_Box.LC && Annotation_Box.REF_1 && Annotation_Box.REF_2 && !Annotation_Box.ECG )
-		{ Annotation_Box.LC_Pos = 0.25; Annotation_Box.REF_1_Pos = 0.5; Annotation_Box.REF_2_Pos = 0.75; Annotation_Box.ECG_Pos = 0; }
-		if( Annotation_Box.LC && Annotation_Box.REF_1 && !Annotation_Box.REF_2 && Annotation_Box.ECG )
-		{ Annotation_Box.LC_Pos = 0.25; Annotation_Box.REF_1_Pos = 0.5; Annotation_Box.REF_2_Pos = 0; Annotation_Box.ECG_Pos = 0.75; }
-		if( Annotation_Box.LC && !Annotation_Box.REF_1 && Annotation_Box.REF_2 && Annotation_Box.ECG )
-		{ Annotation_Box.LC_Pos = 0.25; Annotation_Box.REF_1_Pos = 0; Annotation_Box.REF_2_Pos = 0.5; Annotation_Box.ECG_Pos = 0.75; }
-		if( !Annotation_Box.LC && Annotation_Box.REF_1 && Annotation_Box.REF_2 && Annotation_Box.ECG )
-		{ Annotation_Box.LC_Pos = 0; Annotation_Box.REF_1_Pos = 0.25; Annotation_Box.REF_2_Pos = 0.5; Annotation_Box.ECG_Pos = 0.75; }
-
-		if( Annotation_Box.LC && Annotation_Box.REF_1 && !Annotation_Box.REF_2 && !Annotation_Box.ECG )
-		{ Annotation_Box.LC_Pos = 0.33; Annotation_Box.REF_1_Pos = 0.66; Annotation_Box.REF_2_Pos = 0; Annotation_Box.ECG_Pos = 0; }
-		if( Annotation_Box.LC && !Annotation_Box.REF_1 && Annotation_Box.REF_2 && !Annotation_Box.ECG )
-		{ Annotation_Box.LC_Pos = 0.33; Annotation_Box.REF_1_Pos = 0.; Annotation_Box.REF_2_Pos = 0.66; Annotation_Box.ECG_Pos = 0; }
-		if( Annotation_Box.LC && !Annotation_Box.REF_1 && !Annotation_Box.REF_2 && Annotation_Box.ECG )
-		{ Annotation_Box.LC_Pos = 0.33; Annotation_Box.REF_1_Pos = 0; Annotation_Box.REF_2_Pos = 0; Annotation_Box.ECG_Pos = 0.66; }
-
-		if( !Annotation_Box.LC && Annotation_Box.REF_1 && Annotation_Box.REF_2 && !Annotation_Box.ECG )
-		{ Annotation_Box.LC_Pos = 0; Annotation_Box.REF_1_Pos = 0.33; Annotation_Box.REF_2_Pos = 0.66; Annotation_Box.ECG_Pos = 0; }
-		if( !Annotation_Box.LC && Annotation_Box.REF_1 && !Annotation_Box.REF_2 && Annotation_Box.ECG )
-		{ Annotation_Box.LC_Pos = 0; Annotation_Box.REF_1_Pos = 0.33; Annotation_Box.REF_2_Pos = 0; Annotation_Box.ECG_Pos = 0.66; }
-		if( !Annotation_Box.LC && !Annotation_Box.REF_1 && Annotation_Box.REF_2 && Annotation_Box.ECG )
-		{ Annotation_Box.LC_Pos = 0; Annotation_Box.REF_1_Pos = 0; Annotation_Box.REF_2_Pos = 0.33; Annotation_Box.ECG_Pos = 0.66; }
-
-		if( !Annotation_Box.LC && !Annotation_Box.REF_1 && !Annotation_Box.REF_2 && Annotation_Box.ECG )
-		{ Annotation_Box.LC_Pos = 0; Annotation_Box.REF_1_Pos = 0; Annotation_Box.REF_2_Pos = 0; Annotation_Box.ECG_Pos = 0.5; }
-		if( !Annotation_Box.LC && !Annotation_Box.REF_1 && Annotation_Box.REF_2 && !Annotation_Box.ECG )
-		{ Annotation_Box.LC_Pos = 0; Annotation_Box.REF_1_Pos = 0; Annotation_Box.REF_2_Pos = 0.5; Annotation_Box.ECG_Pos = 0; }
-		if( !Annotation_Box.LC && Annotation_Box.REF_1 && Annotation_Box.REF_2 && !Annotation_Box.ECG )
-		{ Annotation_Box.LC_Pos = 0; Annotation_Box.REF_1_Pos = 0.5; Annotation_Box.REF_2_Pos = 0; Annotation_Box.ECG_Pos = 0; }
-		if( Annotation_Box.LC && !Annotation_Box.REF_1 && !Annotation_Box.REF_2 && !Annotation_Box.ECG )
-		{ Annotation_Box.LC_Pos = 0.5; Annotation_Box.REF_1_Pos = 0; Annotation_Box.REF_2_Pos = 0; Annotation_Box.ECG_Pos = 0; }
-
-		if( !Annotation_Box.LC && !Annotation_Box.REF_1 && !Annotation_Box.REF_2 && !Annotation_Box.ECG )
-		{ Annotation_Box.LC_Pos = 0.0; Annotation_Box.REF_1_Pos = 0; Annotation_Box.REF_2_Pos = 0; Annotation_Box.ECG_Pos = 0; }
-*/
-
 
 
 		if( Annotation_Box.LC && !Annotation_Box.REF && !Annotation_Box.ECG )
@@ -2009,7 +1967,7 @@ void __fastcall TMain_Application_Window::All_EGMs_PaintBoxMouseUp(TObject *Send
 
 void __fastcall TMain_Application_Window::About1Click(TObject *Sender)
 {
-	ShowMessage("EPLab Works. Version v.2.0.0. (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
+	ShowMessage("EPLab Works. Version v.2.0.1. (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
 }
 //---------------------------------------------------------------------------
 
@@ -4795,6 +4753,12 @@ void __fastcall TMain_Application_Window::UpdateReferenceBarpositionwithrespectt
 					&NL_Analysis_Form->V_Wave,
 					1./STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
 					Data_Points[i].ECG_Signal.Time_Step_ms );
+
+
+		ofstream df("PSimilarityvec.csv");
+		for (long i=0; i < PSimilarity_Vector.size(); i++) {
+		df << PSimilarity_Vector[i] << endl;
+		}
 
 		// find max
 		Peak_Range_Ptr = 10 / STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
@@ -9040,16 +9004,66 @@ void TMain_Application_Window::create_new_dpset(AnsiString Name)
 //---------------------------------------------------------------------------
 
 
+void __fastcall TMain_Application_Window::ImportDxLmappreEnsiteX1Click(TObject *Sender)
+
+{
+   bool Append = perform_pre_import_queries();
+
+   ShowMessage("Select folder with DxL_1.csv, DxL_2.csv,... and DxLandmarkGeo.xml files");
+
+   if( SelectDirectory("Select data directory", "", Data_IO_Object.Data_Files_Path) )
+   {
+	Data_FileListBox->Clear();
+	Data_FileListBox->Update();
+	Data_FileListBox->ApplyFilePath( Data_IO_Object.Data_Files_Path );
+
+	Progress_Form->clear();
+	Progress_Form->add_text("Folder selected: " + Data_IO_Object.Data_Files_Path);
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	if( Data_IO_Object.Data_Files_Path.Length() > 0 )
+	{
+		AnsiString Result = Data_IO_Object.import_NavX_DxL_folder(
+			Data_FileListBox,STUDY,Progress_Form,Append);
+
+		if( Result == "Import completed" )
+		{
+		STUDY->Current_Surface = 0;
+
+		Progress_Form->add_text("Initialization...");
+		Progress_Form->Show();
+		Application->ProcessMessages();
+		post_import_initialization(STUDY->Surfaces_List.size()-1,STUDY->Surfaces_List[STUDY->Current_Surface].Data_Points_Filling_Threshold_mm,true);
+
+		update_controls_state();
+
+		if( MessageDlg("Center map?",
+		mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, 0) == mrYes)
+		if( STUDY->is_current_surface_in_range() )
+			STUDY->Surfaces_List[STUDY->Current_Surface].center_geometry_and_data_points();
+
+		OpenGL_Panel_1.set_initial_zoom_in_3D_panel();
+		repaint_3D_panels();
+
+		Progress_Form->add_text("Import completed. Press CLOSE to continue." );
+		Application->ProcessMessages();
+		Progress_Form->Show();
+
+		}
+		else
+		{
+			Progress_Form->Hide();
+			ShowMessage(Result);
+		}
+
+   } // folder path size > 0
+   else
+   ShowMessage("Invalid folder selected");
+
+   }
 
 
-
-
-
-
-
-
-
-
-
-
+}
+//---------------------------------------------------------------------------
 

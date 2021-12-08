@@ -640,9 +640,15 @@ void Data_Point::calculate_values_in_data_point(std::vector <Value_Description_C
 	// bipolar signal (assumed to be Roving !!!!!!!!!!!!!!!!!!!!!)
 	Numerical_Library_Obj.calculate_max_min_mean_vec_ranged(
 		 &Roving_Signal.Voltage_Values,Start,Stop,&min,&max,&mean,&SD);
-
 	v = max - min;
 	set_value(Voltage_Amplitude_Value_Name,v,Values_List);
+
+	// calculate unipolar voltage value from ref (CARTO maps)
+	AnsiString Unipolar_Voltage_Amplitude_Value_Name = "Unipolar voltage";
+	Numerical_Library_Obj.calculate_max_min_mean_vec_ranged(
+		 &Reference_Signal.Voltage_Values,Start,Stop,&min,&max,&mean,&SD);
+	v = max - min;
+	set_value(Unipolar_Voltage_Amplitude_Value_Name,v,Values_List);
 
 	}
 	else

@@ -404,6 +404,8 @@ class TMain_Application_Window : public TForm
 	TMenuItem *Exportcurrentdatapointegms1;
 	TMenuItem *ImportDxLmap1;
 	TMenuItem *ImportSegment1;
+	TMenuItem *N32;
+	TMenuItem *ImportDxLmappreEnsiteX1;
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
@@ -645,6 +647,7 @@ class TMain_Application_Window : public TForm
 	void __fastcall N67Click(TObject *Sender);
 	void __fastcall Exportcurrentdatapointegms1Click(TObject *Sender);
 	void __fastcall ImportDxLmap1Click(TObject *Sender);
+	void __fastcall ImportDxLmappreEnsiteX1Click(TObject *Sender);
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
