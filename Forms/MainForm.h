@@ -403,9 +403,12 @@ class TMain_Application_Window : public TForm
 	TMenuItem *N67;
 	TMenuItem *Exportcurrentdatapointegms1;
 	TMenuItem *ImportDxLmap1;
-	TMenuItem *ImportSegment1;
-	TMenuItem *N32;
 	TMenuItem *ImportDxLmappreEnsiteX1;
+	TMenuItem *ImportgeometryContactMappingModelxmlfile1;
+	TMenuItem *Importegmsselectingfilewithegms1;
+	TButton *Button1;
+	TButton *Button2;
+	TMenuItem *N32;
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
@@ -646,8 +649,10 @@ class TMain_Application_Window : public TForm
 	void __fastcall Exportvaluesatgeometrynodes1Click(TObject *Sender);
 	void __fastcall N67Click(TObject *Sender);
 	void __fastcall Exportcurrentdatapointegms1Click(TObject *Sender);
-	void __fastcall ImportDxLmap1Click(TObject *Sender);
 	void __fastcall ImportDxLmappreEnsiteX1Click(TObject *Sender);
+	void __fastcall ImportgeometryContactMappingModelxmlfile1Click(TObject *Sender);
+	void __fastcall Importegmsselectingfilewithegms1Click(TObject *Sender);
+
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------

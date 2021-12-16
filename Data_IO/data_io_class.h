@@ -66,6 +66,7 @@ class Data_IO_Class
 	AnsiString import_NavX_DxL_folder(TFileListBox* Data_FileListBox,
 				STUDY_Class *Study,TProgress_Form *Progress_Form,bool Append);
 
+
 	int get_ABL_xyz_from_Locations_file(AnsiString FileNamePath,long Time_Ptr,double *x, double *y, double *z);
 
 	// geo load
@@ -80,6 +81,14 @@ class Data_IO_Class
 	void export_master_NavX_files_Geoff_v1(STUDY_Class *STUDY,TProgress_Form *Progress_Form,AnsiString FileName);
 
 	void read_navx_AutoMarkSummaryList_File(AnsiString FileName,Surface_Class *Surface);
+
+	// Ensite X import
+	AnsiString import_EnsiteX_DxL_folder(TFileListBox* Data_FileListBox,
+				STUDY_Class *Study,TProgress_Form *Progress_Form,bool Append);
+	AnsiString read_EnsiteX_PP_omni_data_file(          AnsiString FileName, Data_Point_Set_Class *Data_Point_Set, STUDY_Class *Study);
+	AnsiString read_EnsiteX_egm_data_file(AnsiString FileName, Data_Point_Set_Class *Data_Point_Set, STUDY_Class *Study);
+	AnsiString read_EnsiteX_ref_data_file(AnsiString FileName, Data_Point_Set_Class *Data_Point_Set, STUDY_Class *Study);
+
 
 	//---------------------------------------------------------------------------
 	// CARTO folder import

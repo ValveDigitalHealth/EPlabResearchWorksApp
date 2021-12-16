@@ -183,7 +183,7 @@ AnsiString Data_IO_Class::import_NavX_DxL_folder(TFileListBox* Data_FileListBox,
 	Progress_Form->Cursor = crHourGlass;
 
 	//----------------------------------------------------------------------
-	// set values descriptors (usun wyzej)
+	// set values descriptors
 	//----------------------------------------------------------------------
 	Value_Description_Class Value_Desc;
 	Value_Desc.Type = VALUE_BASED_ON_DATA_POINTS; // based on data points
@@ -265,7 +265,608 @@ AnsiString Data_IO_Class::import_NavX_DxL_folder(TFileListBox* Data_FileListBox,
 	return "Import completed";
 }
 
+//-------------------------ENSITE X-----------------------------------------------------
+
+AnsiString Data_IO_Class::import_EnsiteX_DxL_folder(TFileListBox* Data_FileListBox,
+	STUDY_Class *Study, TProgress_Form *Progress_Form,bool Append)
+{
+	bool Geo_File_Found = false;
+
+	// find geo file
+	int Geo_File_Id = -1;
+	for( int i=0; i < Data_FileListBox->Items[0].Capacity; i++ )
+	if( Utils.is_substring_present( Data_FileListBox->Items[0].Strings[i],"Contact_Mapping_Model.xml") )
+	Geo_File_Id = i;
+	if( Geo_File_Id == -1)
+		return "'Contact_Mapping_Model.xml' file not found! If not present, re-do export according to instructions.";
+
+	// update progress form
+	Progress_Form->add_text("Geo file found: " + Data_FileListBox->Items[0].Strings[Geo_File_Id]);
+	Progress_Form->Show();
+	Application->ProcessMessages();
+	if( Progress_Form->Cancel_Flag ) return "Cancelled";
+
+	Progress_Form->add_text("Parsing geometry file...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	pugi::xml_document Geometry_pugi_object;
+	AnsiString Geo_File_Path = Data_Files_Path + "\\"+ Data_FileListBox->Items[0].Strings[Geo_File_Id];
+	pugi::xml_parse_result Xml_reading_result = Geometry_pugi_object.load_file(Geo_File_Path.c_str());
+
+	Progress_Form->add_text(Xml_reading_result.description());
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	if( !Xml_reading_result )
+	return "Corrupted xml geometry file";
+
+	//-------------------------------------
+	// ask user which geometry to load
+	//-------------------------------------
+	vector <AnsiString> Geo_Names_List;
+
+	pugi::xml_node Volumes = Geometry_pugi_object.child("DIF").child("DIFBody").child("Volumes");
+	for (pugi::xml_node_iterator it=Volumes.begin(); it!=Volumes.end(); ++it)
+		Geo_Names_List.push_back(it->attribute("name").value());
+
+	if( Geo_Names_List.size() == 0 )
+	return "No maps found in DxLandmarkGeo.xml file";
+
+	Selection_List_Form->Caption = "Select geometry to load";
+	Selection_List_Form->fill_selection(&Geo_Names_List);
+
+	if( !Selection_List_Form->ShowModal() )
+	return "Import cancelled";
+
+	if( Selection_List_Form->Selected_Item_Ptr == -1 )
+	return "No geometry to import selected";
+
+	AnsiString Selected_Geometry;
+	if( Selection_List_Form->Selected_Item_Ptr >= 0 &&
+		Selection_List_Form->Selected_Item_Ptr < Geo_Names_List.size() )
+	Selected_Geometry = Geo_Names_List[Selection_List_Form->Selected_Item_Ptr];
+	else
+	return "Selected geometry pointer out of range";
+
+	Progress_Form->add_text("Geometry selected, importing...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+	if( Progress_Form->Cancel_Flag )
+		return "Cancelled";
+
+	// --------------------------------------------------------------------
+	// Import geometry file
+	// --------------------------------------------------------------------
+	// clear surfaces
+	if( !Append )
+	Study->Surfaces_List.clear();
+
+	Surface_Class Suface_Class_Item;
+	Study->Surfaces_List.push_back(Suface_Class_Item);
+	Study->Current_Surface = Study->Surfaces_List.size()-1;
+	Study->Surfaces_List[Study->Current_Surface].Surface_Node_Set.clear();
+	Study->Surfaces_List[Study->Current_Surface].Surface_Triangle_Set.clear();
+	Study->Surfaces_List[Study->Current_Surface].Name = Selected_Geometry;
+	Study->Surfaces_List[Study->Current_Surface].Mapping_System_Source = MAPPING_SYSTEM_ORIGIN_NAVX;
+
+	Study->Study_Source_Path = Data_Files_Path;
+	Study->Study_Current_Path_And_File_Name =
+		Utils.get_string_before_last_occurence_of_specified_string(Data_Files_Path,"\\") + "\\" +
+		Utils.get_string_after_last_occurence_of_specified_string(Data_Files_Path,"\\") + " " +
+			Selected_Geometry + ".eplab";
+
+	AnsiString Result="";
+	Result = load_navx_geo_file(Geo_File_Path,Selected_Geometry,
+		&Study->Surfaces_List[Study->Current_Surface],&Geometry_pugi_object);
+	if( Result.Length() > 3 )
+		return Result;
+
+	// --------------------------------------------------------------------
+	// Import Map_PP_omni file (with values per data point)
+	// --------------------------------------------------------------------
+	Result="";
+
+	if( Study->Current_Surface < 0 ) Study->Current_Surface = Study->Surfaces_List.size() -1;
+	if( Study->Current_Surface < 0 ) return "No geometry loaded";
+
+	Data_Point_Set_Class Data_Point_Set;
+	Study->Surfaces_List[Study->Current_Surface].Data_Point_Set.push_back(Data_Point_Set);
+	int Current_Data_Point_Set = Study->Surfaces_List[Study->Current_Surface].Data_Point_Set.size()-1;
+	Study->Surfaces_List[Study->Current_Surface].Data_Point_Set[Current_Data_Point_Set].Name = "EnsiteX Dataset";
+
+	// update progress form
+	Progress_Form->add_text("Importing Map_PP_omni file...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+	if( Progress_Form->Cancel_Flag ) return "Cancelled";
+
+	Progress_Form->Cursor = crHourGlass;
+
+	//----------------------------------------------------------------------
+	// set values descriptors
+	//----------------------------------------------------------------------
+	Value_Description_Class Value_Desc;
+	Value_Desc.Type = VALUE_BASED_ON_DATA_POINTS; // based on data points
+	Value_Desc.Displayed_In_Table = true;
+
+	Value_Desc.Value_Name = "rov LAT";
+	Value_Desc.Unit = "ms";
+	Value_Desc.LAT_Value = true;
+	Study->Surfaces_List[Study->Current_Surface].Map_Values.add_value(Value_Desc);
+	Value_Desc.LAT_Value = false;
+
+	Value_Desc.Value_Name = "pp_Vmax";
+	Value_Desc.Unit = "mV";
+	Value_Desc.Voltage_Amplitude_Value = true;
+	Study->Surfaces_List[Study->Current_Surface].Map_Values.add_value(Value_Desc);
+	Value_Desc.Voltage_Amplitude_Value = false;
+
+	Value_Desc.Value_Name = "pp_Valong";
+	Value_Desc.Unit = "mV";
+	Study->Surfaces_List[Study->Current_Surface].Map_Values.add_value(Value_Desc);
+
+	Value_Desc.Value_Name = "pp_Vacross";
+	Value_Desc.Unit = "mV";
+	Study->Surfaces_List[Study->Current_Surface].Map_Values.add_value(Value_Desc);
+
+	//####################################################
+	AnsiString PP_omni_File_Path =  Data_Files_Path + "\\Contact_Mapping\\Map_PP_omni.csv";
+	AnsiString Wave_Rov_File_Path = Data_Files_Path + "\\Contact_Mapping\\Wave_rov.csv";
+	AnsiString Ref_File_Path =      Data_Files_Path + "\\Contact_Mapping\\Wave_refs.csv";
+
+	read_EnsiteX_PP_omni_data_file(PP_omni_File_Path,
+				&Study->Surfaces_List[Study->Current_Surface].Data_Point_Set[Current_Data_Point_Set],Study );
+
+	read_EnsiteX_egm_data_file(Wave_Rov_File_Path,
+				&Study->Surfaces_List[Study->Current_Surface].Data_Point_Set[Current_Data_Point_Set],Study );
+
+	read_EnsiteX_ref_data_file(Ref_File_Path,
+				&Study->Surfaces_List[Study->Current_Surface].Data_Point_Set[Current_Data_Point_Set],Study );
+
+
+	//####################################################
+/*
+	//----------------------------------------------------
+	// read ablation points list
+	//----------------------------------------------------
+
+	// find AutoMarkSummaryList.csv file
+	int AutoMarkSummaryList_File_Id = -1;
+	for( int i=0; i < Data_FileListBox->Items[0].Capacity; i++ )
+	if( Utils.is_substring_present( Data_FileListBox->Items[0].Strings[i],"AutoMarkSummaryList.csv") )
+	AutoMarkSummaryList_File_Id = i;
+
+	if( AutoMarkSummaryList_File_Id >= 0 )
+	read_navx_AutoMarkSummaryList_File(Data_FileListBox->Items[0].Strings[AutoMarkSummaryList_File_Id],
+		&Study->Surfaces_List[Study->Current_Surface] );
+	*/
+
+	Progress_Form->Cursor = crArrow;
+
+	// update progress form
+	Progress_Form->add_text("Data files imported, allocating data structures..." );
+	Progress_Form->Show();
+	Application->ProcessMessages();
+	if( Progress_Form->Cancel_Flag ) return "Cancelled";
+
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	return "Import completed";
+}
+
 //------------------------------------------------------------------------------
+
+AnsiString Data_IO_Class::read_EnsiteX_PP_omni_data_file(AnsiString FileName,
+				Data_Point_Set_Class *Data_Point_Set, STUDY_Class *Study)
+{
+	double v,tmpv=0,v1,v2;
+	AnsiString QS,QS1,QS2;
+
+	//----------------------------------------------------------
+	// Load file into Table (using comma as items saparator)
+	//----------------------------------------------------------
+	std::vector <Row_vec> Rows;
+	Rows = Utils.load_rectangular_csv_file_to_grid(FileName);
+	if(Rows.size()<10)
+	return "File import failed";
+
+	//----------------------------------------------------------------
+	// find DxL file version
+	//----------------------------------------------------------------
+	AnsiString TT1 = Utils.get_string_after_last_occurence_of_specified_string(
+		Rows[0].Elements[0].Trim()," ");
+
+
+	double DXLFile_ver = TT1.ToDouble();
+
+	if( DXLFile_ver > 9.5 )
+		return "Unsupported DxL version (9.5 is maximum version currently supported).";
+
+	//----------------------------------------------------------
+	// get # of mapping points
+	//----------------------------------------------------------
+	long DPS_no,Pos;
+	for(long i=0;i<(signed)Rows.size();i++)
+	if( Rows[i].Elements[0].Trim() == "# mapping pts:")
+	Pos = i;
+	DPS_no = Rows[Pos].Elements[1].Trim().ToInt();
+
+	//----------------------------------------------------------
+	// get map name
+	//----------------------------------------------------------
+	AnsiString MapName;
+	for(long i=0;i<(signed)Rows.size();i++)
+	if( Rows[i].Elements[0].Trim() == "Map name:")
+	Pos = i;
+	MapName = Rows[Pos].Elements[1].Trim();
+	Data_Point_Set[0].Name = MapName;
+
+	//----------------------------------------------------------
+	// get row where data starts
+	//----------------------------------------------------------
+	long Data_Start_Row;
+	for(long i=0;i<(signed)Rows.size();i++)
+	if( Rows[i].Elements[0].Trim() == "Data starts in row")
+	Pos = i;
+	Data_Start_Row = Rows[Pos].Elements[1].Trim().ToInt();
+
+	//----------------------------------------------------------
+	// set up data point
+	//----------------------------------------------------------
+	Data_Point D;
+
+	//-------------------------------------------------------------
+	//-------------------------------------------------------------
+	// MAIN DATA READING LOOP
+	//-------------------------------------------------------------
+	for(long i=Data_Start_Row-1;i<Data_Start_Row+DPS_no-1;i++)
+	//-------------------------------------------------------------
+	//-------------------------------------------------------------
+	{
+		D.Identifier = (Rows[i+1].Elements[3].Trim()).ToInt(); // freeze id
+
+		//-----------------------
+		// READING CHANNELS NAMES
+		//-----------------------
+		QS = Rows[i+1].Elements[0].Trim();
+		QS = Utils.replace_substring_from_string(QS," ","-");
+		D.Roving_Signal.Name = QS;
+
+		QS = Rows[i+1].Elements[5].Trim();
+		if( QS != "..") // .. means it is empty
+		{
+			QS = Utils.replace_substring_from_string(QS," ","-");
+			D.Reference_Signal.Name = QS;
+		}
+
+		QS1 = Rows[i+1].Elements[45].Trim();
+		QS2 = Rows[i+1].Elements[43].Trim();
+
+		D.Ref_Signal_Activation_ptr = QS2.ToDouble();
+		D.Rov_Signal_Activation_ptr = QS1.ToDouble();
+
+		D.set_value("rov LAT",0.5*(QS1.ToDouble()-QS2.ToDouble()), // Ensite X has 2000 Hz sampling rate, so it has to be divided by 2 to be in ms
+			Study->Surfaces_List[Study->Current_Surface].Map_Values.get_values_table_ref());
+
+		D.set_value("pp_Vmax",Rows[i+1].Elements[28].Trim().ToDouble(),
+			Study->Surfaces_List[Study->Current_Surface].Map_Values.get_values_table_ref());
+
+		D.set_value("pp_Valong",Rows[i+1].Elements[29].Trim().ToDouble(),
+			Study->Surfaces_List[Study->Current_Surface].Map_Values.get_values_table_ref());
+
+		D.set_value("pp_Vacross",Rows[i+1].Elements[30].Trim().ToDouble(),
+			Study->Surfaces_List[Study->Current_Surface].Map_Values.get_values_table_ref());
+
+		// uni corner electrode is taken as xyz
+		D.x = (Rows[i+1].Elements[32].Trim()).ToDouble();
+		D.y = (Rows[i+1].Elements[33].Trim()).ToDouble();
+		D.z = (Rows[i+1].Elements[34].Trim()).ToDouble();
+
+		D.Original_x = D.x;
+		D.Original_y = D.y;
+		D.Original_z = D.z;
+
+		D.Displayed = Rows[i+1].Elements[15].Trim().ToInt();
+		D.Utilized =  Rows[i+1].Elements[16].Trim().ToInt();
+
+		// finally, push D to the list (if utilized and valid name)
+		if( D.Roving_Signal.Name != ".." && D.Utilized == 1 )
+		Data_Point_Set[0].Data_Points.push_back(D);
+
+	} // through all columns
+
+	return "Ok";
+}
+
+//-----------------------------------------------------------------------------------------------
+
+AnsiString Data_IO_Class::read_EnsiteX_egm_data_file(AnsiString FileName,
+	Data_Point_Set_Class *Data_Point_Set, STUDY_Class *Study)
+{
+
+	double v,tmpv=0,v1,v2;
+	AnsiString DP_Name;
+	int Freeze_Group;
+
+	//----------------------------------------------------------
+	// Load file into Table (using comma as items saparator)
+	//----------------------------------------------------------
+	Progress_Form->add_text("Reading rov egms file into data structure. May take a while...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	std::vector <Row_vec> Rows;
+	Rows = Utils.load_rectangular_csv_file_to_grid(FileName);
+	if(Rows.size()<10)
+	return "File import failed";
+
+	//----------------------------------------------------------------
+	// find DxL file version
+	//----------------------------------------------------------------
+	AnsiString TT1 = Utils.get_string_after_last_occurence_of_specified_string(
+		Rows[0].Elements[0].Trim()," ");
+
+	double DXLFile_ver = TT1.ToDouble();
+
+	if( DXLFile_ver > 9.5 )
+		return "Unsupported DxL version (9.5 is maximum version currently supported).";
+
+	//----------------------------------------------------------
+	// get # of mapping points
+	//----------------------------------------------------------
+	long DPS_no,Pos;
+	for(long i=0;i<(signed)Rows.size();i++)
+	if( Rows[i].Elements[0].Trim() == "# mapping pts:")
+	Pos = i;
+	DPS_no = Rows[Pos].Elements[1].Trim().ToInt();
+
+	// check if number of data points agrees
+//	if( DPS_no != Data_Point_Set[0].Data_Points.size() )
+//	{
+//		ShowMessage("Data points number in this file is different from the number declared in Map_PP_Omni.csv file. Are you sure you selected file from correct folder?");
+//		return "Data points number differs";
+//	}
+
+	//----------------------------------------------------------
+	// get row where data starts
+	//----------------------------------------------------------
+	long Data_Start_Row;
+	for(long i=0;i<(signed)Rows.size();i++)
+	if( Rows[i].Elements[0].Trim() == "Data starts in row")
+	Pos = i;
+	Data_Start_Row = Rows[Pos].Elements[1].Trim().ToInt();
+
+	//----------------------------------------------------------
+	// get sampling rate
+	//----------------------------------------------------------
+	long Sampling_Rate;
+	for(long i=0;i<(signed)Rows.size();i++)
+	if( Rows[i].Elements[0].Trim() == "Sample rate:")
+	Pos = i;
+	Sampling_Rate = Rows[Pos].Elements[1].Trim().ToDouble();
+
+	if( Sampling_Rate != 2000 )
+	ShowMessage("Warning, sampling rate is not 2000 Hz as should be default in Ensite X export.");
+	if( Sampling_Rate == 0 )
+	Sampling_Rate = 1;
+
+	//----------------------------------------------------------
+	// get number of samples
+	//----------------------------------------------------------
+	long Number_of_Samples;
+	for(long i=0;i<(signed)Rows.size();i++)
+	if( Rows[i].Elements[0].Trim() == "Waveform samples exported:")
+	Pos = i;
+	Number_of_Samples = Rows[Pos].Elements[1].Trim().ToInt();
+
+	Progress_Form->add_text("Reading wave_row file");
+	Progress_Form->add_text("# mapping pts: " + FloatToStr(DPS_no));
+	Progress_Form->add_text("Sampling rate: " + FloatToStr(Sampling_Rate));
+	Progress_Form->add_text("Number of samples: " + FloatToStr(Number_of_Samples));
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Data_Point *D;
+
+	//-------------------------------------------------------------
+	//-------------------------------------------------------------
+	// MAIN DATA READING LOOP
+	//-------------------------------------------------------------
+	Progress_Form->add_text("Reading rov egms...");
+	for(long i=Data_Start_Row-1;i<Data_Start_Row+DPS_no-1;i++)
+	//-------------------------------------------------------------
+	//-------------------------------------------------------------
+	{
+		if( i%100==1 )
+		{
+		// update progress form
+		Progress_Form->replace_last_line_with_text("Roving egm read: " + FloatToStr(i) + "/" + FloatToStr(DPS_no));
+		Progress_Form->Show();
+		Application->ProcessMessages();
+		}
+
+		DP_Name = Rows[i+1].Elements[0].Trim();
+		DP_Name = Utils.replace_substring_from_string(DP_Name," ","-");
+
+		Freeze_Group = Rows[i+1].Elements[1].Trim().ToInt();
+
+		// find in data point set data point with the same name and freeze_group
+		for(long d=0;d<Data_Point_Set->Data_Points.size();d++)
+		if( Data_Point_Set->Data_Points[d].Identifier == Freeze_Group )
+		if( Data_Point_Set->Data_Points[d].Roving_Signal.Name == DP_Name )
+		{
+
+		D = &Data_Point_Set->Data_Points[d];
+
+		D->Roving_Signal.Time_Step_ms = 1000.0/Sampling_Rate;
+		D->Reference_Signal.Time_Step_ms = 1000.0/Sampling_Rate;
+		D->Reference_Signal_2.Time_Step_ms = 1000.0/Sampling_Rate;
+		D->ECG_Signal.Time_Step_ms = 1000.0/Sampling_Rate;
+
+		D->Roving_Signal.Voltage_Values.clear();
+
+		for(long t=0;t<Number_of_Samples;t++)
+		{
+			if( Rows[i+1].Elements[5+t].Trim() != "")
+			v =(Rows[i+1].Elements[5+t].Trim()).ToDouble();
+
+			D->Roving_Signal.Voltage_Values.push_back(v);
+		}
+
+		}
+
+	} // through all rows
+
+	Progress_Form->add_text("Importing roving egms complete.");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	return "Ok";
+}
+
+//-----------------------------------------------------------------------------------------------
+
+AnsiString Data_IO_Class::read_EnsiteX_ref_data_file(AnsiString FileName,
+	Data_Point_Set_Class *Data_Point_Set, STUDY_Class *Study)
+{
+	double v,tmpv=0,v1,v2;
+	AnsiString DP_Name,QS;
+	int Freeze_Group;
+	std::vector<double> Voltage_Values;
+
+	//----------------------------------------------------------
+	// Load file into Table (using comma as items saparator)
+	//----------------------------------------------------------
+	Progress_Form->add_text("Reading ref egms file into data structure. May take a while...");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	std::vector <Row_vec> Rows;
+	Rows = Utils.load_rectangular_csv_file_to_grid(FileName);
+	if(Rows.size()<10)
+	return "File import failed";
+
+	//----------------------------------------------------------------
+	// find DxL file version
+	//----------------------------------------------------------------
+	AnsiString TT1 = Utils.get_string_after_last_occurence_of_specified_string(
+		Rows[0].Elements[0].Trim()," ");
+
+	double DXLFile_ver = TT1.ToDouble();
+
+	if( DXLFile_ver > 9.5 )
+		return "Unsupported DxL version (9.5 is maximum version currently supported).";
+
+	//----------------------------------------------------------
+	// get # of freeze groups
+	//----------------------------------------------------------
+	long FG_no,Pos;
+	for(long i=0;i<(signed)Rows.size();i++)
+	if( Rows[i].Elements[0].Trim() == "# freeze groups:")
+	Pos = i;
+	FG_no = Rows[Pos].Elements[1].Trim().ToInt();
+
+	//----------------------------------------------------------
+	// get row where data starts
+	//----------------------------------------------------------
+	long Data_Start_Row;
+	for(long i=0;i<(signed)Rows.size();i++)
+	if( Rows[i].Elements[0].Trim() == "Data starts in row")
+	Pos = i;
+	Data_Start_Row = Rows[Pos].Elements[1].Trim().ToInt();
+
+	//----------------------------------------------------------
+	// get sampling rate
+	//----------------------------------------------------------
+	long Sampling_Rate;
+	for(long i=0;i<(signed)Rows.size();i++)
+	if( Rows[i].Elements[0].Trim() == "Sample rate:")
+	Pos = i;
+	Sampling_Rate = Rows[Pos].Elements[1].Trim().ToDouble();
+
+	if( Sampling_Rate != 2000 )
+	ShowMessage("Warning, sampling rate is not 2000 Hz as should be default in Ensite X export.");
+	if( Sampling_Rate == 0 )
+	Sampling_Rate = 1;
+
+	//----------------------------------------------------------
+	// get number of samples
+	//----------------------------------------------------------
+	long Number_of_Samples;
+	for(long i=0;i<(signed)Rows.size();i++)
+	if( Rows[i].Elements[0].Trim() == "Waveform samples exported:")
+	Pos = i;
+	Number_of_Samples = Rows[Pos].Elements[1].Trim().ToInt();
+
+
+	Progress_Form->add_text("Reading wave_row file");
+	Progress_Form->add_text("# of freeze groups: " + FloatToStr(FG_no));
+	Progress_Form->add_text("Sampling rate: " + FloatToStr(Sampling_Rate));
+	Progress_Form->add_text("Number of samples: " + FloatToStr(Number_of_Samples));
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Data_Point *D;
+
+	//-------------------------------------------------------------
+	//-------------------------------------------------------------
+	// MAIN DATA READING LOOP
+	//-------------------------------------------------------------
+	Progress_Form->add_text("Reading ref egms...");
+	for(long i=Data_Start_Row-1;i<Data_Start_Row+FG_no-1;i++)
+	//-------------------------------------------------------------
+	//-------------------------------------------------------------
+	{
+		if( i%40==1 )
+		{
+		// update progress form
+		Progress_Form->replace_last_line_with_text("Ref egm read: " + FloatToStr(i) + "/" + FloatToStr(FG_no));
+		Progress_Form->Show();
+		Application->ProcessMessages();
+		}
+
+		// read dp info
+		DP_Name = Rows[i+1].Elements[0].Trim();
+		DP_Name = Utils.replace_substring_from_string(DP_Name," ","-");
+		Freeze_Group = Rows[i+1].Elements[1].Trim().ToInt(); // 'freeze id' used as identifier
+
+		// read egm
+		Voltage_Values.clear();
+		for(long t=0;t<Number_of_Samples;t++)
+		{
+			if( Rows[i+1].Elements[5+t].Trim() != "")
+			v =(Rows[i+1].Elements[5+t].Trim()).ToDouble();
+			Voltage_Values.push_back(v);
+		}
+
+		if( Utils.is_substring_present( DP_Name, "ECG"))
+		// go through all dps, add egm to all dps with the same freeze id
+		for(long d=0;d<Data_Point_Set->Data_Points.size();d++)
+		if( Data_Point_Set->Data_Points[d].Identifier == Freeze_Group )
+		{
+		Data_Point_Set->Data_Points[d].ECG_Signal.Name = DP_Name;
+		Data_Point_Set->Data_Points[d].ECG_Signal.Voltage_Values = Voltage_Values;
+		}
+
+		if( !Utils.is_substring_present( DP_Name, "ECG") && !Utils.is_substring_present( DP_Name, "ABL"))
+
+		// go through all dps, add egm to all dps with the same freeze id
+		for(long d=0;d<Data_Point_Set->Data_Points.size();d++)
+		if( Data_Point_Set->Data_Points[d].Identifier == Freeze_Group )
+		{
+		Data_Point_Set->Data_Points[d].Reference_Signal.Name = DP_Name;
+		Data_Point_Set->Data_Points[d].Reference_Signal.Voltage_Values = Voltage_Values;
+		}
+
+	} // through all rows
+
+	return "Ok";
+}
+
+//-----------------------------------------------------------------------------------------------
+
 
 int Data_IO_Class::get_ABL_xyz_from_Locations_file(AnsiString FileNamePath,long Time_Ptr,
 	double *x, double *y, double *z)
@@ -279,8 +880,9 @@ int Data_IO_Class::get_ABL_xyz_from_Locations_file(AnsiString FileNamePath,long 
 	bool found;
 	std::vector <Row_vec> Table;
 	std::string SS;
-
 	Table = Utils.load_rectangular_csv_file_to_grid(FileNamePath);
+	if(Table.size()<1)
+	return -1;
 
 	//----------------------------------------------------
 	// find abl channel id
@@ -348,7 +950,7 @@ void Data_IO_Class::read_navx_AutoMarkSummaryList_File(AnsiString FileName,Surfa
 	std::string SS;
 
 	Table = Utils.load_rectangular_csv_file_to_grid(FileName);
-//kosiuk
+
 	for(long row=1;row<(signed)Table.size();row++)
 	if( Table[row].Elements.size() > 0 )
 	if( Table[row].Elements[0].Trim() == "RF Episode" )
@@ -546,8 +1148,6 @@ AnsiString Data_IO_Class::read_old_navx_data_file(AnsiString FileName, Data_Poin
 AnsiString Data_IO_Class::read_navx_velocity_data_file(AnsiString FileName,
 				Data_Point_Set_Class *Data_Point_Set, STUDY_Class *Study)
 {
-	Row_vec Row1;
-	vector <Row_vec> Rows;
 	char c;
 	int Columns_To_Read;
 	long signal_size;
@@ -557,38 +1157,8 @@ AnsiString Data_IO_Class::read_navx_velocity_data_file(AnsiString FileName,
 	//----------------------------------------------------------
 	// Load file into Table (using comma as items saparator)
 	//----------------------------------------------------------
-	ifstream dfile(FileName.c_str());
-
-	if( !dfile.is_open() )
-		return "Unable to open data file "+FileName;
-
-	long Iterator = 0;
-	while( !dfile.eof() && Iterator < 100000 )
-	{
-
-	Row1.Elements.clear();
-    QS = "";
-
-    while(c!=10 && !dfile.eof()) // till end of line
-	{
-		dfile.get(c);
-		if( c == 44 ) // comma
-		{
-			Row1.Elements.push_back(QS);
-            QS = "";
-			dfile.get(c);
-		}
-
-		if( c!= 10)  QS += c; // end of line?
-	} // reading line
-
-	Row1.Elements.push_back(QS);
-    Rows.push_back(Row1);
-	c = 0;
-
-	Iterator++;
-
-	} // reading file
+	std::vector <Row_vec> Rows;
+	Rows = Utils.load_rectangular_csv_file_to_grid(FileName);
 
 	//----------------------------------------------------------------
 	// find DxL file version
@@ -811,20 +1381,20 @@ AnsiString Data_IO_Class::read_navx_velocity_data_file(AnsiString FileName,
 		// READING CHANNELS NAMES
 		//-----------------------
 		QS = Rows[Rov_Name_Pos].Elements[i+1].Trim();
-		Utils.replace_substring_from_string(QS," ","-");
+		QS = Utils.replace_substring_from_string(QS," ","-");
 		D.Roving_Signal.Name = QS;
 
 		QS = Rows[Ref_Name_Pos].Elements[i+1].Trim();
 		if( QS != "..") // .. means it is empty
 		{
-			Utils.replace_substring_from_string(QS," ","-");
+			QS = Utils.replace_substring_from_string(QS," ","-");
 			D.Reference_Signal.Name = QS;
 		}
 
 		QS = Rows[S1_Name_Pos].Elements[i+1].Trim();
 		if( QS != "..") // .. means it is empty
 		{
-			Utils.replace_substring_from_string(QS," ","-");
+			QS = Utils.replace_substring_from_string(QS," ","-");
 			D.ECG_Signal.Name = QS;
 			D.Additional_Ref_Channels[0].Name = QS;
 		}
@@ -832,14 +1402,14 @@ AnsiString Data_IO_Class::read_navx_velocity_data_file(AnsiString FileName,
 		QS = Rows[S2_Name_Pos].Elements[i+1].Trim();
 		if( QS != "..") // .. means it is empty
 		{
-			Utils.replace_substring_from_string(QS," ","-");
+			QS = Utils.replace_substring_from_string(QS," ","-");
 			D.Additional_Ref_Channels[1].Name = QS;
 		}
 
 		QS = Rows[S3_Name_Pos].Elements[i+1].Trim();
 		if( QS != "..") // .. means it is empty
 		{
-			Utils.replace_substring_from_string(QS," ","-");
+			QS = Utils.replace_substring_from_string(QS," ","-");
 			D.Additional_Ref_Channels[2].Name = QS;
 		}
 
@@ -974,11 +1544,7 @@ AnsiString Data_IO_Class::read_navx_velocity_data_file(AnsiString FileName,
 
 	} // through all columns
 
-
-	dfile.close();
-
 	return "Ok";
-
 }
 
 //-----------------------------------------------------------------------------------------------

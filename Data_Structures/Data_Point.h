@@ -147,7 +147,7 @@ class Data_Point
 	int find_roving_catheter_LAT_in_data_point(Computational_Module_Class *Comp_Module);
 
 	void calculate_values_in_data_point(std::vector <Value_Description_Class> *Values_List,
-			Computational_Module_Class *Comp_Module);
+			Computational_Module_Class *Comp_Module,int Mapping_System_Type);
 
 	// !!!!!!!!!! add to load/save
 	std::vector <int> Phase_Singularities_Present; // presence of PS in time

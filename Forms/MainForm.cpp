@@ -1967,7 +1967,7 @@ void __fastcall TMain_Application_Window::All_EGMs_PaintBoxMouseUp(TObject *Send
 
 void __fastcall TMain_Application_Window::About1Click(TObject *Sender)
 {
-	ShowMessage("EPLab Works. Version v.2.0.1. (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
+	ShowMessage("EPLab Works. Version v.2.0.2 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
 }
 //---------------------------------------------------------------------------
 
@@ -3331,7 +3331,8 @@ void __fastcall TMain_Application_Window::Annotation_Window_PaintBoxMouseUp(TObj
 
 		STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
 			Data_Points[cdp].calculate_values_in_data_point(
-			STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_values_table_ref(),&STUDY->Comp_Module);
+			STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_values_table_ref(),&STUDY->Comp_Module,
+			STUDY->Surfaces_List[STUDY->Current_Surface].Mapping_System_Source);
 	}
 
 	// update all data point values if ref dragged and "affects all" flag is true
@@ -3376,7 +3377,9 @@ void TMain_Application_Window::update_LAT_annotation_of_current_map()
 
 	STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
 		Data_Points[dp].calculate_values_in_data_point(
-			STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_values_table_ref(),&STUDY->Comp_Module);
+			STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_values_table_ref(),&STUDY->Comp_Module,
+			STUDY->Surfaces_List[STUDY->Current_Surface].Mapping_System_Source);
+
 	}
 }
 
@@ -8892,67 +8895,6 @@ void __fastcall TMain_Application_Window::Exportcurrentdatapointegms1Click(TObje
 
 
 
-void __fastcall TMain_Application_Window::ImportDxLmap1Click(TObject *Sender)
-{
-   bool Append = perform_pre_import_queries();
-
-   ShowMessage("Select folder with DxL_1.csv, DxL_2.csv,... and DxLandmarkGeo.xml files");
-
-   if( SelectDirectory("Select data directory", "", Data_IO_Object.Data_Files_Path) )
-   {
-	Data_FileListBox->Clear();
-	Data_FileListBox->Update();
-	Data_FileListBox->ApplyFilePath( Data_IO_Object.Data_Files_Path );
-
-	Progress_Form->clear();
-	Progress_Form->add_text("Folder selected: " + Data_IO_Object.Data_Files_Path);
-	Progress_Form->Show();
-	Application->ProcessMessages();
-
-	if( Data_IO_Object.Data_Files_Path.Length() > 0 )
-	{
-		AnsiString Result = Data_IO_Object.import_NavX_DxL_folder(
-			Data_FileListBox,STUDY,Progress_Form,Append);
-
-		if( Result == "Import completed" )
-		{
-		STUDY->Current_Surface = 0;
-
-		Progress_Form->add_text("Initialization...");
-		Progress_Form->Show();
-		Application->ProcessMessages();
-		post_import_initialization(STUDY->Surfaces_List.size()-1,STUDY->Surfaces_List[STUDY->Current_Surface].Data_Points_Filling_Threshold_mm,true);
-
-		update_controls_state();
-
-		if( MessageDlg("Center map?",
-		mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, 0) == mrYes)
-		if( STUDY->is_current_surface_in_range() )
-			STUDY->Surfaces_List[STUDY->Current_Surface].center_geometry_and_data_points();
-
-		OpenGL_Panel_1.set_initial_zoom_in_3D_panel();
-		repaint_3D_panels();
-
-		Progress_Form->add_text("Import completed. Press CLOSE to continue." );
-		Application->ProcessMessages();
-		Progress_Form->Show();
-
-		}
-		else
-		{
-			Progress_Form->Hide();
-			ShowMessage(Result);
-		}
-
-   } // folder path size > 0
-   else
-   ShowMessage("Invalid folder selected");
-
-   }
-
-}
-
-//---------------------------------------------------------------------------
 
 void TMain_Application_Window::create_new_dpset(AnsiString Name)
 {
@@ -9062,8 +9004,117 @@ void __fastcall TMain_Application_Window::ImportDxLmappreEnsiteX1Click(TObject *
    ShowMessage("Invalid folder selected");
 
    }
-
-
 }
 //---------------------------------------------------------------------------
+
+void __fastcall TMain_Application_Window::ImportgeometryContactMappingModelxmlfile1Click(TObject *Sender)
+
+{
+   bool Append = perform_pre_import_queries();
+
+   ShowMessage("Select folder with DxL export (it should contain 'Contact_Mapping_Model.xml' file and 'Contact_Mapping' folder");
+
+   if( SelectDirectory("Select data directory", "", Data_IO_Object.Data_Files_Path) )
+   {
+	Data_FileListBox->Clear();
+	Data_FileListBox->Update();
+	Data_FileListBox->ApplyFilePath( Data_IO_Object.Data_Files_Path );
+
+	Progress_Form->clear();
+	Progress_Form->add_text("Folder selected: " + Data_IO_Object.Data_Files_Path);
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	if( Data_IO_Object.Data_Files_Path.Length() > 0 )
+	{
+		AnsiString Result = Data_IO_Object.import_EnsiteX_DxL_folder(
+			Data_FileListBox,STUDY,Progress_Form,Append);
+
+		if( Result == "Import completed" )
+		{
+
+		STUDY->Current_Surface = 0;
+
+		Annotation_Box.Displayed_Segment_Length_ptr = 4000;
+		Annotation_Box.Local_Signal_Zoom = 300;
+
+		Progress_Form->add_text("Initialization...");
+		Progress_Form->Show();
+		Application->ProcessMessages();
+		post_import_initialization(STUDY->Surfaces_List.size()-1,STUDY->Surfaces_List[STUDY->Current_Surface].Data_Points_Filling_Threshold_mm,true);
+
+		update_controls_state();
+
+		if( MessageDlg("Center map?",
+		mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, 0) == mrYes)
+		if( STUDY->is_current_surface_in_range() )
+			STUDY->Surfaces_List[STUDY->Current_Surface].center_geometry_and_data_points();
+
+		if( MessageDlg("Force data points onto geometry surface?",
+		mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, 0) == mrYes)
+		if( STUDY->is_current_surface_in_range() )
+			Forcedatapointsontosurface1Click(this);
+
+		OpenGL_Panel_1.set_initial_zoom_in_3D_panel();
+		repaint_3D_panels();
+
+		Progress_Form->add_text("Import completed. Press CLOSE to continue." );
+		Application->ProcessMessages();
+		Progress_Form->Show();
+
+		}
+		else
+		{
+			Progress_Form->Hide();
+			ShowMessage(Result);
+		}
+
+   } // folder path size > 0
+   else
+   ShowMessage("Invalid folder selected");
+
+   }
+}
+//---------------------------------------------------------------------------
+
+
+
+void __fastcall TMain_Application_Window::Importegmsselectingfilewithegms1Click(TObject *Sender)
+{
+	OpenDialog->Title = "Select wave_XXX.csv file (eg. Wave_rov.csv, Wave_uni_across.csv, etc.)";
+	OpenDialog->FilterIndex = 0;
+
+	if( STUDY->is_current_surface_in_range() )
+	if( STUDY->Surfaces_List[STUDY->Current_Surface].data_points_set_ptr_in_range() )
+	if( OpenDialog->Execute() )
+	{
+
+	Progress_Form->clear();
+	Progress_Form->add_text("File selected: " + OpenDialog->FileName);
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	Main_Application_Window->Cursor = crHourGlass;
+
+	int S = STUDY->Current_Surface;
+	int dset = STUDY->Surfaces_List[S].Current_Data_Point_Set_Ptr;
+
+	AnsiString Result = Data_IO_Object.read_EnsiteX_egm_data_file(OpenDialog->FileName,
+		&STUDY->Surfaces_List[S].Data_Point_Set[dset], STUDY);
+
+	if( Result == "Import completed" )
+	{
+		update_controls_state();
+		repaint_3D_panels();
+	}
+	else
+	{
+		Progress_Form->Hide();
+		ShowMessage(Result);
+	}
+
+   }
+}
+//---------------------------------------------------------------------------
+
 

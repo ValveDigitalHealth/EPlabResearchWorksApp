@@ -480,7 +480,7 @@ bool Data_Point::set_value(AnsiString Value_Name, double Value,
 
 	if( value_ptr == -1 )
 	{
-		ShowMessage("adding value to master values list, set_value "+ SourceFileName);
+//		ShowMessage("Missing value: " + Value_Name + " while adding value to master values list, set_value "+ SourceFileName);
 		Value_Description_Class VDC;
 		VDC.Value_Name = "Value_Name";
 		Values_List[0].push_back(VDC);
@@ -490,7 +490,6 @@ bool Data_Point::set_value(AnsiString Value_Name, double Value,
 	// check if value_ptr is in range
 	if( value_ptr >= Values_Set.size() )
 	{
-//		ShowMessage("expanding dp values list, set_value "+ SourceFileName);
 		while( value_ptr >= Values_Set.size() )
 		Values_Set.push_back(tmpv);
 	}
@@ -558,7 +557,7 @@ int Data_Point::find_roving_catheter_LAT_in_data_point(Computational_Module_Clas
 	//----------------------------------------------------------------------
 
 void Data_Point::calculate_values_in_data_point(std::vector <Value_Description_Class> *Values_List,
-		Computational_Module_Class *Comp_Module)
+		Computational_Module_Class *Comp_Module,int Mapping_System_Type)
 {
 	Value_Description_Class VC;
 	int ptr=-1;
@@ -644,11 +643,14 @@ void Data_Point::calculate_values_in_data_point(std::vector <Value_Description_C
 	set_value(Voltage_Amplitude_Value_Name,v,Values_List);
 
 	// calculate unipolar voltage value from ref (CARTO maps)
-	AnsiString Unipolar_Voltage_Amplitude_Value_Name = "Unipolar voltage";
-	Numerical_Library_Obj.calculate_max_min_mean_vec_ranged(
-		 &Reference_Signal.Voltage_Values,Start,Stop,&min,&max,&mean,&SD);
-	v = max - min;
-	set_value(Unipolar_Voltage_Amplitude_Value_Name,v,Values_List);
+	if( Mapping_System_Type == MAPPING_SYSTEM_ORIGIN_CARTO )
+	{
+		AnsiString Unipolar_Voltage_Amplitude_Value_Name = "Unipolar voltage";
+		Numerical_Library_Obj.calculate_max_min_mean_vec_ranged(
+			 &Reference_Signal.Voltage_Values,Start,Stop,&min,&max,&mean,&SD);
+		v = max - min;
+		set_value(Unipolar_Voltage_Amplitude_Value_Name,v,Values_List);
+	}
 
 	}
 	else
