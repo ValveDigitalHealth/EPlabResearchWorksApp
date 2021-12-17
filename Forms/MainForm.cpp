@@ -9055,12 +9055,15 @@ void __fastcall TMain_Application_Window::ImportgeometryContactMappingModelxmlfi
 		if( STUDY->is_current_surface_in_range() )
 			Forcedatapointsontosurface1Click(this);
 
+		Progress_Form->add_text("Import completed." );
+		Application->ProcessMessages();
+		Progress_Form->Hide();
+
 		OpenGL_Panel_1.set_initial_zoom_in_3D_panel();
 		repaint_3D_panels();
 
-		Progress_Form->add_text("Import completed. Press CLOSE to continue." );
-		Application->ProcessMessages();
-		Progress_Form->Show();
+		STUDY->Comp_Module.Individual_Reference_Channel_Annotation = false;
+		ShowMessage("Import completed. Individual reference annotation flag set to false (if not desired, change in 'Options->Annotation signal processing parameters");
 
 		}
 		else

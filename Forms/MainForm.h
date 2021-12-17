@@ -406,8 +406,6 @@ class TMain_Application_Window : public TForm
 	TMenuItem *ImportDxLmappreEnsiteX1;
 	TMenuItem *ImportgeometryContactMappingModelxmlfile1;
 	TMenuItem *Importegmsselectingfilewithegms1;
-	TButton *Button1;
-	TButton *Button2;
 	TMenuItem *N32;
 
 	//----------------------------------------------------------------------

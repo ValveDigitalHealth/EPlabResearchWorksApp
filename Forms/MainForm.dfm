@@ -647,22 +647,6 @@ object Main_Application_Window: TMain_Application_Window
     TabOrder = 6
     OnChange = Signals_ScrollBarChange
   end
-  object Button1: TButton
-    Left = 32
-    Top = 232
-    Width = 75
-    Height = 25
-    Caption = 'Button1'
-    TabOrder = 7
-  end
-  object Button2: TButton
-    Left = 32
-    Top = 263
-    Width = 75
-    Height = 25
-    Caption = 'Button1'
-    TabOrder = 8
-  end
   object MainMenuResearch: TMainMenu
     Left = 448
     Top = 40
