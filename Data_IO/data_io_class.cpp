@@ -622,13 +622,6 @@ AnsiString Data_IO_Class::read_EnsiteX_egm_data_file(AnsiString FileName,
 	Pos = i;
 	DPS_no = Rows[Pos].Elements[1].Trim().ToInt();
 
-	// check if number of data points agrees
-//	if( DPS_no != Data_Point_Set[0].Data_Points.size() )
-//	{
-//		ShowMessage("Data points number in this file is different from the number declared in Map_PP_Omni.csv file. Are you sure you selected file from correct folder?");
-//		return "Data points number differs";
-//	}
-
 	//----------------------------------------------------------
 	// get row where data starts
 	//----------------------------------------------------------
@@ -679,6 +672,7 @@ AnsiString Data_IO_Class::read_EnsiteX_egm_data_file(AnsiString FileName,
 	//-------------------------------------------------------------
 	//-------------------------------------------------------------
 	{
+
 		if( i%100==1 )
 		{
 		// update progress form
@@ -708,6 +702,7 @@ AnsiString Data_IO_Class::read_EnsiteX_egm_data_file(AnsiString FileName,
 		D->Roving_Signal.Voltage_Values.clear();
 
 		for(long t=0;t<Number_of_Samples;t++)
+		if( 5+t < Rows[i+1].Elements.size()-1 )
 		{
 			if( Rows[i+1].Elements[5+t].Trim() != "")
 			v =(Rows[i+1].Elements[5+t].Trim()).ToDouble();
@@ -835,6 +830,7 @@ AnsiString Data_IO_Class::read_EnsiteX_ref_data_file(AnsiString FileName,
 		// read egm
 		Voltage_Values.clear();
 		for(long t=0;t<Number_of_Samples;t++)
+		if( 5+t < Rows[i+1].Elements.size()-1 )
 		{
 			if( Rows[i+1].Elements[5+t].Trim() != "")
 			v =(Rows[i+1].Elements[5+t].Trim()).ToDouble();
