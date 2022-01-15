@@ -904,6 +904,9 @@ void TMain_Application_Window::set_Map_Panel_PopupMenu_item_checked_state
 
 void __fastcall TMain_Application_Window::Displayoptions1Click(TObject *Sender)
 {
+	if( STUDY->is_current_surface_in_range() )
+	{
+
 	double ScalingFactor = 4;
 
 	//-------------------------------------------------------------------
@@ -1275,6 +1278,8 @@ void __fastcall TMain_Application_Window::Displayoptions1Click(TObject *Sender)
 	OpenGL_Panel_1.prepare_colors_for_display();
 	repaint_3D_panels();
 	//*********
+
+	}
 
 	}
 }
@@ -1967,7 +1972,7 @@ void __fastcall TMain_Application_Window::All_EGMs_PaintBoxMouseUp(TObject *Send
 
 void __fastcall TMain_Application_Window::About1Click(TObject *Sender)
 {
-	ShowMessage("EPLab Works. Version v.2.0.3 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
+	ShowMessage("EPLab Works. Version v.2.0.4 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
 }
 //---------------------------------------------------------------------------
 
@@ -3798,6 +3803,9 @@ void __fastcall TMain_Application_Window::Applicationsettings1Click(TObject *Sen
 
 void __fastcall TMain_Application_Window::Annotationsignalprocessinparameters1Click(TObject *Sender)
 {
+	if( STUDY->is_current_surface_in_range() )
+	{
+
 	int result;
 	bool DP_update_required = false;
 
@@ -3920,6 +3928,8 @@ void __fastcall TMain_Application_Window::Annotationsignalprocessinparameters1Cl
 	}
 
 	repaint_all_controls();
+
+	}
 }
 //---------------------------------------------------------------------------
 
@@ -4722,6 +4732,7 @@ void __fastcall TMain_Application_Window::UpdateReferenceBarpositionwithrespectt
 	long Min_Ptr,Max_Ptr,Start,Stop;
 	int Peak_Range_Ptr;
 
+	double Correlation_Threshold = Annotation_Parameters_Form->Corr_Th_Template_Matching_Edit->Text.ToDouble();
 
 	// 1. Check if V wave is selected
 	if( NL_Analysis_Form->V_Wave.size() == 0 )
@@ -4757,12 +4768,6 @@ void __fastcall TMain_Application_Window::UpdateReferenceBarpositionwithrespectt
 					1./STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
 					Data_Points[i].ECG_Signal.Time_Step_ms );
 
-
-		ofstream df("PSimilarityvec.csv");
-		for (long i=0; i < PSimilarity_Vector.size(); i++) {
-		df << PSimilarity_Vector[i] << endl;
-		}
-
 		// find max
 		Peak_Range_Ptr = 10 / STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
 					Data_Points[i].ECG_Signal.Time_Step_ms;
@@ -4771,8 +4776,12 @@ void __fastcall TMain_Application_Window::UpdateReferenceBarpositionwithrespectt
 		PNUM.find_max_peak_with_max_slopes(&PSimilarity_Vector,Start,Stop,&Max,&Max_Ptr,Peak_Range_Ptr);
 
 		// reassign ref
+		if( PSimilarity_Vector[Max_Ptr] > Correlation_Threshold )
 		STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
 					Data_Points[i].Ref_Signal_Activation_ptr = Max_Ptr;
+		else
+		STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
+					Data_Points[i].Ref_Signal_Activation_ptr = NOT_POSSIBLE_TO_CALCULATE_VALUE;
 	}
 
 	// update annotation of current map

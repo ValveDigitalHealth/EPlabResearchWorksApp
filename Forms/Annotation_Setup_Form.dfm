@@ -355,6 +355,17 @@ object Annotation_Parameters_Form: TAnnotation_Parameters_Form
     ParentFont = False
     WordWrap = True
   end
+  object Label16: TLabel
+    Left = 230
+    Top = 307
+    Width = 203
+    Height = 13
+    Margins.Left = 2
+    Margins.Top = 2
+    Margins.Right = 2
+    Margins.Bottom = 2
+    Caption = 'Correlation threshold for template matching:'
+  end
   object ROV_Left_Edge_Edit: TEdit
     Left = 270
     Top = 42
@@ -685,7 +696,7 @@ object Annotation_Parameters_Form: TAnnotation_Parameters_Form
     Text = '150'
   end
   object DataPoints_space_Filling_Th_Edit: TEdit
-    Left = 766
+    Left = 794
     Top = 18
     Width = 39
     Height = 21
@@ -697,7 +708,7 @@ object Annotation_Parameters_Form: TAnnotation_Parameters_Form
     Text = '20'
   end
   object Max_Dist_Corr_Nodes_Edit: TEdit
-    Left = 766
+    Left = 794
     Top = 43
     Width = 39
     Height = 21
@@ -743,5 +754,17 @@ object Annotation_Parameters_Form: TAnnotation_Parameters_Form
     Margins.Bottom = 2
     TabOrder = 29
     Text = '20'
+  end
+  object Corr_Th_Template_Matching_Edit: TEdit
+    Left = 436
+    Top = 304
+    Width = 55
+    Height = 21
+    Margins.Left = 2
+    Margins.Top = 2
+    Margins.Right = 2
+    Margins.Bottom = 2
+    TabOrder = 30
+    Text = '0.1'
   end
 end

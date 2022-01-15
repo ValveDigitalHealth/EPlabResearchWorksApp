@@ -93,6 +93,8 @@ __published:	// IDE-managed Components
 	TEdit *EOS_Th_Edit;
 	TLabel *Label13;
 	TEdit *MinVolt_LAT_Annotaiton_Edit;
+	TLabel *Label16;
+	TEdit *Corr_Th_Template_Matching_Edit;
     void __fastcall OK_ButtonClick(TObject *Sender);
     void __fastcall Cancel_ButtonClick(TObject *Sender);
     void __fastcall FormResize(TObject *Sender);
