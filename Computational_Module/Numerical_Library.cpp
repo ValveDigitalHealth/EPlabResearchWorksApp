@@ -70,6 +70,20 @@ void Numerical_Library::find_max_peak_with_max_slopes(
 	}
 
 	}
+
+	// now update max_ptr position to reflect max value in the vector (in first stage we just find for region of the peak with max slope
+	double max = std::numeric_limits<double>::min();
+	long max_ptr = -1;
+	for(long i=Max_Ptr[0]-Slope_Range_Ptr; i<Max_Ptr[0]+Slope_Range_Ptr; i++)
+	{
+		if( Signal[0][i] > max )
+		{
+			max = Signal[0][i];
+			max_ptr = i;
+		}
+	}
+
+	Max_Ptr[0] = max_ptr;
 }
 
 //--------------------------------------------------------------------------

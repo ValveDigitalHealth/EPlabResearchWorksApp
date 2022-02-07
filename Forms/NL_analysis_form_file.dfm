@@ -3,8 +3,8 @@ object NL_Analysis_Form: TNL_Analysis_Form
   Top = 135
   Align = alClient
   Caption = 'NL analysis'
-  ClientHeight = 670
-  ClientWidth = 1267
+  ClientHeight = 1002
+  ClientWidth = 1722
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -88,8 +88,8 @@ object NL_Analysis_Form: TNL_Analysis_Form
   object PageControl1: TPageControl
     Left = 179
     Top = 51
-    Width = 1081
-    Height = 587
+    Width = 1382
+    Height = 838
     Margins.Left = 2
     Margins.Top = 2
     Margins.Right = 2
@@ -104,10 +104,8 @@ object NL_Analysis_Form: TNL_Analysis_Form
       Margins.Bottom = 2
       Caption = 'Pre-filtering'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitWidth = 1073
+      ExplicitHeight = 559
       object Label6: TLabel
         Left = 44
         Top = 198

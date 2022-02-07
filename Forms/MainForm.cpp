@@ -1972,7 +1972,7 @@ void __fastcall TMain_Application_Window::All_EGMs_PaintBoxMouseUp(TObject *Send
 
 void __fastcall TMain_Application_Window::About1Click(TObject *Sender)
 {
-	ShowMessage("EPLab Works. Version v.2.0.4 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
+	ShowMessage("EPLab Works. Version v.2.0.5 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
 }
 //---------------------------------------------------------------------------
 
@@ -3374,8 +3374,7 @@ void TMain_Application_Window::update_LAT_annotation_of_current_map()
 {
 	int dset = STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr;
 
-	for(long dp=0;dp<STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
-		Data_Points.size();dp++)
+	for(long dp=0;dp<STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].Data_Points.size();dp++)
 	{
 	STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
 		Data_Points[dp].find_roving_catheter_LAT_in_data_point(&STUDY->Comp_Module);
@@ -4740,8 +4739,7 @@ void __fastcall TMain_Application_Window::UpdateReferenceBarpositionwithrespectt
 	else
 	{
 
-	for(long i=0;i<(signed)STUDY->Surfaces_List[STUDY->Current_Surface].
-		Data_Point_Set[dset].Data_Points.size();i++)
+	for(long i=0;i<(signed)STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].Data_Points.size();i++)
 	{
 		if( i%10 == 0 )
 		{
@@ -4769,7 +4767,7 @@ void __fastcall TMain_Application_Window::UpdateReferenceBarpositionwithrespectt
 					Data_Points[i].ECG_Signal.Time_Step_ms );
 
 		// find max
-		Peak_Range_Ptr = 10 / STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
+		Peak_Range_Ptr = 10. / STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
 					Data_Points[i].ECG_Signal.Time_Step_ms;
 		Start = 0.1*PSimilarity_Vector.size();
 		Stop = 0.9*PSimilarity_Vector.size();
@@ -4788,16 +4786,19 @@ void __fastcall TMain_Application_Window::UpdateReferenceBarpositionwithrespectt
 	Annotation_Box.Reference_Annotation_Dragged = true;
 	update_LAT_annotation_of_current_map();
 	update_display_of_LAT_Bip_maps();
+	STUDY->Surfaces_List[STUDY->Current_Surface].interpolate_all_values(0,dset,Progress_Form);
 	Annotation_Box.Reference_Annotation_Dragged = false;
 
 	STUDY->compute_min_max_values();
+	update_controls_state();
+	OpenGL_Panel_1.prepare_colors_for_display();
+	repaint_3D_panels();
+
+	Progress_Form->Hide();
 
 	// set individual ref annotaiton flag
 	STUDY->Comp_Module.Individual_Reference_Channel_Annotation = true;
 	ShowMessage("Individual positioning of reference bar mode enabled. Go to Options->Annotation options to modify.");
-
-	Progress_Form->Hide();
-	repaint_3D_panels();
 
 	} // if V wave size > 0
 
