@@ -96,7 +96,7 @@ void __fastcall TStringGrid_Form::CopyTableButtonClick(TObject *Sender)
 void __fastcall TStringGrid_Form::FormResize(TObject *Sender)
 {
 	StringGrid1->Width = StringGrid_Form->Width-20;
-	StringGrid1->Height = StringGrid_Form->Height - Close_Button->Height - 60;
+	StringGrid1->Height = StringGrid_Form->Height - Close_Button->Height - 70;
 
 	StringGrid_Form->StringGrid1->DefaultColWidth =
 		((double)StringGrid_Form->Width-20.) / (double)StringGrid_Form->StringGrid1->ColCount-10;

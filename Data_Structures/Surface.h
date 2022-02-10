@@ -129,7 +129,7 @@ class Surface_Class
 	bool triangle_values_valid_specific_value(long Triangle_Ptr,long Val_Ptr);
 
 	int calculate_statistics_for_Values(int Seg_No,int Val_Id,
-				double* av,double* median,double* min,double* max,double* sd,double* covc,
+				double* av,double* median,double* p5,double* p25,double* p75,double* p95,double* min,double* max,double* sd,double* covc,
 				int DP_Set,bool Exclude_Zero_Values);
 
 	int calculate_area_taken_by_Value(int Seg_No,int Val_Id,double Threshold,int Direction,

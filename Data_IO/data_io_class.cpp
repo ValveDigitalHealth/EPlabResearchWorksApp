@@ -1883,6 +1883,19 @@ AnsiString Data_IO_Class::import_single_CARTO_map(TFileListBox* Data_FileListBox
    Value_Desc.Unit = "Ohm";
    Study->Surfaces_List[Study->Current_Surface].Map_Values.add_value(Value_Desc);
 
+
+   Value_Desc.Value_Name = "Unipolar peak negative voltage";
+   Value_Desc.Unit = "mV";
+   Study->Surfaces_List[Study->Current_Surface].Map_Values.add_value(Value_Desc);
+
+   Value_Desc.Value_Name = "Unipolar peak positive voltage";
+   Value_Desc.Unit = "mV";
+   Study->Surfaces_List[Study->Current_Surface].Map_Values.add_value(Value_Desc);
+
+   Value_Desc.Value_Name = "Unipolar dvdt";
+   Value_Desc.Unit = "mV/ms";
+   Study->Surfaces_List[Study->Current_Surface].Map_Values.add_value(Value_Desc);
+
    df.getline(Line,20000); // read header line
 
    for(long d=0;d<Data_Points_No;d++)
@@ -1946,7 +1959,14 @@ AnsiString Data_IO_Class::import_single_CARTO_map(TFileListBox* Data_FileListBox
    // LABEL ID
    istringstream_Line >> string;  // point type (defined in "predefined paramets.h" CARTO_TYPES)
    Study->Surfaces_List[Study->Current_Surface].Data_Point_Set[0].Data_Points[Dp_ptr].LabelId = atoi(string);
-
+/*
+   istringstream_Line >> string; // column Q
+   istringstream_Line >> string; // column R
+   istringstream_Line >> string; // column S
+   istringstream_Line >> string; // column T
+   istringstream_Line >> string; // column U
+   istringstream_Line >> string; // column V
+*/
 
    Dp_ptr ++;
 
@@ -3864,10 +3884,12 @@ bool Data_IO_Class::export_geo_as_stl_file(AnsiString FileName,Surface_Class *Su
 }
 //---------------------------------------------------------------------------
 
-void Data_IO_Class::save_values_at_geometry_nodes(AnsiString FileName,STUDY_Class *STUDY)
+void Data_IO_Class::save_values_at_geometry_nodes(AnsiString FileName,STUDY_Class *STUDY,Segments_List_Class* Segments_Info)
 {
 	ofstream df;
 	df.open(FileName.c_str());
+	AnsiString Val_Name;
+    double v;
 
 	int dset = STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr;
 
@@ -3899,11 +3921,21 @@ void Data_IO_Class::save_values_at_geometry_nodes(AnsiString FileName,STUDY_Clas
 	df << i << ",";
 
 	for(int k=0;k<STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.Values_Table.size();k++)
-	if( STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Node_Set[i].get_value(dset,k) != NOT_POSSIBLE_TO_CALCULATE_VALUE )
-	df << STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Node_Set[i].get_value(dset,k) << ",";
+	{
+
+	v =  STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Node_Set[i].get_value(dset,k);
+
+	Val_Name = STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_value_name_according_to_ptr(k);
+
+	if( Val_Name == SEGMENTATION_VALUE_NAME )
+	df << STUDY->get_segment_name_at_given_node(STUDY->Current_Surface,i,Segments_Info).c_str() << ",";
+	else
+	if( v != NOT_POSSIBLE_TO_CALCULATE_VALUE )
+	df << v << ",";
 	else
 	df << ",";
 
+	}
 	df << "\n";
 
 	}
@@ -3913,11 +3945,12 @@ void Data_IO_Class::save_values_at_geometry_nodes(AnsiString FileName,STUDY_Clas
 
 //---------------------------------------------------------------------------
 
-void Data_IO_Class::save_values_at_data_points(AnsiString FileName,STUDY_Class *STUDY)
+void Data_IO_Class::save_values_at_data_points(AnsiString FileName,STUDY_Class *STUDY,Segments_List_Class* Segments_Info)
 {
 	ofstream df;
 	df.open(FileName.c_str());
-    double v;
+	double v;
+	AnsiString Val_Name;
 
 	int dset = STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr;
 
@@ -3944,18 +3977,30 @@ void Data_IO_Class::save_values_at_data_points(AnsiString FileName,STUDY_Class *
 
 	for(int k=0;k<STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.Values_Table.size();k++)
 	{
-	v = STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].Data_Points[i].get_value(
-			STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_value_name_according_to_ptr(k),
+
+	Val_Name = STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_value_name_according_to_ptr(k);
+
+	v = STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].Data_Points[i].get_value(Val_Name,
 			STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_values_table_ref());
 
+	if( Val_Name == SEGMENTATION_VALUE_NAME )
+	{
+		// if segment name is to be displayed, take it from triangle Segment_Id field
+		if( STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].Data_Points[i].Closest_Node_Id >= 0 )
+		df << STUDY->get_segment_name_at_given_node(STUDY->Current_Surface,
+				STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
+				Data_Points[i].Closest_Node_Id,Segments_Info).c_str() << ",";
+		else
+		df << ",";
+	}
+	else
 	if( v!= NOT_POSSIBLE_TO_CALCULATE_VALUE )
-	df << STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].Data_Points[i].get_value(
-			STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_value_name_according_to_ptr(k),
-			STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_values_table_ref()) << ",";
+	df << v << ",";
 	else
 	df << ",";
 
 	}
+
 	df << "\n";
 
 	}

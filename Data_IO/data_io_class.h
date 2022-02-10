@@ -138,8 +138,8 @@ class Data_IO_Class
 	//-------------------------------------------------------------------------
 	// Various import/export functions
 	//-------------------------------------------------------------------------
-	void save_values_at_geometry_nodes(AnsiString FileName,STUDY_Class *STUDY);
-	void save_values_at_data_points(AnsiString FileName,STUDY_Class *STUDY);
+	void save_values_at_geometry_nodes(AnsiString FileName,STUDY_Class *STUDY,Segments_List_Class* Segments_Info);
+	void save_values_at_data_points(AnsiString FileName,STUDY_Class *STUDY,Segments_List_Class* Segments_Info);
 
 	//-------------------------------------------------------------------------
 	// Application settings

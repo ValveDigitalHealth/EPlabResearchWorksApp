@@ -933,7 +933,7 @@ void OpenGL_Panel_Class::MouseFeedBack(int X, int Y,bool Segmenting)
 	if( OpenGL_Panel_Display_Parameters.Display_Data_Points )
 	for(long S=0;S<STUDY->Surfaces_List.size();S++)
 	if( STUDY->Surfaces_List[S].Display_Whole_Dataset_Flag )
-	if( STUDY->Surfaces_List[S].Display_Geometry_Flag )
+//	if( STUDY->Surfaces_List[S].Display_Geometry_Flag )
 	{
 		int dset = STUDY->Surfaces_List[S].Current_Data_Point_Set_Ptr;
 
@@ -1095,6 +1095,7 @@ void OpenGL_Panel_Class::prepare_colors_for_display()
 	double Value,CV;
 	double Min_Value, Max_Value,DP_Val;
 	long Closest_DP_Ptr;
+	double p5,p25,p75,p95;
 
 	for(int S=0;S<(signed)STUDY->Surfaces_List.size();S++)
 	if( STUDY->Surfaces_List[S].Display_Whole_Dataset_Flag )
@@ -1224,7 +1225,7 @@ void OpenGL_Panel_Class::prepare_colors_for_display()
 
 	double av,min,max,SD,CovC,median;
 	STUDY->Surfaces_List[S].calculate_statistics_for_Values(0,Current_Value_Ptr,
-			&av,&median,&min,&max,&SD,&CovC,dset,false); // ,bool Exclude_Zero_Values);
+			&av,&median,&p5,&p25,&p75,&p95,&min,&max,&SD,&CovC,dset,false); // ,bool Exclude_Zero_Values);
 	STUDY->Surfaces_List[S].Mean_Map_Value = av;
 	STUDY->Surfaces_List[S].SD_of_Map_Value = SD;
 

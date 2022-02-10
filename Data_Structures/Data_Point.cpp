@@ -482,7 +482,7 @@ bool Data_Point::set_value(AnsiString Value_Name, double Value,
 	{
 //		ShowMessage("Missing value: " + Value_Name + " while adding value to master values list, set_value "+ SourceFileName);
 		Value_Description_Class VDC;
-		VDC.Value_Name = "Value_Name";
+		VDC.Value_Name = Value_Name;
 		Values_List[0].push_back(VDC);
 		value_ptr = Values_List[0].size()-1;
 	}
@@ -562,7 +562,6 @@ void Data_Point::calculate_values_in_data_point(std::vector <Value_Description_C
 	Value_Description_Class VC;
 	int ptr=-1;
 	double v;
-	AnsiString Unipolar_Voltage_Amplitude_Value_Name = "Unipolar voltage";
 
 	//----------------------------------------------------------------------
 	// find which values are LAT and voltage maps (for roving signal analysis)
@@ -614,17 +613,23 @@ void Data_Point::calculate_values_in_data_point(std::vector <Value_Description_C
 	long Start,Stop;
 
 	double p_rov = Rov_Signal_Activation_ptr;
+
 	double p1 = Ref_Signal_Activation_ptr +
 			Comp_Module->ROV_LAT_Annotation_Left_Edge_ms/Roving_Signal.Time_Step_ms;
+
 	double p2 = Rov_Signal_Activation_ptr-
 			ACTIVATION_HALF_WIDTH_FOR_PEAK_TO_PEAK_EXTRACTION_MS/Roving_Signal.Time_Step_ms;
+
 	double p3 = Ref_Signal_Activation_ptr +
 			Comp_Module->ROV_LAT_Annotation_Right_Edge_ms/Roving_Signal.Time_Step_ms;
+
 	double p4 = Rov_Signal_Activation_ptr +
 			ACTIVATION_HALF_WIDTH_FOR_PEAK_TO_PEAK_EXTRACTION_MS/Roving_Signal.Time_Step_ms;
 
 	long Left_Min_Dist = 1000000,Right_Min_Dist = 1000000;
 
+	// this code is to make sure p2p voltage is estimaded from the window that falls into
+    // ROI (dark gray area within which rov is annotated)
 	if( p_rov > p1 && p_rov - p1 < Left_Min_Dist )  { Left_Min_Dist =  p_rov - p1; Start = p1; }
 	if( p_rov < p1 && p1 - p_rov < Right_Min_Dist ) { Right_Min_Dist = p1 - p_rov; Stop = p1; }
 
@@ -647,16 +652,29 @@ void Data_Point::calculate_values_in_data_point(std::vector <Value_Description_C
 	if( Mapping_System_Type == MAPPING_SYSTEM_ORIGIN_CARTO )
 	{
 		Numerical_Library_Obj.calculate_max_min_mean_vec_ranged(
-			 &Reference_Signal.Voltage_Values,Start,Stop,&min,&max,&mean,&SD);
-		v = max - min;
-		set_value(Unipolar_Voltage_Amplitude_Value_Name,v,Values_List);
+			 &Reference_Signal.Voltage_Values,p1,p3,&min,&max,&mean,&SD);
+
+		set_value("Unipolar voltage",max-min,Values_List);
+		set_value("Unipolar peak negative voltage",min,Values_List);
+		set_value("Unipolar peak positive voltage",max,Values_List);
+
+		// calculate dvdt
+		min = 10000;
+		for(long t=p1;t<p3;t++)
+		if( Reference_Signal.Voltage_Values[t] - Reference_Signal.Voltage_Values[t-1] < min )
+		min = Reference_Signal.Voltage_Values[t] - Reference_Signal.Voltage_Values[t-1];
+
+		set_value("Unipolar dvdt",min,Values_List);
 	}
 
 	}
 	else
 	{
 	set_value(Voltage_Amplitude_Value_Name,NOT_POSSIBLE_TO_CALCULATE_VALUE,Values_List);
-	set_value(Unipolar_Voltage_Amplitude_Value_Name,NOT_POSSIBLE_TO_CALCULATE_VALUE,Values_List);
+	set_value("Unipolar voltage",NOT_POSSIBLE_TO_CALCULATE_VALUE,Values_List);
+	set_value("Unipolar peak negative voltage",NOT_POSSIBLE_TO_CALCULATE_VALUE,Values_List);
+	set_value("Unipolar peak positive voltage",NOT_POSSIBLE_TO_CALCULATE_VALUE,Values_List);
+	set_value("Unipolar dvdt",NOT_POSSIBLE_TO_CALCULATE_VALUE,Values_List);
 	}
 
 	}

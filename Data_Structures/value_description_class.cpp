@@ -48,7 +48,7 @@ Value_Description_Class::Value_Description_Class()
 
 int Value_Description_Class::save_object_to_stream(ofstream* File)
 {
-	int version = 1;
+	int version = 2;
 
 	File->write((char*)&version, sizeof (int));
 
@@ -65,6 +65,9 @@ int Value_Description_Class::save_object_to_stream(ofstream* File)
 	File->write((char*)&LAT_Value, sizeof (bool));
 	File->write((char*)&Voltage_Amplitude_Value, sizeof (bool));
 
+	File->write((char*)&Min_Value_On_Map, sizeof (double));
+	File->write((char*)&Max_Value_On_Map, sizeof (double));
+
 	return 1;
 }
 //---------------------------------------------------------------------------
@@ -75,6 +78,26 @@ int Value_Description_Class::load_object_from_stream(ifstream* File)
 	int version,Size;
 
 	File->read((char*)&version, sizeof (int));
+
+	if( version == 2 )
+	{
+		Value_Name = Utils.load_String_from_File(File);
+		Unit = Utils.load_String_from_File(File);
+		File->read((char*)&Displayed_In_Table, sizeof (bool));
+
+		File->read((char*)&Type, sizeof (int));
+		File->read((char*)&Interpolation_Type, sizeof (int));
+		File->read((char*)&Fixed_Palette, sizeof (bool));
+		File->read((char*)&Inverted_Palette, sizeof (bool));
+
+		File->read((char*)&LAT_Value, sizeof (bool));
+		File->read((char*)&Voltage_Amplitude_Value, sizeof (bool));
+
+		File->read((char*)&Min_Value_On_Map, sizeof (double));
+		File->read((char*)&Max_Value_On_Map, sizeof (double));
+
+	return 1;
+	} // v2
 
 	if( version == 1 )
 	{

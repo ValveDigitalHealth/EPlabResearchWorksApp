@@ -31,6 +31,12 @@ SOFTWARE. */
 
 TMain_Application_Window *Main_Application_Window;
 
+void __fastcall TMain_Application_Window::About1Click(TObject *Sender)
+{
+	ShowMessage("EPLab Works. Version v.2.0.6 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
+}
+//---------------------------------------------------------------------------
+
 //---------------------------------------------------------------------------
 __fastcall TMain_Application_Window::TMain_Application_Window(TComponent* Owner)
 	: TForm(Owner)
@@ -116,12 +122,10 @@ void __fastcall TMain_Application_Window::FormResize(TObject *Sender)
 	int H = Main_Application_Window->Height - ToolBar1->Height - 4;
 	int Spacing = 5;
 
-	double page_ratio = 0.2;
+	double page_ratio = 0.35;
 	double opengl_panel_height_ratio = 0.6;
 
-	//---------------------------
-	// MAIN PAGE CONTROL
-	//---------------------------
+	///////////////////////////////// LEFT PAGE CONTROL ////////////////////////////////////////////////////
 
 	Left_PageControl->Left = Spacing;
 	Left_PageControl->Top = ToolBar1->Top + ToolBar1->Height + Spacing;
@@ -171,15 +175,19 @@ void __fastcall TMain_Application_Window::FormResize(TObject *Sender)
 	Deleted_Data_Points_List_StringGrid->ColWidths[5]= Deleted_Data_Points_List_StringGrid->ColWidths[0];
 	Deleted_Data_Points_List_StringGrid->ColWidths[6]= Deleted_Data_Points_List_StringGrid->ColWidths[0];
 
+	///////////////////////////////// OPENGL 3D WINDOW ////////////////////////////////////////////////////
+
 	Panel_1->Left = Left_PageControl->Left + Left_PageControl->Width + Spacing;
 	Panel_1->Top = ToolBar1->Height;
-	Panel_1->Width = 0.5*(W - W*page_ratio-5*Spacing);
+	Panel_1->Width = 0.7*(W - W*page_ratio-5*Spacing);
 	Panel_1->Height = H*opengl_panel_height_ratio;
 
 	Zoom_Label->Left = Left_PageControl->Width - Zoom_Label->Width - 20;
 	Zoom_Label->Top = 10;
 	Zoom_Slider_Image->Left = Zoom_Label->Left;
 	Zoom_Slider_Image->Top = Zoom_Label->Top + Zoom_Label->Height + 10;
+
+	//////////////////////////////  RIGHT PAGE CONTROL ///////////////////////////////////////////////////////
 
 	Right_PageControl->Left = Panel_1->Left + Panel_1->Width + Spacing;
 	Right_PageControl->Top = Panel_1->Top;
@@ -527,6 +535,7 @@ void TMain_Application_Window::fill_data_points_table(int Which_Data_Points)
 	vector<Data_Point> *Data_Points_List;
 	int DS = STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr;
 	double val;
+	long n0,t0;
 
 	if( Which_Data_Points == NOT_DELETED_DATA_POINTS )
 	{
@@ -539,21 +548,13 @@ void TMain_Application_Window::fill_data_points_table(int Which_Data_Points)
 	Selected_Data_Points_List_StringGrid = Deleted_Data_Points_List_StringGrid;
 	Data_Points_List = &STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[DS].Deleted_Data_Points;
 	}
-
+// xxx
 	//--------------------------------------------
 	// clear and fill headers of the string grid  (this is displayed when no data is loaded)
 	//--------------------------------------------
 	Selected_Data_Points_List_StringGrid->RowCount = 2;
 	Selected_Data_Points_List_StringGrid->ColCount = 9;
 	Selected_Data_Points_List_StringGrid->FixedRows = 1;
-	Selected_Data_Points_List_StringGrid->ColWidths[0]= (double)Selected_Data_Points_List_StringGrid->Width/(double)(Selected_Data_Points_List_StringGrid->ColCount)-3;
-	Selected_Data_Points_List_StringGrid->ColWidths[1]= Selected_Data_Points_List_StringGrid->ColWidths[0];
-	Selected_Data_Points_List_StringGrid->ColWidths[2]= Selected_Data_Points_List_StringGrid->ColWidths[0];
-	Selected_Data_Points_List_StringGrid->ColWidths[3]= Selected_Data_Points_List_StringGrid->ColWidths[0];
-	Selected_Data_Points_List_StringGrid->ColWidths[4]= Selected_Data_Points_List_StringGrid->ColWidths[0];
-	Selected_Data_Points_List_StringGrid->ColWidths[5]= Selected_Data_Points_List_StringGrid->ColWidths[0];
-	Selected_Data_Points_List_StringGrid->ColWidths[6]= Selected_Data_Points_List_StringGrid->ColWidths[0];
-	Selected_Data_Points_List_StringGrid->ColWidths[7]= Selected_Data_Points_List_StringGrid->ColWidths[0];
 
 	Selected_Data_Points_List_StringGrid->Cells[0][0] = "Id";
 	Selected_Data_Points_List_StringGrid->Cells[0][1] = "Type";
@@ -587,11 +588,15 @@ void TMain_Application_Window::fill_data_points_table(int Which_Data_Points)
 	// filling table with data points
 	//--------------------------------------------
 
-	int Number_of_displayed_values_in_columns = 8;
+	// int Number_of_displayed_values_in_columns = 8;
 
 	int Values_Number = STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_values_number();
 
-	Selected_Data_Points_List_StringGrid->ColCount = std::max(Number_of_displayed_values_in_columns,Values_Number);
+	Selected_Data_Points_List_StringGrid->ColCount = 2+Values_Number; //std::max(Number_of_displayed_values_in_columns,Values_Number);
+	for(int k=0;k<Selected_Data_Points_List_StringGrid->ColCount;k++)
+	Selected_Data_Points_List_StringGrid->ColWidths[k] =
+			Selected_Data_Points_List_StringGrid->Width/
+			Selected_Data_Points_List_StringGrid->ColCount-5;
 
 	//--------------------------------------------------
 	// fill values selection combobox
@@ -608,8 +613,7 @@ void TMain_Application_Window::fill_data_points_table(int Which_Data_Points)
 	Selected_Data_Points_List_StringGrid->Cells[0][0] = "Id";
 	Selected_Data_Points_List_StringGrid->Cells[1][0] = "Type";
 
-	for(int k=0;k<Number_of_displayed_values_in_columns-2;k++)
-	if( k < Values_Number )
+	for(int k=0;k<Values_Number;k++)
 	Selected_Data_Points_List_StringGrid->Cells[k+2][0] =
 		STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_value_name_according_to_ptr(k);
 
@@ -625,7 +629,7 @@ void TMain_Application_Window::fill_data_points_table(int Which_Data_Points)
 	Selected_Data_Points_List_StringGrid->Cells[1][i+1] = Data_Points_List[0][i].data_point_type(
 		STUDY->Surfaces_List[STUDY->Current_Surface].Mapping_System_Source);
 
-	for(int k=0;k<Number_of_displayed_values_in_columns-1;k++)
+	for(int k=0;k<Values_Number;k++)
 	if( k < Values_Number )
 	{
 
@@ -642,8 +646,10 @@ void TMain_Application_Window::fill_data_points_table(int Which_Data_Points)
 	if( STUDY->Surfaces_List[STUDY->Current_Surface].
 		Map_Values.get_value_name_according_to_ptr(k) == SEGMENTATION_VALUE_NAME )
 	{
-		if( val > 0 )
-		Selected_Data_Points_List_StringGrid->Cells[k+2][i+1] = Segments_Info.get_segment_name(val);
+		// if segment name is to be displayed, take it from triangle Segment_Id field
+		if( Data_Points_List[0][i].Closest_Node_Id >= 0 )
+		Selected_Data_Points_List_StringGrid->Cells[k+2][i+1] =
+			STUDY->get_segment_name_at_given_node(STUDY->Current_Surface,Data_Points_List[0][i].Closest_Node_Id,&Segments_Info);
 		else
 		Selected_Data_Points_List_StringGrid->Cells[k+2][i+1] = "";
 	}
@@ -805,9 +811,6 @@ void TMain_Application_Window::map_dislplay_panel_mouse_move(int X, int Y,
 	{
 
 	int Selected_Segment = get_current_segment_id();
-
-	int tt = STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Triangle_Set[
-		STUDY->Surfaces_List[STUDY->Current_Surface].Pointed_Triangle].Segment_Id;
 
 	mark_segment(STUDY->Surfaces_List[STUDY->Current_Surface].Pointed_Triangle,
 		Selected_Segment,Block_Existing_Segments_CheckBox->State);
@@ -1040,8 +1043,7 @@ void __fastcall TMain_Application_Window::Displayoptions1Click(TObject *Sender)
 			OpenGL_Panel_1.OpenGL_Panel_Display_Parameters.Palette_Type;
 
 		// fixed palette support
-		if( STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.
-				get_current_value_fixed_palette_flag() )
+		if( STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_current_value_fixed_palette_flag() )
 		Display_Options_Form_1->Fixed_Palette_Range_CheckBox->State = cbChecked;
 		else
 		Display_Options_Form_1->Fixed_Palette_Range_CheckBox->State = cbUnchecked;
@@ -1049,8 +1051,7 @@ void __fastcall TMain_Application_Window::Displayoptions1Click(TObject *Sender)
 		Display_Options_Form_1->Fixed_Palette_Range_Min_Edit->Text = FloatToStrF(STUDY->Min_Value_On_All_Maps,ffGeneral,3,2 );
 		Display_Options_Form_1->Fixed_Palette_Range_Max_Edit->Text = FloatToStrF(STUDY->Max_Value_On_All_Maps,ffGeneral,3,2 );
 
-		if( STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.
-				get_current_value_inverted_flag() )
+		if( STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_current_value_inverted_flag() )
 		Display_Options_Form_1->Invert_Palette_CheckBox->State = cbChecked;
 		else
 		Display_Options_Form_1->Invert_Palette_CheckBox->State = cbUnchecked;
@@ -1246,8 +1247,7 @@ void __fastcall TMain_Application_Window::Displayoptions1Click(TObject *Sender)
 		// fixed palette support
 		if( Display_Options_Form_1->Fixed_Palette_Range_CheckBox->State == cbChecked )
 		{
-		STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.
-				set_current_value_fixed_palette_flag(true);
+		STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.set_current_value_fixed_palette_flag(true);
 
 		STUDY->Min_Value_On_All_Maps = Display_Options_Form_1->Fixed_Palette_Range_Min_Edit->Text.ToDouble();
 		STUDY->Max_Value_On_All_Maps = Display_Options_Form_1->Fixed_Palette_Range_Max_Edit->Text.ToDouble();
@@ -1442,6 +1442,8 @@ void TMain_Application_Window::post_study_load_processing()
 		Extra_Channels_Box_Parameters.Displayed_Segment_Length_ptr =
 			Annotation_Box.Displayed_Segment_Length_ptr;
 	}
+
+	STUDY->compute_min_max_values();
 
 	Progress_Form->add_text("Finishing post study load processing...");
 	Progress_Form->Show();
@@ -1970,11 +1972,6 @@ void __fastcall TMain_Application_Window::All_EGMs_PaintBoxMouseUp(TObject *Send
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TMain_Application_Window::About1Click(TObject *Sender)
-{
-	ShowMessage("EPLab Works. Version v.2.0.5 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
-}
-//---------------------------------------------------------------------------
 
 void __fastcall TMain_Application_Window::Getstatsofcurrentmapvalue1Click(TObject *Sender)
 {
@@ -1985,10 +1982,11 @@ void __fastcall TMain_Application_Window::Getstatsofcurrentmapvalue1Click(TObjec
    AnsiString FileName = Utils.get_file_name_from_full_path(STUDY->Study_Current_Path_And_File_Name);
    int dset = STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr;
    double min,max,mean,SD,median,CovC;
+   double p5,p25,p75,p95;
    AnsiString Current_Value_Name = STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.Current_Map_Value_Name;
 
 
-   StringGrid_Form->StringGrid1->ColCount = 12; // stats paramenters no + value name + filename + geo + dsetname
+   StringGrid_Form->StringGrid1->ColCount = 16; // stats paramenters no + value name + filename + geo + dsetname
    StringGrid_Form->StringGrid1->RowCount =
 	STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_values_number() - 1 + 1; // -1 because there is segmentation value, +1 for header
 
@@ -2004,8 +2002,11 @@ void __fastcall TMain_Application_Window::Getstatsofcurrentmapvalue1Click(TObjec
    StringGrid_Form->StringGrid1->Cells[8][0] = "Mean";
    StringGrid_Form->StringGrid1->Cells[9][0] = "SD";
    StringGrid_Form->StringGrid1->Cells[10][0] = "CovC";
-
    StringGrid_Form->StringGrid1->Cells[11][0] = "Area[cm2]";
+   StringGrid_Form->StringGrid1->Cells[12][0] = "p5";
+   StringGrid_Form->StringGrid1->Cells[13][0] = "p25";
+   StringGrid_Form->StringGrid1->Cells[14][0] = "p75";
+   StringGrid_Form->StringGrid1->Cells[15][0] = "p95";
 
    int Counter=0;
    for(int val=0;val<STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_values_number();val++)
@@ -2013,9 +2014,10 @@ void __fastcall TMain_Application_Window::Getstatsofcurrentmapvalue1Click(TObjec
    {
 
    STUDY->Surfaces_List[STUDY->Current_Surface].calculate_statistics_for_Values(
-		0,val,&mean,&median,&min,&max,&SD,&CovC,dset,false);
+		0,val,&mean,&median,&p5,&p25,&p75,&p95,&min,&max,&SD,&CovC,dset,false);
 //    				int Seg_No,int Val_Id,
-//				double* av,double* median,double* min,double* max,double* sd,double* covc,
+//				double* av,double* median,double* p5,double* p25,double* p75,double* p95,
+//			    double* min,double* max,double* sd,double* covc,
 //				int DP_Set,bool Exclude_Zero_Values);
 	double area = STUDY->Surfaces_List[STUDY->Current_Surface].get_total_area();
 	long DPValid_No = STUDY->Surfaces_List[STUDY->Current_Surface].
@@ -2036,6 +2038,10 @@ void __fastcall TMain_Application_Window::Getstatsofcurrentmapvalue1Click(TObjec
    StringGrid_Form->StringGrid1->Cells[10][Counter] = FloatToStrF(CovC,ffGeneral,3,2);
    StringGrid_Form->StringGrid1->Cells[11][Counter] = FloatToStrF(area,ffGeneral,3,2);
 
+   StringGrid_Form->StringGrid1->Cells[12][Counter] = FloatToStrF(p5,ffGeneral,3,2);
+   StringGrid_Form->StringGrid1->Cells[13][Counter] = FloatToStrF(p25,ffGeneral,3,2);
+   StringGrid_Form->StringGrid1->Cells[14][Counter] = FloatToStrF(p75,ffGeneral,3,2);
+   StringGrid_Form->StringGrid1->Cells[15][Counter] = FloatToStrF(p95,ffGeneral,3,2);
    }
 
    StringGrid_Form->ShowModal();
@@ -2055,10 +2061,11 @@ void __fastcall TMain_Application_Window::GetstatsofcurrentmapvaluePERSEGMENT1Cl
    double min,max,mean,SD,median,CovC;
    //AnsiString Current_Value_Name = STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.Current_Map_Value_Name;
    AnsiString Value_Name;
+   double p5,p25,p75,p95;
 
    int Segments_Present_Number = 1;
 
-   StringGrid_Form->StringGrid1->ColCount = 13;
+   StringGrid_Form->StringGrid1->ColCount = 17;
 
    StringGrid_Form->StringGrid1->Cells[0][0] = "FileName";
    StringGrid_Form->StringGrid1->Cells[1][0] = "Geometry";
@@ -2073,8 +2080,12 @@ void __fastcall TMain_Application_Window::GetstatsofcurrentmapvaluePERSEGMENT1Cl
    StringGrid_Form->StringGrid1->Cells[9][0] = "Mean";
    StringGrid_Form->StringGrid1->Cells[10][0] = "SD";
    StringGrid_Form->StringGrid1->Cells[11][0] = "CovC";
-
    StringGrid_Form->StringGrid1->Cells[12][0] = "Area[cm2]";
+
+   StringGrid_Form->StringGrid1->Cells[13][0] = "p5";
+   StringGrid_Form->StringGrid1->Cells[14][0] = "p25";
+   StringGrid_Form->StringGrid1->Cells[15][0] = "p75";
+   StringGrid_Form->StringGrid1->Cells[16][0] = "p95";
 
    int Counter=0;
    int Segment_Id;
@@ -2103,7 +2114,7 @@ void __fastcall TMain_Application_Window::GetstatsofcurrentmapvaluePERSEGMENT1Cl
    {
 
    STUDY->Surfaces_List[STUDY->Current_Surface].calculate_statistics_for_Values(
-		Segment_Id,val,&mean,&median,&min,&max,&SD,&CovC,dset,false);
+		Segment_Id,val,&mean,&median,&p5,&p25,&p75,&p95,&min,&max,&SD,&CovC,dset,false);
 
    Counter++;
    StringGrid_Form->StringGrid1->Cells[0][Counter] = FileName;
@@ -2119,9 +2130,12 @@ void __fastcall TMain_Application_Window::GetstatsofcurrentmapvaluePERSEGMENT1Cl
    StringGrid_Form->StringGrid1->Cells[9][Counter] = FloatToStrF(mean,ffGeneral,3,2);
    StringGrid_Form->StringGrid1->Cells[10][Counter] = FloatToStrF(SD,ffGeneral,3,2);
    StringGrid_Form->StringGrid1->Cells[11][Counter] = FloatToStrF(CovC,ffGeneral,3,2);
-
    StringGrid_Form->StringGrid1->Cells[12][Counter] = FloatToStrF(area,ffGeneral,3,2);
 
+   StringGrid_Form->StringGrid1->Cells[13][Counter] = FloatToStrF(p5,ffGeneral,3,2);
+   StringGrid_Form->StringGrid1->Cells[14][Counter] = FloatToStrF(p25,ffGeneral,3,2);
+   StringGrid_Form->StringGrid1->Cells[15][Counter] = FloatToStrF(p75,ffGeneral,3,2);
+   StringGrid_Form->StringGrid1->Cells[16][Counter] = FloatToStrF(p95,ffGeneral,3,2);
    }
 
    }
@@ -7836,7 +7850,7 @@ void __fastcall TMain_Application_Window::Exportvaluesatdatapoints1Click(TObject
 	AnsiString AS = Utils.remove_substring_from_string(SaveDialog->FileName,".csv") + ".csv";
 	ofstream df( AS.c_str());
 
-	Data_IO_Object.save_values_at_data_points(AS,STUDY);
+	Data_IO_Object.save_values_at_data_points(AS,STUDY,&Segments_Info);
 
 	ShowMessage("Done");
 
@@ -8148,6 +8162,7 @@ void __fastcall TMain_Application_Window::Set_Sample_ButtonClick(TObject *Sender
 
 void __fastcall TMain_Application_Window::Phase_Movie_Mode_CheckBoxClick(TObject *Sender)
 {
+
 	if( STUDY->is_current_surface_in_range() )
 	if( Phase_Movie_Mode_CheckBox->State == cbChecked &&
 		STUDY->Surfaces_List[0].Map_Values.get_value_ptr("Instantaneous phase") < 0 )
@@ -8823,7 +8838,7 @@ void __fastcall TMain_Application_Window::Exportvaluesatgeometrynodes1Click(TObj
 	AnsiString AS = Utils.remove_substring_from_string(SaveDialog->FileName,".csv") + ".csv";
 	ofstream df( AS.c_str());
 
-	Data_IO_Object.save_values_at_geometry_nodes(AS,STUDY);
+	Data_IO_Object.save_values_at_geometry_nodes(AS,STUDY,&Segments_Info);
 
 	ShowMessage("Done");
    }
@@ -8901,10 +8916,8 @@ void __fastcall TMain_Application_Window::Exportcurrentdatapointegms1Click(TObje
    }
 
 }
+
 //---------------------------------------------------------------------------
-
-
-
 
 void TMain_Application_Window::create_new_dpset(AnsiString Name)
 {
@@ -9127,6 +9140,14 @@ void __fastcall TMain_Application_Window::Importegmsselectingfilewithegms1Click(
 	}
 
    }
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TMain_Application_Window::UpdateSegsNamesButtonClick(TObject *Sender)
+
+{
+    update_controls_state();
 }
 //---------------------------------------------------------------------------
 

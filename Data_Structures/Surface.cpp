@@ -2996,7 +2996,8 @@ double Surface_Class::get_map_percentile(int Val_Id, int DP_Set, int Percentile)
 //---------------------------------------------------------------------------
 
 int Surface_Class::calculate_statistics_for_Values(int Seg_Id,int Val_Id,
-				double* av,double* median,double* min,double* max,double* sd,double* covc,
+				double* av,double* median,double* p5,double* p25,double* p75,double* p95,
+				double* min,double* max,double* sd,double* covc,
 				int DP_Set,bool Exclude_Zero_Values)
 {
 	double v=0,v1=0,v2=0,v3=0;
@@ -3123,6 +3124,12 @@ int Surface_Class::calculate_statistics_for_Values(int Seg_Id,int Val_Id,
 	{
 	sort(List.begin(),List.end());
 	median[0] =List[ (int)(0.5*List.size()) ];
+
+	p5[0]  =List[ (int)(0.05*List.size()) ];
+	p25[0] =List[ (int)(0.25*List.size()) ];
+	p75[0] =List[ (int)(0.75*List.size()) ];
+	p95[0] =List[ (int)(0.95*List.size()) ];
+
 	}
 	else
 	median[0] = 0;

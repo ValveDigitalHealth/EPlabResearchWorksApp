@@ -249,9 +249,9 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
   end
   object Fixed_Palette_Range_CheckBox: TCheckBox
     Left = 195
-    Top = 25
+    Top = 20
     Width = 133
-    Height = 17
+    Height = 29
     Margins.Left = 2
     Margins.Top = 2
     Margins.Right = 2
@@ -488,33 +488,15 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
   end
   object Invert_Palette_CheckBox: TCheckBox
     Left = 195
-    Top = 41
+    Top = 46
     Width = 141
-    Height = 16
+    Height = 22
     Margins.Left = 2
     Margins.Top = 2
     Margins.Right = 2
     Margins.Bottom = 2
     Caption = 'Invert palette'
     TabOrder = 19
-  end
-  object Interpolation_CheckBox: TCheckBox
-    Left = 192
-    Top = 329
-    Width = 177
-    Height = 16
-    Margins.Left = 2
-    Margins.Top = 2
-    Margins.Right = 2
-    Margins.Bottom = 2
-    Caption = 'Surface Interpolation'
-    Font.Charset = DEFAULT_CHARSET
-    Font.Color = clWindowText
-    Font.Height = -11
-    Font.Name = 'MS Sans Serif'
-    Font.Style = []
-    ParentFont = False
-    TabOrder = 20
   end
   object NavX_Patient_Doll_CheckBox: TCheckBox
     Left = 401
@@ -526,7 +508,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Margins.Right = 2
     Margins.Bottom = 2
     Caption = 'Display patient doll'
-    TabOrder = 21
+    TabOrder = 20
     Visible = False
   end
   object Display_Segments_CheckBox: TCheckBox
@@ -541,7 +523,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Caption = 'Display segments names'
     Checked = True
     State = cbChecked
-    TabOrder = 22
+    TabOrder = 21
   end
   object Display_17_LV_markersCheckBox: TCheckBox
     Left = 192
@@ -553,7 +535,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Margins.Right = 2
     Margins.Bottom = 2
     Caption = 'Display 17 LV segmentation markers'
-    TabOrder = 23
+    TabOrder = 22
   end
   object DAP_CheckBox: TCheckBox
     Left = 30
@@ -567,7 +549,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Caption = 'Display ablation points'
     Checked = True
     State = cbChecked
-    TabOrder = 24
+    TabOrder = 23
   end
   object P1_Limits_Button: TButton
     Left = 351
@@ -579,7 +561,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Margins.Right = 2
     Margins.Bottom = 2
     Caption = 'Preset: 0.2 - 1.0'
-    TabOrder = 25
+    TabOrder = 24
     OnClick = P1_Limits_ButtonClick
   end
   object Disp_Segm_Paths_CheckBox: TCheckBox
@@ -594,7 +576,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Caption = 'Display segmentation paths'
     Checked = True
     State = cbChecked
-    TabOrder = 26
+    TabOrder = 25
     Visible = False
   end
   object PaintRegPoints_CheckBox: TCheckBox
@@ -605,7 +587,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Caption = 'Display 3D registraiton markers'
     Checked = True
     State = cbChecked
-    TabOrder = 27
+    TabOrder = 26
   end
   object Transparency_ScrollBar: TScrollBar
     Left = 432
@@ -613,7 +595,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Width = 121
     Height = 17
     PageSize = 0
-    TabOrder = 28
+    TabOrder = 27
     Visible = False
   end
   object Display_Map_Title_CheckBox: TCheckBox
@@ -622,7 +604,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Width = 178
     Height = 17
     Caption = 'Display map title and value'
-    TabOrder = 29
+    TabOrder = 28
   end
   object Display_Normals_CheckBox: TCheckBox
     Left = 192
@@ -632,7 +614,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Caption = 'Display normals to surface'
     Checked = True
     State = cbChecked
-    TabOrder = 30
+    TabOrder = 29
   end
   object P2_Limits_Button: TButton
     Left = 351
@@ -644,7 +626,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Margins.Right = 2
     Margins.Bottom = 2
     Caption = 'Preset: 0.5 - 1.5'
-    TabOrder = 31
+    TabOrder = 30
     OnClick = P2_Limits_ButtonClick
   end
   object Auto_DP_Size_Scaling_CheckBox: TCheckBox
@@ -655,7 +637,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Caption = 'Autmatic size scaling '
     Checked = True
     State = cbChecked
-    TabOrder = 32
+    TabOrder = 31
   end
   object OK_Button: TButton
     Left = 884
@@ -680,7 +662,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Margins.Right = 2
     Margins.Bottom = 2
     NumbersOnly = True
-    TabOrder = 33
+    TabOrder = 32
     Text = '50'
   end
   object DP_Size_ComboBox: TComboBox
@@ -695,7 +677,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     AutoDropDown = True
     Style = csDropDownList
     ItemIndex = 7
-    TabOrder = 34
+    TabOrder = 33
     Text = '8'
     Items.Strings = (
       '1'
@@ -726,7 +708,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     AutoDropDown = True
     Style = csDropDownList
     ItemIndex = 7
-    TabOrder = 35
+    TabOrder = 34
     Text = '8'
     Items.Strings = (
       '1'
@@ -755,7 +737,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Margins.Right = 2
     Margins.Bottom = 2
     Caption = 'Cancel'
-    TabOrder = 36
+    TabOrder = 35
     OnClick = Cancel_ButtonClick
   end
   object Display_Paths_CheckBox: TCheckBox
@@ -764,7 +746,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Width = 97
     Height = 17
     Caption = 'Display paths'
-    TabOrder = 37
+    TabOrder = 36
   end
   object Background_Color_RadioGroup: TRadioGroup
     Left = 190
@@ -776,7 +758,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Items.Strings = (
       'Black'
       'White')
-    TabOrder = 38
+    TabOrder = 37
   end
   object Display_Edges_CheckBox: TCheckBox
     Left = 192
@@ -786,13 +768,13 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Caption = 'Display mesh geometry edges'
     Checked = True
     State = cbChecked
-    TabOrder = 39
+    TabOrder = 38
   end
   object Display_3D_Point_Cloud_CheckBox: TCheckBox
     Left = 192
-    Top = 347
+    Top = 332
     Width = 177
-    Height = 16
+    Height = 31
     Margins.Left = 2
     Margins.Top = 2
     Margins.Right = 2
@@ -804,7 +786,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Font.Name = 'MS Sans Serif'
     Font.Style = []
     ParentFont = False
-    TabOrder = 40
+    TabOrder = 39
   end
   object Palette_Type_RadioGroup: TRadioGroup
     Left = 2
@@ -816,7 +798,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Items.Strings = (
       'Thermal palette'
       'White->Red')
-    TabOrder = 41
+    TabOrder = 40
   end
   object Min09Max_Range_CheckBox: TCheckBox
     Left = 192
@@ -828,7 +810,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Margins.Right = 2
     Margins.Bottom = 2
     Caption = 'Min-0.9*Max range'
-    TabOrder = 42
+    TabOrder = 41
     Visible = False
   end
   object AT_Edit: TEdit
@@ -836,7 +818,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Top = 437
     Width = 56
     Height = 21
-    TabOrder = 43
+    TabOrder = 42
     Text = 'AT_Edit'
   end
   object PS_Edit: TEdit
@@ -844,7 +826,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Top = 462
     Width = 56
     Height = 21
-    TabOrder = 44
+    TabOrder = 43
     Text = 'Edit1'
   end
   object AS_Edit: TEdit
@@ -852,7 +834,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Top = 487
     Width = 56
     Height = 21
-    TabOrder = 45
+    TabOrder = 44
     Text = 'Edit1'
   end
   object DTS_Edit: TEdit
@@ -860,7 +842,7 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Top = 114
     Width = 56
     Height = 21
-    TabOrder = 46
+    TabOrder = 45
     Text = 'DTS_Edit'
   end
   object Display_Arrows_CheckBox: TCheckBox
@@ -869,6 +851,6 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Width = 127
     Height = 26
     Caption = 'Display arrows'
-    TabOrder = 47
+    TabOrder = 46
   end
 end

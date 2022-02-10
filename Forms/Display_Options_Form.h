@@ -66,7 +66,6 @@ __published:	// IDE-managed Components
     TBevel *Bevel3;
     TCheckBox *Display_Triangles_CheckBox;
     TCheckBox *Invert_Palette_CheckBox;
-    TCheckBox *Interpolation_CheckBox;
     TCheckBox *NavX_Patient_Doll_CheckBox;
 	TCheckBox *Display_Segments_CheckBox;
 	TCheckBox *Display_17_LV_markersCheckBox;

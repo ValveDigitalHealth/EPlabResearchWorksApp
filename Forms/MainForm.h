@@ -407,6 +407,7 @@ class TMain_Application_Window : public TForm
 	TMenuItem *ImportgeometryContactMappingModelxmlfile1;
 	TMenuItem *Importegmsselectingfilewithegms1;
 	TMenuItem *N32;
+	TButton *UpdateSegsNamesButton;
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
@@ -650,6 +651,7 @@ class TMain_Application_Window : public TForm
 	void __fastcall ImportDxLmappreEnsiteX1Click(TObject *Sender);
 	void __fastcall ImportgeometryContactMappingModelxmlfile1Click(TObject *Sender);
 	void __fastcall Importegmsselectingfilewithegms1Click(TObject *Sender);
+	void __fastcall UpdateSegsNamesButtonClick(TObject *Sender);
 
 
 	//----------------------------------------------------------------------

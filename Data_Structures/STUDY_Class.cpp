@@ -377,8 +377,8 @@ bool STUDY_Class::is_valid_current_value_selected()
 {
     if( is_current_surface_in_range() )
 	if( is_valid_data_point_set_selected() )
-    if( Surfaces_List[Current_Surface].Map_Values.get_current_value_ptr() >= 0 &&
-        Surfaces_List[Current_Surface].Map_Values.get_current_value_ptr() <
+	if( Surfaces_List[Current_Surface].Map_Values.get_current_value_ptr() >= 0 &&
+		Surfaces_List[Current_Surface].Map_Values.get_current_value_ptr() <
 			Surfaces_List[Current_Surface].Map_Values.get_values_number() )
      return true;
 
@@ -704,7 +704,10 @@ AnsiString STUDY_Class::get_segment_name_at_given_node(int Geometry_Id,long Node
 	if( Neig_T >= 0 && Neig_T < Surfaces_List[Current_Surface].Surface_Triangle_Set.size() )
 		Seg_Id = Surfaces_List[Current_Surface].Surface_Triangle_Set[Neig_T].Segment_Id;
 
+	if( Seg_Id > 0 )
 	return Segments_Info->get_segment_name(Seg_Id);
+	else
+    return "";
 	}
 }
 //---------------------------------------------------------------------------
@@ -794,12 +797,18 @@ void STUDY_Class::calculate_inter_chamber_coherence_map(int Base_Surface,int Tar
 int STUDY_Class::compute_min_max_values()
 {
 	double minv,maxv;
-	Min_Value_On_All_Maps=1000000;
-	Max_Value_On_All_Maps=-1000000;
 
 	for(int S=0;S<Surfaces_List.size();S++)
 	if( Surfaces_List[S].Display_Whole_Dataset_Flag )
+	if( !Surfaces_List[S].Map_Values.get_fixed_palette_flag(
+			Surfaces_List[S].Map_Values.get_current_value_ptr() ) )
 	{
+		if( S == 0 )
+		{
+			Min_Value_On_All_Maps=1000000;
+			Max_Value_On_All_Maps=-1000000;
+		}
+
 		Surfaces_List[S].compute_min_max_values_on_surface();
 		Surfaces_List[S].Map_Values.get_current_value_minmax(&minv,&maxv);
 
