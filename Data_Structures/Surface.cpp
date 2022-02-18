@@ -3655,6 +3655,8 @@ int Surface_Class::force_data_points_to_surface(int Data_Point_Set_Ptr)
 
 void Surface_Class::cut_geometry_to_confine_to_radius(double Radius)
 {
+	// ASSUMES GEOMETRY IS A RECTANGULAR, CENTERED SQUARE
+
 	double dist;
 
 	for(long n=0;n<(signed)Surface_Node_Set.size();n++)

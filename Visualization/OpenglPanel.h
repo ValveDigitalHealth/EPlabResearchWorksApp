@@ -52,6 +52,8 @@ SOFTWARE. */
 #include "Segments_List.h"
 #include "STUDY_Class.h"
 
+#include "predefined_parameters.h"
+
 //---------------------------------------------------------------------------
 
 class OpenGL_Panel_Class
@@ -183,7 +185,9 @@ class OpenGL_Panel_Class
 	void set_initial_zoom_in_3D_panel();
 
 	void draw_Arrow(double x1,double y1,double z1,double x2,double y2,double z2,double D);
+    void draw_Circle_xz_plane(double CenterX,double CenterY, double CenterZ, double Radius, int Sides );
 
+	void paint_polar_plot_rings(int Surface_Ptr);
 };
 
 #endif

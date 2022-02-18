@@ -797,18 +797,21 @@ void STUDY_Class::calculate_inter_chamber_coherence_map(int Base_Surface,int Tar
 int STUDY_Class::compute_min_max_values()
 {
 	double minv,maxv;
+	Min_Value_On_All_Maps=1000000;
+	Max_Value_On_All_Maps=-1000000;
 
 	for(int S=0;S<Surfaces_List.size();S++)
 	if( Surfaces_List[S].Display_Whole_Dataset_Flag )
 	if( !Surfaces_List[S].Map_Values.get_fixed_palette_flag(
 			Surfaces_List[S].Map_Values.get_current_value_ptr() ) )
 	{
+/*
 		if( S == 0 )
 		{
 			Min_Value_On_All_Maps=1000000;
 			Max_Value_On_All_Maps=-1000000;
 		}
-
+*/
 		Surfaces_List[S].compute_min_max_values_on_surface();
 		Surfaces_List[S].Map_Values.get_current_value_minmax(&minv,&maxv);
 

@@ -408,6 +408,10 @@ class TMain_Application_Window : public TForm
 	TMenuItem *Importegmsselectingfilewithegms1;
 	TMenuItem *N32;
 	TButton *UpdateSegsNamesButton;
+	TMenuItem *ransformationtopolarplot1;
+	TMenuItem *N1Createwheelgeometryaslastgeoonthelist1;
+	TMenuItem *N2Repositiondatapointsfromcurrentgeometrymaptopolarplot1;
+	TMenuItem *Removecurrentgeometry1;
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
@@ -652,6 +656,12 @@ class TMain_Application_Window : public TForm
 	void __fastcall ImportgeometryContactMappingModelxmlfile1Click(TObject *Sender);
 	void __fastcall Importegmsselectingfilewithegms1Click(TObject *Sender);
 	void __fastcall UpdateSegsNamesButtonClick(TObject *Sender);
+	void __fastcall N1Createwheelgeometryaslastgeoonthelist1Click(TObject *Sender);
+	void __fastcall N2Repositiondatapointsfromcurrentgeometrymaptopolarplot1Click(TObject *Sender);
+	void __fastcall Removecurrentgeometry1Click(TObject *Sender);
+
+
+
 
 
 	//----------------------------------------------------------------------
@@ -723,7 +733,7 @@ class TMain_Application_Window : public TForm
 	void post_study_load_processing();
 
 	// call this to re-calculate "closest" ptrs of all nodes and dp's
-	void calculate_closest_nodes_and_data_points_pointers();
+	void calculate_closest_nodes_and_data_points_pointers(int Surface_Id);
 
 	Utils_Tools Utils;
 	Numerical_Library PNUM;
@@ -746,6 +756,9 @@ class TMain_Application_Window : public TForm
 	int Previously_Selected_Value_ptr;
 	int get_current_segment_id();
 	AnsiString get_current_segment_name();
+	int get_segment_id(AnsiString Name);
+
+	void reposition_data_points_according_to_17segments(int Source_Geo,int Target_Geo);
 
 	//-----------------------------------------------------------
 	// labels support

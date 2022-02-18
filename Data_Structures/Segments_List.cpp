@@ -63,6 +63,7 @@ int Segments_List_Class::load_object()
 	ifstream dfile((FilePath).c_str());
 	Segment Seg;
 	int version = -1;
+	Segments.clear();
 
 	if( dfile == NULL )
 	{
@@ -117,7 +118,14 @@ int Segments_List_Class::load_object()
 		save_object();
 */
 
-		return 1;
+	// check if predefined segments present, if not, add
+
+	add_segment_if_not_present("LV_Anterior",200,0,0);
+	add_segment_if_not_present("LV_Septal",0,200,0);
+	add_segment_if_not_present("LV_Lateral",0,0,200);
+
+	return 1;
+
 	}
 
 	ShowMessage("Segments coding file Segments_Codes.txt corrupted. Contact support.");
@@ -126,6 +134,35 @@ int Segments_List_Class::load_object()
 	}
 }
 
+//---------------------------------------------------------------------------
+
+int Segments_List_Class::add_segment_if_not_present(AnsiString Name, int R, int G, int B)
+{
+	bool present = false;
+	long max_code=-1000;
+	Segment S;
+	for(int i=0;i<Segments.size();i++)
+	{
+		if( Segments[i].Code > max_code )
+		max_code = Segments[i].Code;
+
+		if( Segments[i].Name == Name)
+		present == true;
+	}
+
+	if(!present)
+	{
+		S.Name = Name;
+		S.Code = max_code + 1;
+
+		S.Color_R = R;
+		S.Color_G = G;
+		S.Color_B = B;
+
+		Segments.push_back(S);
+	}
+
+}
 //---------------------------------------------------------------------------
 
 int Segments_List_Class::get_segment_id(AnsiString Name)

@@ -230,6 +230,8 @@ void OpenGL_Panel_Class::set_Rhythmia_PA_view()
 
 void OpenGL_Panel_Class::set_NavX_AP_view()
 {
+
+
 ThisRot.M[0] = 0.999948;
 ThisRot.M[1] = 0.00398936;
 ThisRot.M[2] = -0.00943229;
@@ -467,6 +469,10 @@ void OpenGL_Panel_Class::paint_3D_contents()
 
 		draw_fluoro_images_3D(S);
 
+		// if polar plot, paint white rings
+		if(STUDY->Surfaces_List[S].Name == "Polar plot")
+		paint_polar_plot_rings(S);
+
 	} // going through all surfaces
 
 }
@@ -519,6 +525,142 @@ void OpenGL_Panel_Class::paint_ablation_points(int Surface_Ptr)
 		paint_sphere(1.4*OpenGL_Panel_Display_Parameters.Data_Point_Size);
 		glPopMatrix();
 	}
+}
+
+//---------------------------------------------------------------------------
+
+void OpenGL_Panel_Class::paint_polar_plot_rings(int Surface_Ptr)
+{
+	// ASSUMPTIONS:
+	// size and details of the rings positions have to be the same as during polar plot geo creation
+	double Shift = -0.15;
+
+	// inner ring
+	double if1 = M_PI/4. +  Shift;
+	double if2 = 3.*M_PI/4.+ Shift;
+	double if3 = -M_PI/4.+ Shift;
+	double if4 = -3.*M_PI/4.+ Shift;
+
+	// outer rings
+	double f1 = 0 + Shift;
+	double f2 = M_PI/3.+ Shift;
+	double f3 = 2*M_PI/3.+ Shift;
+	double f4 = M_PI + Shift;
+	double f5 = -2*M_PI/3.+ Shift;
+	double f6 = -M_PI/3.+ Shift;
+
+	double R1 = 10;
+	double R2 = R1 + 15;
+	double R3 = R2 + 12.5;
+	double R4 = 50;
+
+	int Sides = 100;
+	double elevation = 0.1;
+
+	glColor3f (1.0, 1.0, 1.0);
+	glEnable(GL_LINE_SMOOTH);
+	glLineWidth(7.0);
+
+	// circles
+	draw_Circle_xz_plane(0,0,0, R1, Sides );
+	draw_Circle_xz_plane(0,0,0, R2, Sides );
+	draw_Circle_xz_plane(0,0,0, R3, Sides );
+	glLineWidth(20.0);
+	draw_Circle_xz_plane(0,0,0, R4-0.5, Sides );
+
+	// lines
+	glBegin(GL_LINES);
+
+	// inner ring lines
+	glVertex3f(R1*cos(if1),elevation,R1*sin(if1) );
+	glVertex3f(R2*cos(if1),elevation,R2*sin(if1) );
+
+	glVertex3f(R1*cos(if2),elevation,R1*sin(if2) );
+	glVertex3f(R2*cos(if2),elevation,R2*sin(if2) );
+
+	glVertex3f(R1*cos(if3),elevation,R1*sin(if3) );
+	glVertex3f(R2*cos(if3),elevation,R2*sin(if3) );
+
+	glVertex3f(R1*cos(if4),elevation,R1*sin(if4) );
+	glVertex3f(R2*cos(if4),elevation,R2*sin(if4) );
+
+	// outer ring lines
+	glVertex3f(R2*cos(f1),elevation,R2*sin(f1) );
+	glVertex3f(R4*cos(f1),elevation,R4*sin(f1) );
+
+	glVertex3f(R2*cos(f2),elevation,R2*sin(f2) );
+	glVertex3f(R4*cos(f2),elevation,R4*sin(f2) );
+
+	glVertex3f(R2*cos(f3),elevation,R2*sin(f3) );
+	glVertex3f(R4*cos(f3),elevation,R4*sin(f3) );
+
+	glVertex3f(R2*cos(f4),elevation,R2*sin(f4) );
+	glVertex3f(R4*cos(f4),elevation,R4*sin(f4) );
+
+	glVertex3f(R2*cos(f5),elevation,R2*sin(f5) );
+	glVertex3f(R4*cos(f5),elevation,R4*sin(f5) );
+
+	glVertex3f(R2*cos(f6),elevation,R2*sin(f6) );
+	glVertex3f(R4*cos(f6),elevation,R4*sin(f6) );
+
+	// inner ring lines
+	glVertex3f(R1*cos(if1),-elevation,R1*sin(if1) );
+	glVertex3f(R2*cos(if1),-elevation,R2*sin(if1) );
+
+	glVertex3f(R1*cos(if2),-elevation,R1*sin(if2) );
+	glVertex3f(R2*cos(if2),-elevation,R2*sin(if2) );
+
+	glVertex3f(R1*cos(if3),-elevation,R1*sin(if3) );
+	glVertex3f(R2*cos(if3),-elevation,R2*sin(if3) );
+
+	glVertex3f(R1*cos(if4),-elevation,R1*sin(if4) );
+	glVertex3f(R2*cos(if4),-elevation,R2*sin(if4) );
+
+	// outer ring lines
+	glVertex3f(R2*cos(f1),-elevation,R2*sin(f1) );
+	glVertex3f(R4*cos(f1),-elevation,R4*sin(f1) );
+
+	glVertex3f(R2*cos(f2),-elevation,R2*sin(f2) );
+	glVertex3f(R4*cos(f2),-elevation,R4*sin(f2) );
+
+	glVertex3f(R2*cos(f3),-elevation,R2*sin(f3) );
+	glVertex3f(R4*cos(f3),-elevation,R4*sin(f3) );
+
+	glVertex3f(R2*cos(f4),-elevation,R2*sin(f4) );
+	glVertex3f(R4*cos(f4),-elevation,R4*sin(f4) );
+
+	glVertex3f(R2*cos(f5),-elevation,R2*sin(f5) );
+	glVertex3f(R4*cos(f5),-elevation,R4*sin(f5) );
+
+	glVertex3f(R2*cos(f6),-elevation,R2*sin(f6) );
+	glVertex3f(R4*cos(f6),-elevation,R4*sin(f6) );
+
+	glEnd();
+}
+
+//---------------------------------------------------------------------------
+
+void OpenGL_Panel_Class::draw_Circle_xz_plane(double CenterX,double CenterY, double CenterZ, double Radius, int Sides )
+{
+	double heading;
+	glBegin(GL_LINE_LOOP);
+	double elevation = 0.1;
+
+	for (int a = 0; a < 360; a += 360.0 / (double)Sides)
+	{
+		heading = a * 3.1415926535897932384626433832795 / 180.0;
+		glVertex3f(cos(heading) * Radius, -elevation , sin(heading) * Radius);
+	}
+
+	for (int a = 0; a < 360; a += 360.0 / (double)Sides)
+	{
+		heading = a * 3.1415926535897932384626433832795 / 180.0;
+		glVertex3f(cos(heading) * Radius, +elevation , sin(heading) * Radius);
+	}
+
+	glEnd();
+
+	glFlush();
 }
 
 //---------------------------------------------------------------------------
@@ -1029,6 +1171,7 @@ void OpenGL_Panel_Class::MouseFeedBack(int X, int Y,bool Segmenting)
 		n1 = STUDY->Surfaces_List[S].Surface_Triangle_Set[tt].Nodes[1];
 		n2 = STUDY->Surfaces_List[S].Surface_Triangle_Set[tt].Nodes[2];
 
+
 		vt1 = glm::vec3( STUDY->Surfaces_List[S].Surface_Node_Set[n0].x,
 						 STUDY->Surfaces_List[S].Surface_Node_Set[n0].y,
 						 STUDY->Surfaces_List[S].Surface_Node_Set[n0].z );
@@ -1363,16 +1506,22 @@ void OpenGL_Panel_Class::paint_surface(int Surface_Ptr,int DP_Set,bool For_Mouse
 		// PAINTING SEGMENTS segmentsgogh
 		//---------------------------------------------------------------------------
 		if( Current_Value_Name == SEGMENTATION_VALUE_NAME )
-		if(STUDY->Surfaces_List[Surface_Ptr].Surface_Triangle_Set[i].Segment_Id > 0)
-		if( STUDY->Surfaces_List[Surface_Ptr].Surface_Triangle_Set[i].Segment_Id <
-				   Segments_Info->Segments.size() )
 		{
 
 		Segment_Id = STUDY->Surfaces_List[Surface_Ptr].Surface_Triangle_Set[i].Segment_Id;
 
+		if(	Segment_Id > 0 && Segment_Id < Segments_Info->Segments.size() )
+		{
 		R = Segments_Info->Segments[Segment_Id].Color_R/255.;
 		G = Segments_Info->Segments[Segment_Id].Color_G/255.;
 		B = Segments_Info->Segments[Segment_Id].Color_B/255.;
+		}
+		else
+		{
+		R = 0.1;
+		G = 0.1;
+		B = 0.1;
+		}
 
 		glColor4f(R,G,B,OpenGL_Panel_Display_Parameters.Transparency_Level);
 
@@ -1456,12 +1605,12 @@ void OpenGL_Panel_Class::paint_surface(int Surface_Ptr,int DP_Set,bool For_Mouse
 	if( !For_Mouse_Feedback )
 	{
 
-	glColor4f( 0.0f,0.0f,0.0f,OpenGL_Panel_Display_Parameters.Transparency_Level);
-
 	// through all segments
 	double DistsN = OpenGL_Panel_Display_Parameters.Text_Dist_From_Geo;
 	double sx,sy,sz;
 	double nx,ny,nz;
+
+	// through all segments
 	for(int S=0;S<STUDY->Surfaces_List[Surface_Ptr].Segments_Centers_X.size();S++)
 	if( STUDY->Surfaces_List[Surface_Ptr].Segments_Centers_X[S] != 0 ||
 		STUDY->Surfaces_List[Surface_Ptr].Segments_Centers_Y[S] != 0 ||

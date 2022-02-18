@@ -33,7 +33,7 @@ TMain_Application_Window *Main_Application_Window;
 
 void __fastcall TMain_Application_Window::About1Click(TObject *Sender)
 {
-	ShowMessage("EPLab Works. Version v.2.0.6 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
+	ShowMessage("EPLab Works. Version v.2.0.7 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
 }
 //---------------------------------------------------------------------------
 
@@ -81,7 +81,7 @@ void __fastcall TMain_Application_Window::FormCreate(TObject *Sender)
 	for(long i=0;i<(signed)Segments_Info.Segments.size();i++)
 	Segment_No_ComboBox->Items[0].Add(Segments_Info.Segments[i].Name);
 
-	Segment_No_ComboBox->DropDownCount = Segments_Info.Segments.size()-1;
+	Segment_No_ComboBox->DropDownCount = Segments_Info.Segments.size();
 
 	System::Set8087CW(0x133f); // Disable all fpu exceptions.
     SetExceptionMask (exAllArithmeticExceptions);
@@ -315,22 +315,17 @@ void TMain_Application_Window::map_display_panel_mouse_down(TMouseButton Button,
 
 	OpenGL_Panel_1.MouseFeedBack(X, Y,Paint_Segments_CheckBox->State);
 
+	if(STUDY->Current_Surface != STUDY->Previous_Current_Surface )
+			update_controls_state();
+
 	// if data point clicked
 	if( OpenGL_Panel_1.closest_dp_clicked >= 0 )
 	{
 		OpenGL_Panel_1.prepare_colors_for_display();
 
-		if(STUDY->Current_Surface != STUDY->Previous_Current_Surface )
-		{
-			update_controls_state();
-		}
-		else
-		{
 		Data_Points_List_StringGrid->Row =
 			STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Ptr+1;
 		repaint_all_controls();
-		}
-
 	}
 	else
 	//------------------------------------
@@ -548,7 +543,7 @@ void TMain_Application_Window::fill_data_points_table(int Which_Data_Points)
 	Selected_Data_Points_List_StringGrid = Deleted_Data_Points_List_StringGrid;
 	Data_Points_List = &STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[DS].Deleted_Data_Points;
 	}
-// xxx
+
 	//--------------------------------------------
 	// clear and fill headers of the string grid  (this is displayed when no data is loaded)
 	//--------------------------------------------
@@ -1361,6 +1356,7 @@ void __fastcall TMain_Application_Window::Loadstudy1Click(TObject *Sender)
 		Progress_Form->add_text("Load complete. Press Close to continue.");
 		Progress_Form->Show();
 		Application->ProcessMessages();
+		Progress_Form->Hide();
 
 		if(Echo)
 		ShowMessage("Loading done");
@@ -1460,28 +1456,27 @@ void TMain_Application_Window::post_study_load_processing()
 }
 //---------------------------------------------------------------------------
 
-void TMain_Application_Window::calculate_closest_nodes_and_data_points_pointers()
+void TMain_Application_Window::calculate_closest_nodes_and_data_points_pointers(int Surface_Id)
 {
-	if( STUDY->is_current_surface_in_range() )
-	if( STUDY->Surfaces_List[STUDY->Current_Surface].data_points_set_ptr_in_range() )
+	if( Surface_Id > 0 && Surface_Id < STUDY->Surfaces_List.size() )
 	{
 
-	int dset = STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr;
+	int dset = STUDY->Surfaces_List[Surface_Id].Current_Data_Point_Set_Ptr;
 
 	Progress_Form->add_text("Calculating closest nodes to data points..." );
 	Progress_Form->Show();
 	Application->ProcessMessages();
 
-	STUDY->Surfaces_List[STUDY->Current_Surface].calculate_closest_nodes_and_data_points_ALL(dset);
+	STUDY->Surfaces_List[Surface_Id].calculate_closest_nodes_and_data_points_ALL(dset);
 
 	Progress_Form->add_text("Calculating data points neighbouroods..." );
 	Progress_Form->Show();
 	Application->ProcessMessages();
 
-	STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].calculate_neighboring_data_points(
-				STUDY->Surfaces_List[STUDY->Current_Surface].Data_Points_Filling_Threshold_mm);
+	STUDY->Surfaces_List[Surface_Id].Data_Point_Set[dset].calculate_neighboring_data_points(
+				STUDY->Surfaces_List[Surface_Id].Data_Points_Filling_Threshold_mm);
 
-	STUDY->Surfaces_List[STUDY->Current_Surface].interpolate_all_values(0,dset,Progress_Form);
+	STUDY->Surfaces_List[Surface_Id].interpolate_all_values(0,dset,Progress_Form);
 
 	OpenGL_Panel_1.prepare_colors_for_display();
 
@@ -1570,7 +1565,8 @@ void __fastcall TMain_Application_Window::Displayed_Value_Selection_ComboBox_1Ch
 */
 	if( STUDY->is_current_surface_in_range() )
 	{
-		STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.Current_Map_Value_Name =
+		for(int S=0;S<STUDY->Surfaces_List.size();S++)
+		STUDY->Surfaces_List[S].Map_Values.Current_Map_Value_Name =
 			Displayed_Value_Selection_ComboBox_1->Text;
 		STUDY->compute_min_max_values();
 	}
@@ -1620,7 +1616,7 @@ void __fastcall TMain_Application_Window::Deletepointswithoutxyzcoordinates1Clic
 	Application->ProcessMessages();
 
 	if( D > 0 )
-	calculate_closest_nodes_and_data_points_pointers();
+	calculate_closest_nodes_and_data_points_pointers(STUDY->Current_Surface);
 
 	Data_Point_Set_Selection_ComboBoxChange(this);
 	}
@@ -3491,7 +3487,7 @@ void __fastcall TMain_Application_Window::Downsamplemesh1Click(TObject *Sender)
 
 		New_T_Number = STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Triangle_Set.size();
 
-		calculate_closest_nodes_and_data_points_pointers();
+		calculate_closest_nodes_and_data_points_pointers(STUDY->Current_Surface);
 
 		STUDY->Surfaces_List[STUDY->Current_Surface].compute_segments_centers(Segments_Info.Segments.size());
 
@@ -3913,7 +3909,7 @@ void __fastcall TMain_Application_Window::Annotationsignalprocessinparameters1Cl
 	DP_update_required = true;
 	if( DP_update_required )
 		FULL_MAP_VALUES_UPDATE(STUDY->Current_Surface);
-		//calculate_closest_nodes_and_data_points_pointers();
+		//calculate_closest_nodes_and_data_points_pointers(STUDY->Current_Surface);
 
 	if( STUDY->Comp_Module.Automatic_Annotation_Flag )
 	if( STUDY->Surfaces_List.size() > 0 )
@@ -3964,7 +3960,7 @@ void __fastcall TMain_Application_Window::Forcedatapointsontosurface1Click(TObje
 	Progress_Form->Show();
 	Application->ProcessMessages();
 
-	calculate_closest_nodes_and_data_points_pointers();
+	calculate_closest_nodes_and_data_points_pointers(STUDY->Current_Surface);
 
 	repaint_3D_panels();
 
@@ -4453,7 +4449,7 @@ void __fastcall TMain_Application_Window::Deletedatapointswithcurrentvaluebelowg
 	Application->ProcessMessages();
 
 	if( D>0 )
-	calculate_closest_nodes_and_data_points_pointers();
+	calculate_closest_nodes_and_data_points_pointers(STUDY->Current_Surface);
 
 	Data_Point_Set_Selection_ComboBoxChange(this);
 	Displayed_Value_Selection_ComboBox_1Change(this);
@@ -4853,7 +4849,7 @@ void __fastcall TMain_Application_Window::Deletepointswithspecificvalue1Click(TO
 	Application->ProcessMessages();
 
 	if( D > 0 )
-	calculate_closest_nodes_and_data_points_pointers();
+	calculate_closest_nodes_and_data_points_pointers(STUDY->Current_Surface);
 
 	Data_Point_Set_Selection_ComboBoxChange(this);
 	Displayed_Value_Selection_ComboBox_1Change(this);
@@ -5068,7 +5064,7 @@ void __fastcall TMain_Application_Window::Restoreoriginallocationsofdatapoints1C
 	Progress_Form->Show();
 	Application->ProcessMessages();
 
-	calculate_closest_nodes_and_data_points_pointers();
+	calculate_closest_nodes_and_data_points_pointers(STUDY->Current_Surface);
 
 	repaint_3D_panels();
 
@@ -5322,7 +5318,7 @@ void __fastcall TMain_Application_Window::DeletedatapointswithcurrentvalueABOVEg
 	Application->ProcessMessages();
 
 	if( D>0 )
-	calculate_closest_nodes_and_data_points_pointers();
+	calculate_closest_nodes_and_data_points_pointers(STUDY->Current_Surface);
 
 	Data_Point_Set_Selection_ComboBoxChange(this);
 	Displayed_Value_Selection_ComboBox_1Change(this);
@@ -5351,7 +5347,7 @@ void __fastcall TMain_Application_Window::Undeletealldatapoints1Click(TObject *S
 			restore_removed_data_points();
 
 	if( D > 0 )
-	calculate_closest_nodes_and_data_points_pointers();
+	calculate_closest_nodes_and_data_points_pointers(STUDY->Current_Surface);
 
 	Data_Point_Set_Selection_ComboBoxChange(this);
 	Displayed_Value_Selection_ComboBox_1Change(this);
@@ -7342,7 +7338,7 @@ void __fastcall TMain_Application_Window::Upsamplemesh1Click(TObject *Sender)
 
 		STUDY->Surfaces_List[STUDY->Current_Surface].upsample_mesh();
 
-		calculate_closest_nodes_and_data_points_pointers();
+		calculate_closest_nodes_and_data_points_pointers(STUDY->Current_Surface);
 
 		OpenGL_Panel_1.prepare_colors_for_display();
 
@@ -8272,7 +8268,7 @@ void __fastcall TMain_Application_Window::Removedatapointsbelowtop1Click(TObject
 	Application->ProcessMessages();
 
 	if( D>0 )
-	calculate_closest_nodes_and_data_points_pointers();
+	calculate_closest_nodes_and_data_points_pointers(STUDY->Current_Surface);
 
 	Data_Point_Set_Selection_ComboBoxChange(this);
 	Displayed_Value_Selection_ComboBox_1Change(this);
@@ -8709,7 +8705,7 @@ void __fastcall TMain_Application_Window::RemovedatapointsnotonmapsurfaceHARDdel
 	Application->ProcessMessages();
 
 	if( D > 0 )
-	calculate_closest_nodes_and_data_points_pointers();
+	calculate_closest_nodes_and_data_points_pointers(STUDY->Current_Surface);
 
 	Data_Point_Set_Selection_ComboBoxChange(this);
 	Displayed_Value_Selection_ComboBox_1Change(this);
@@ -9151,4 +9147,438 @@ void __fastcall TMain_Application_Window::UpdateSegsNamesButtonClick(TObject *Se
 }
 //---------------------------------------------------------------------------
 
+int TMain_Application_Window::get_segment_id(AnsiString Name)
+{
+	int ptr=-1;
+
+	for(long i=0;i<(signed)Segments_Info.Segments.size();i++)
+	if( Segments_Info.Segments[i].Name == Name )
+	ptr = i;
+
+	if( ptr < (signed)Segments_Info.Segments.size() )
+	return Segments_Info.Segments[ptr].Code;
+	else
+	return -1;
+}
+
+//---------------------------------------------------------------------------
+
+void __fastcall TMain_Application_Window::N1Createwheelgeometryaslastgeoonthelist1Click(TObject *Sender)
+{
+	double Radius = 50; // assuming plaque is 100x100, 1mm spacing
+	double Node_Spacing = 1;
+
+	int Original_Current_Surface = STUDY->Current_Surface;
+
+	// check if polar plot alrady exists, if not, create one
+	bool Present = false;
+	for(int S=0;S<STUDY->Surfaces_List.size();S++)
+	if(STUDY->Surfaces_List[S].Name == "Polar plot")
+	{
+		Present = true;
+		STUDY->Current_Surface = S;
+	}
+
+	if(!Present)
+	{
+	Surface_Class Suface_Class_Item;
+	STUDY->Surfaces_List.push_back(Suface_Class_Item);
+	STUDY->Current_Surface = STUDY->Surfaces_List.size()-1;
+	STUDY->Surfaces_List[STUDY->Current_Surface].generate_wheel_sample(Progress_Form,Radius,Node_Spacing);
+	STUDY->Surfaces_List[STUDY->Current_Surface].Name = "Polar plot";
+	}
+
+
+	// mark 17 segments on the wheel geometry
+	double Shift = -0.15;
+
+	// inner ring
+	double if1 = M_PI/4. +  Shift;
+	double if2 = 3.*M_PI/4.+ Shift;
+	double if3 = -M_PI/4.+ Shift;
+	double if4 = -3.*M_PI/4.+ Shift;
+
+	// outer rings
+	double f1 = 0 + Shift;
+	double f2 = M_PI/3.+ Shift;
+	double f3 = 2*M_PI/3.+ Shift;
+	double f4 = M_PI + Shift;
+	double f5 = -2*M_PI/3.+ Shift;
+	double f6 = -M_PI/3.+ Shift;
+
+	double R1 = 10;
+	double R2 = R1 + 15;
+	double R3 = R2 + 12.5;
+
+	double cx,cy,cz;
+	double R,fi;
+	int Seg;
+
+	for(long t=0;t<(signed)(signed)STUDY->Surfaces_List[STUDY->Current_Surface].
+		Surface_Triangle_Set.size();t++)
+	{
+		STUDY->Surfaces_List[STUDY->Current_Surface].
+			get_xyz_centre_of_triangle(t,&cx,&cy,&cz);
+
+		// find R and fi
+		// !!!!!!!!!!!!!!! ASSUMING GEO IS CENTERED !!!!!!!!!!!!!!!!
+
+		R = std::sqrt( std::pow(cx,2)+std::pow(cy,2)+std::pow(cz,2) );
+		fi = atan2(cz,cx);
+
+		Seg = -1;
+
+		// centre
+		if( R < R1 ) Seg = get_segment_id("S17");
+
+		// first outer ring
+		if( R > R1 && R < R2 &&  fi > if3 && fi < if1 ) Seg = get_segment_id("S14");
+		if( R > R1 && R < R2 &&  fi > if1 && fi < if2 ) Seg = get_segment_id("S13");
+		if( R > R1 && R < R2 &&  ( fi > if2 || fi < if4)  ) Seg = get_segment_id("S16");
+		if( R > R1 && R < R2 &&  fi > if4 && fi < if3 ) Seg = get_segment_id("S15");
+
+		// second outer ring
+		if( R > R2 && R < R3 &&  fi > f1 && fi < f2 ) Seg = get_segment_id("S8");
+		if( R > R2 && R < R3 &&  fi > f2 && fi < f3 ) Seg = get_segment_id("S7");
+		if( R > R2 && R < R3 &&  fi > f3 && fi < f4 ) Seg = get_segment_id("S12");
+		if( R > R2 && R < R3 &&  fi < f1 && fi > f6 ) Seg = get_segment_id("S9");
+		if( R > R2 && R < R3 &&  fi < f6 && fi > f5 ) Seg = get_segment_id("S10");
+		if( R > R2 && R < R3 &&  fi < f5 ||
+			R > R2 && R < R3 &&  fi > f4 ) Seg = get_segment_id("S11");
+
+		// third outer ring
+		if( R > R3 &&  fi > f1 && fi < f2 ) Seg = get_segment_id("S2");
+		if( R > R3 &&  fi > f2 && fi < f3 ) Seg = get_segment_id("S1");
+		if( R > R3 &&  fi > f3 && fi < f4 ) Seg = get_segment_id("S6");
+		if( R > R3 &&  fi < f1 && fi > f6 ) Seg = get_segment_id("S3");
+		if( R > R3 &&  fi < f6 && fi > f5 ) Seg = get_segment_id("S4");
+		if( R > R3 &&  fi < f5 ||
+			R > R3 &&  fi > f4) Seg = get_segment_id("S5");
+
+		STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Triangle_Set[t].Segment_Id = Seg;
+	}
+
+	STUDY->Surfaces_List[STUDY->Current_Surface].compute_segments_centers(Segments_Info.Segments.size());
+
+	STUDY->Current_Surface = Original_Current_Surface;
+
+	update_controls_state();
+	repaint_3D_panels();
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMain_Application_Window::N2Repositiondatapointsfromcurrentgeometrymaptopolarplot1Click(TObject *Sender)
+{
+	// 1. Find which geo is polar plot
+	int Polar_Plot_Geo_Id = -1;
+	for(int S=0;S<STUDY->Surfaces_List.size();S++)
+	if( STUDY->Surfaces_List[S].Name == "Polar plot" )
+	Polar_Plot_Geo_Id = S;
+
+	if( STUDY->Current_Surface == Polar_Plot_Geo_Id )
+	ShowMessage("Select geometry that is not polar plot (curretnly you selected 'Polar plot' geometry as active)");
+	if( Polar_Plot_Geo_Id >= 0 )
+	reposition_data_points_according_to_17segments(STUDY->Current_Surface,Polar_Plot_Geo_Id);
+	else
+	ShowMessage("Polar plot geometry missing (do step 1. first)");
+
+}
+//---------------------------------------------------------------------------
+
+void TMain_Application_Window::reposition_data_points_according_to_17segments(int Source_Geo,int Target_Geo)
+{
+	int Source_Surf = Source_Geo;
+	int Target_Surf = Target_Geo;
+	long P1,P2;
+	vector <long> Path_Left;
+	vector <long> Path_Right;
+	vector <long> Path_Base;
+	double Phi_Offset;
+	long Node_Id;
+	int Region_Id;
+	int dset = STUDY->Surfaces_List[Source_Geo].Current_Data_Point_Set_Ptr;
+
+	//------------------------------------------------------
+	// create empty dataset in target geo
+	//------------------------------------------------------
+	STUDY->Surfaces_List[Target_Surf].Data_Point_Set.clear();
+	Data_Point_Set_Class DSET;
+	DSET.Name = STUDY->Surfaces_List[Source_Surf].Data_Point_Set[dset].Name;
+	STUDY->Surfaces_List[Target_Surf].Data_Point_Set.push_back(DSET);
+	STUDY->Surfaces_List[Target_Surf].Current_Data_Point_Set_Ptr = 0;
+
+	//------------------------------------------------------
+	// copy auxiliary data from Source_geo
+	//------------------------------------------------------
+	STUDY->Surfaces_List[Target_Surf].Map_Values = STUDY->Surfaces_List[Source_Surf].Map_Values;
+
+	//------------------------------------------------------
+	// Go through all datapoints
+	//------------------------------------------------------
+	long DP_Target;
+
+	for(long dp=0;dp<(signed)(signed)STUDY->Surfaces_List[Source_Surf].Data_Point_Set[dset].Data_Points.size();dp++)
+	if( 							 STUDY->Surfaces_List[Source_Surf].Data_Point_Set[dset].Data_Points[dp].Closest_Node_Id >= 0 )
+	{
+
+	//------------------------------------------------------
+	// 1. find which region is the closest (within Threshold tolerance)
+	//------------------------------------------------------
+	AnsiString Region_Name = "";
+	Node_Id = STUDY->Surfaces_List[Source_Surf].Data_Point_Set[dset].Data_Points[dp].Closest_Node_Id;
+	if( Node_Id >= 0 && Node_Id < (signed)STUDY->Surfaces_List[Source_Surf].Surface_Node_Set.size() )
+	if (STUDY->Surfaces_List[Source_Surf].Surface_Node_Set[Node_Id].Neig_Triangles[0] > 0 &&
+		STUDY->Surfaces_List[Source_Surf].Surface_Node_Set[Node_Id].Neig_Triangles[0] < (signed)
+		STUDY->Surfaces_List[Source_Surf].Surface_Triangle_Set.size() )
+	Region_Name = Segments_Info.get_segment_name(
+			STUDY->Surfaces_List[Source_Surf].Surface_Triangle_Set[
+				STUDY->Surfaces_List[Source_Surf].Surface_Node_Set[Node_Id].Neig_Triangles[0] ].Segment_Id);
+//xxx
+	if( Region_Name == LV_ANTERIOR_SEGMENT_NAME ||
+		Region_Name == LV_LATERAL_SEGMENT_NAME ||
+		Region_Name == LV_SEPTAL_SEGMENT_NAME  )
+	{
+
+	if( Region_Name == LV_ANTERIOR_SEGMENT_NAME  ) // anterior
+	{
+		P1 = STUDY->Surfaces_List[Source_Surf].Septal_Anterior_Node_Ptr;
+		P2 = STUDY->Surfaces_List[Source_Surf].Anterior_Lateral_Node_Ptr;
+		Path_Left =  STUDY->Surfaces_List[Source_Surf].Ap_SA_Path;
+		Path_Right = STUDY->Surfaces_List[Source_Surf].Ap_AL_Path;
+		Path_Base = STUDY->Surfaces_List[Source_Surf].Anterior_Base_Path;
+		Phi_Offset = 0;
+	}
+
+	if( Region_Name == LV_LATERAL_SEGMENT_NAME  ) // lateral
+	{
+		P1 = STUDY->Surfaces_List[Source_Surf].Anterior_Lateral_Node_Ptr;
+		P2 = STUDY->Surfaces_List[Source_Surf].Septal_Lateral_Node_Ptr;
+		Path_Left =  STUDY->Surfaces_List[Source_Surf].Ap_AL_Path;
+		Path_Right = STUDY->Surfaces_List[Source_Surf].Ap_SL_Path;
+		Path_Base = STUDY->Surfaces_List[Source_Surf].Lateral_Base_Path;
+		Phi_Offset = 2.*M_PI/3.;
+	}
+
+	if( Region_Name == LV_SEPTAL_SEGMENT_NAME  ) // septal
+	{
+		P1 = STUDY->Surfaces_List[Source_Surf].Septal_Lateral_Node_Ptr;
+		P2 = STUDY->Surfaces_List[Source_Surf].Septal_Anterior_Node_Ptr;
+		Path_Left =  STUDY->Surfaces_List[Source_Surf].Ap_SL_Path;
+		Path_Right = STUDY->Surfaces_List[Source_Surf].Ap_SA_Path;
+		Path_Base = STUDY->Surfaces_List[Source_Surf].Septal_Base_Path;
+		Phi_Offset = 2.*2.*M_PI/3. ;
+	}
+
+	//------------------------------------------------------
+	//  2. Calculate normalized distance from apex
+	//------------------------------------------------------
+	double Apex_Dist = STUDY->Surfaces_List[Source_Surf].get_path_length(
+		Node_Id,STUDY->Surfaces_List[Source_Surf].Apex_Node_Ptr);
+
+	double d1 = STUDY->Surfaces_List[Source_Surf].get_path_length(
+				P1,STUDY->Surfaces_List[Source_Surf].Apex_Node_Ptr);
+	double d2 = STUDY->Surfaces_List[Source_Surf].get_path_length(
+				P2,STUDY->Surfaces_List[Source_Surf].Apex_Node_Ptr);
+	double D1 = 2*Apex_Dist/(d1+d2);
+
+	double dp_to_base = STUDY->Surfaces_List[Source_Surf].
+			get_distance_to_path(Node_Id,&Path_Base);
+	D1 =  Apex_Dist / (Apex_Dist+dp_to_base);
+
+	//  3. Calculate phi
+	double dp_left = STUDY->Surfaces_List[Source_Surf].
+			get_distance_to_path(Node_Id,&Path_Left);
+	double dp_right = STUDY->Surfaces_List[Source_Surf].
+			get_distance_to_path(Node_Id,&Path_Right);
+	double Phi;
+
+	if( dp_left+dp_right != 0 )
+	Phi = Phi_Offset + 2.*M_PI/3. * dp_left / (dp_left+dp_right);
+	else
+	Phi = 0;
+
+	//------------------------------------------------------
+	// Reposition data point
+	//------------------------------------------------------
+	double Radius = 50; // assuming plaque is 100x100, 1mm spacing
+
+	STUDY->Surfaces_List[Target_Surf].Data_Point_Set[0].Data_Points.push_back(
+			STUDY->Surfaces_List[Source_Surf].Data_Point_Set[dset].Data_Points[dp]);
+
+	DP_Target = STUDY->Surfaces_List[Target_Surf].Data_Point_Set[0].Data_Points.size()-1;
+
+	STUDY->Surfaces_List[Target_Surf].Data_Point_Set[0].Data_Points[DP_Target].x = Radius*D1*cos(Phi);
+	STUDY->Surfaces_List[Target_Surf].Data_Point_Set[0].Data_Points[DP_Target].y = 0;
+	STUDY->Surfaces_List[Target_Surf].Data_Point_Set[0].Data_Points[DP_Target].z = Radius*D1*sin(Phi);
+
+	} // DP belongs to a region > 0
+
+	}
+
+	calculate_closest_nodes_and_data_points_pointers(Target_Surf);
+
+	update_controls_state();
+	repaint_3D_panels();
+
+	ShowMessage("Done");
+
+//	post_geo_or_DPset_modification();
+
+/*
+	int Source_Suf = 0;
+	int Target_Surf = STUDY.Geometry_Model.Surfaces_List.size()-1;
+
+	long P1,P2;
+	vector <long> Path_Left;
+	vector <long> Path_Right;
+	vector <long> Path_Base;
+	double Phi_Offset;
+	long Node_Id,nt;
+	int Region_Id;
+
+	// zero Flag_B
+	for(long Node_Id=0;Node_Id<(signed)STUDY.Geometry_Model.Surfaces_List[Source_Suf].
+		Surface_Node_Set.size();Node_Id++)
+	STUDY.Geometry_Model.Surfaces_List[Source_Suf].Surface_Node_Set[Node_Id].Flag_B = -1;
+
+	//------------------------------------------------------
+	// Go through all nodes in 3D map within segments
+	//------------------------------------------------------
+	for(long Node_Id=0;Node_Id<(signed)STUDY.Geometry_Model.Surfaces_List[Source_Suf].
+		Surface_Node_Set.size();Node_Id++)
+	{
+
+	Region_Id = STUDY.Geometry_Model.Surfaces_List[Source_Suf].Surface_Triangle_Set[
+		STUDY.Geometry_Model.Surfaces_List[Source_Suf].
+			Surface_Node_Set[Node_Id].Neig_Triangles[0] ].Segment_Id;
+
+	if( Region_Id == 6 || Region_Id == 7 || Region_Id == 8  )  // > 0 later
+	{
+
+	if( Region_Id == 6  ) // anterior
+	{
+		P1 = STUDY.Geometry_Model.Surfaces_List[Source_Suf].Septal_Anterior_Node_Ptr;
+		P2 = STUDY.Geometry_Model.Surfaces_List[Source_Suf].Anterior_Lateral_Node_Ptr;
+		Path_Left =  STUDY.Geometry_Model.Surfaces_List[Source_Suf].Ap_SA_Path;
+		Path_Right = STUDY.Geometry_Model.Surfaces_List[Source_Suf].Ap_AL_Path;
+		Path_Base = STUDY.Geometry_Model.Surfaces_List[Source_Suf].SA_AL_Path;
+		Phi_Offset = 0;
+	}
+
+	if( Region_Id == 8  ) // lateral
+	{
+		P1 = STUDY.Geometry_Model.Surfaces_List[Source_Suf].Anterior_Lateral_Node_Ptr;
+		P2 = STUDY.Geometry_Model.Surfaces_List[Source_Suf].Septal_Lateral_Node_Ptr;
+		Path_Left =  STUDY.Geometry_Model.Surfaces_List[Source_Suf].Ap_AL_Path;
+		Path_Right = STUDY.Geometry_Model.Surfaces_List[Source_Suf].Ap_SL_Path;
+		Path_Base = STUDY.Geometry_Model.Surfaces_List[Source_Suf].SL_AL_Path;
+		Phi_Offset = 2.*M_PI/3.;
+	}
+
+	if( Region_Id == 7  ) // septal
+	{
+		P1 = STUDY.Geometry_Model.Surfaces_List[Source_Suf].Septal_Lateral_Node_Ptr;
+		P2 = STUDY.Geometry_Model.Surfaces_List[Source_Suf].Septal_Anterior_Node_Ptr;
+		Path_Left =  STUDY.Geometry_Model.Surfaces_List[Source_Suf].Ap_SL_Path;
+		Path_Right = STUDY.Geometry_Model.Surfaces_List[Source_Suf].Ap_SA_Path;
+		Path_Base = STUDY.Geometry_Model.Surfaces_List[Source_Suf].SA_SL_Path;
+		Phi_Offset = 2.*2.*M_PI/3. ;
+	}
+
+	//------------------------------------------------------
+	//  2. Calculate normalized distance from apex
+	//------------------------------------------------------
+	double Apex_Dist = STUDY.Geometry_Model.Surfaces_List[Source_Suf].get_path_length(
+		Node_Id,STUDY.Geometry_Model.Surfaces_List[Source_Suf].Apex_Node_Ptr);
+
+	double d1 = STUDY.Geometry_Model.Surfaces_List[Source_Suf].get_path_length(
+				P1,STUDY.Geometry_Model.Surfaces_List[Source_Suf].Apex_Node_Ptr);
+	double d2 = STUDY.Geometry_Model.Surfaces_List[Source_Suf].get_path_length(
+				P2,STUDY.Geometry_Model.Surfaces_List[Source_Suf].Apex_Node_Ptr);
+	double D1;
+	if( d1+d2 != 0 )
+		D1 = 2*Apex_Dist/(d1+d2);
+
+	double dp_to_base = STUDY.Geometry_Model.Surfaces_List[Source_Suf].
+			get_distance_to_path(Node_Id,&Path_Base);
+	if( Apex_Dist+dp_to_base != 0 )
+	D1 =  Apex_Dist / (Apex_Dist+dp_to_base);
+	else
+	ShowMessage("Apex_Dist+dp_to_base == 0 in PropagatesegemntsbackfromWheelto3DMap1Click() ");
+
+	//  3. Calculate phi
+	double dp_left = STUDY.Geometry_Model.Surfaces_List[Source_Suf].
+			get_distance_to_path(Node_Id,&Path_Left);
+	double dp_right = STUDY.Geometry_Model.Surfaces_List[Source_Suf].
+			get_distance_to_path(Node_Id,&Path_Right);
+
+	double Phi;
+	if( dp_left+dp_right == 0 )
+	1; // ShowMessage("dp_left+dp_right == 0 in PropagatesegemntsbackfromWheelto3DMap1Click() ");
+	else
+	Phi = Phi_Offset + 2.*M_PI/3. * dp_left / (dp_left+dp_right);
+
+	//------------------------------------------------------
+	// find xyz of the node in polar plot wheel
+	//------------------------------------------------------
+
+	double Radius = 50; // assuming plaque is 100x100
+	double new_x = Radius*D1*cos(Phi);
+	double new_y = 0;
+	double new_z = Radius*D1*sin(Phi);
+
+	long closest_node = STUDY.Geometry_Model.Surfaces_List[Target_Surf].get_closest_node_to_xyz(new_x,new_y,new_z,1000);
+	long closest_triangle = STUDY.Geometry_Model.Surfaces_List[Target_Surf].
+				Surface_Node_Set[closest_node].Neig_Triangles[0];
+
+	STUDY.Geometry_Model.Surfaces_List[Source_Suf].Surface_Node_Set[Node_Id].Flag_B =
+		STUDY.Geometry_Model.Surfaces_List[Target_Surf].Surface_Triangle_Set[closest_triangle].Segment_Id;
+
+	} // if node is in region
+
+	} // through all nodes
+
+
+	// assign found segments
+	for(long t=0;t<(signed)(signed)STUDY.Geometry_Model.Surfaces_List[Source_Suf].
+		Surface_Triangle_Set.size();t++)
+	{
+		// set not segmented as default
+		STUDY.Geometry_Model.Surfaces_List[Source_Suf].Surface_Triangle_Set[t].Segment_Id = -1;
+
+		nt = STUDY.Geometry_Model.Surfaces_List[Source_Suf].Surface_Triangle_Set[t].Nodes[0];
+
+		if( STUDY.Geometry_Model.Surfaces_List[Source_Suf].Surface_Node_Set[nt].Flag_B > 0 )
+		STUDY.Geometry_Model.Surfaces_List[Source_Suf].Surface_Triangle_Set[t].Segment_Id =
+			STUDY.Geometry_Model.Surfaces_List[Source_Suf].Surface_Node_Set[nt].Flag_B;
+	}
+
+	map_display_panels_paint();
+
+	if( Echo )
+	ShowMessage("Done");
+*/
+
+}
+//---------------------------------------------------------------------------
+
+
+void __fastcall TMain_Application_Window::Removecurrentgeometry1Click(TObject *Sender)
+
+{
+	if( STUDY->is_current_surface_in_range() )
+	{
+
+	STUDY->Surfaces_List.erase( STUDY->Surfaces_List.begin() + STUDY->Current_Surface );
+
+	STUDY->Current_Surface--;
+
+	Geometry_Selection_ComboBox->ItemIndex = STUDY->Current_Surface;
+
+	update_controls_state();
+
+	}
+}
+//---------------------------------------------------------------------------
 

@@ -51,7 +51,9 @@ class Segments_List_Class
 	int get_segment_id(AnsiString Name);
 	AnsiString get_current_segment_name();
 	AnsiString get_segment_name(int Segment_Id);
-    int get_segment_ptr_from_name(AnsiString Name);
+	int get_segment_ptr_from_name(AnsiString Name);
+
+    int add_segment_if_not_present(AnsiString Name, int R, int G, int B);
 
 	void get_segment_color(int Segment_Id,int* R,int* G,int* B);
 
