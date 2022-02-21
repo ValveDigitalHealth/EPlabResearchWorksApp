@@ -1366,7 +1366,10 @@ std::vector <Row_vec> Utils_Tools::load_rectangular_csv_file_to_grid(AnsiString 
 	ifstream dfile(FileName.c_str());
 
 	if( !dfile.is_open() )
+	{
+		ShowMessage("Unable to find or open " + FileName);
 		return Rows;
+	}
 
 	long Iterator = 0;
 	while( !dfile.eof() && Iterator < 100000 )

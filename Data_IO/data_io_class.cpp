@@ -415,14 +415,17 @@ AnsiString Data_IO_Class::import_EnsiteX_DxL_folder(TFileListBox* Data_FileListB
 	AnsiString Wave_Rov_File_Path = Data_Files_Path + "\\Contact_Mapping\\Wave_rov.csv";
 	AnsiString Ref_File_Path =      Data_Files_Path + "\\Contact_Mapping\\Wave_refs.csv";
 
-	read_EnsiteX_PP_omni_data_file(PP_omni_File_Path,
-				&Study->Surfaces_List[Study->Current_Surface].Data_Point_Set[Current_Data_Point_Set],Study );
+	read_EnsiteX_PP_omni_data_file(PP_omni_File_Path,&Study->Surfaces_List[Study->Current_Surface].Data_Point_Set[Current_Data_Point_Set],Study );
 
-	read_EnsiteX_egm_data_file(Wave_Rov_File_Path,
-				&Study->Surfaces_List[Study->Current_Surface].Data_Point_Set[Current_Data_Point_Set],Study );
-
-	read_EnsiteX_ref_data_file(Ref_File_Path,
-				&Study->Surfaces_List[Study->Current_Surface].Data_Point_Set[Current_Data_Point_Set],Study );
+/*  requires some changes, omni and bi type fiels are not the same syntax
+	AnsiString PP_bi_File_Path =  Data_Files_Path + "\\Contact_Mapping\\Map_PP_bi.csv";
+	if( Study->Surfaces_List[Study->Current_Surface].Data_Point_Set[Current_Data_Point_Set].Data_Points.size() == 0 )
+	if( MessageDlg("Since Map_PP_omni.csv file is not present, attempt to import Map_PP_bi.csv instead?",
+		mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, 0) == mrYes)
+	read_EnsiteX_PP_omni_data_file(PP_bi_File_Path,&Study->Surfaces_List[Study->Current_Surface].Data_Point_Set[Current_Data_Point_Set],Study );
+*/
+	read_EnsiteX_egm_data_file(Wave_Rov_File_Path,&Study->Surfaces_List[Study->Current_Surface].Data_Point_Set[Current_Data_Point_Set],Study );
+	read_EnsiteX_ref_data_file(Ref_File_Path,&Study->Surfaces_List[Study->Current_Surface].Data_Point_Set[Current_Data_Point_Set],Study );
 
 
 	//####################################################

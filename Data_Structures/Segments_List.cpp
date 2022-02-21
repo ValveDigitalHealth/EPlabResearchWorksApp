@@ -32,6 +32,7 @@ SOFTWARE. */
 
 int Segments_List_Class::save_object()
 {
+/*
 	ofstream dfile;
 	dfile.open(FilePath.c_str());
 	int version = 2;
@@ -54,6 +55,7 @@ int Segments_List_Class::save_object()
 	return 1;
 
 	}
+*/
 }
 
 //---------------------------------------------------------------------------
@@ -87,14 +89,18 @@ int Segments_List_Class::load_object()
 	if(version > 0 )
 	{
 		int counter=0;
-		while( !dfile.eof() && counter < 10000 )
+		while( !dfile.eof() && counter < 100 )
 		{
-			if( Seg.load_object_from_stream(&dfile,version) )
+			if( Seg.load_object_from_stream(&dfile,version)
+				&& Seg.Name.Length() > 1 )
 			Segments.push_back(Seg);
 
 			counter++;
 		}
 		dfile.close();
+
+		// ShowMessage(FloatToStr(counter));
+
 /*
 		// temporary: generate colors
 		for(long i=0;i<Segments.size();i++)
