@@ -96,6 +96,8 @@ int Value_Description_Class::load_object_from_stream(ifstream* File)
 		File->read((char*)&Min_Value_On_Map, sizeof (double));
 		File->read((char*)&Max_Value_On_Map, sizeof (double));
 
+		Fixed_Palette = false; // from v.2 decision to have Fixed_Palette always false on study load
+
 	return 1;
 	} // v2
 

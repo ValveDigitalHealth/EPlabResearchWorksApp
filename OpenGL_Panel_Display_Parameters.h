@@ -144,6 +144,8 @@ class OpenGL_Panel_Display_Parameters_class
 	// arrow
 	bool Display_Arrows_Flag;
 	double Arrow_Thickness,Arrow_Lenght_Scaling_Factor,Arrow_Dist_From_Surface;
+
+    double Polar_Plot_Line_Width;
 };
 
 #endif

@@ -89,6 +89,8 @@ OpenGL_Panel_Display_Parameters_class::OpenGL_Panel_Display_Parameters_class()
 
 	Display_17_LV_Markers = true;
 
+	Polar_Plot_Line_Width = 7;
+
 	Display_Arrows_Flag = false;
 	Arrow_Thickness = 0.15;
 	Arrow_Lenght_Scaling_Factor = 0.1;

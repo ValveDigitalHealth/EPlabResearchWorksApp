@@ -128,7 +128,7 @@ class STUDY_Class
 		int Base_Surface_DS,int Target_Surface_DS,double Base_AFCL_ms);
 
 	int compute_min_max_values();
-	double Min_Value_On_All_Maps,Max_Value_On_All_Maps;
+	// double Min_Value_On_All_Maps,Max_Value_On_All_Maps;
 
 	AnsiString project_surface_onto_other_surface_ray_intersection_as_value(int Projected_Geometry,
 		int Base_Geometry,double Threshold,int Data_Point_Set_Ptr, AnsiString Geo_Value_Name,

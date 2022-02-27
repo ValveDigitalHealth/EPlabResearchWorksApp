@@ -3893,7 +3893,7 @@ void Surface_Class::compute_paths_for_4_point_LV_segmentation()
 	if( Lat_Intermediate >= 0 )
 	{
 	Lateral_Base_Path = get_shortest_path_between_nodes(Septal_Lateral_Node_Ptr,Lat_Intermediate);
-	vv = get_shortest_path_between_nodes(Ant_Intermediate,Anterior_Lateral_Node_Ptr);
+	vv = get_shortest_path_between_nodes(Lat_Intermediate,Anterior_Lateral_Node_Ptr);
 
 	Lateral_Base_Path.insert( Lateral_Base_Path.end(), vv.begin(), vv.end() );
 	}
@@ -3915,10 +3915,10 @@ vector <long> Surface_Class::get_shortest_path_between_nodes(long Node_1,long No
 
 	// clear 'visited' flag
 	for(unsigned long n=0;n<Surface_Node_Set.size();n++)
-	Surface_Node_Set[n].Flag_A = 0;
+	Surface_Node_Set[n].Flag_B = 0;
 
 	Path.push_back(Node_1);
-	Surface_Node_Set[Node_1].Flag_A = 1;
+	Surface_Node_Set[Node_1].Flag_B = 1;
 
 	double Dest_x = Surface_Node_Set[Node_2].x;
 	double Dest_y = Surface_Node_Set[Node_2].y;
@@ -3939,7 +3939,7 @@ vector <long> Surface_Class::get_shortest_path_between_nodes(long Node_1,long No
 		sth_done = false;
 
 		for(unsigned long n=0;n<Surface_Node_Set[ Path[last_ptr] ].Neighbors.size();n++)
-		if( Surface_Node_Set[Surface_Node_Set[ Path[last_ptr] ].Neighbors[n] ].Flag_A == 0 )
+		if( Surface_Node_Set[Surface_Node_Set[ Path[last_ptr] ].Neighbors[n] ].Flag_B == 0 )
 		{
 			neig_ptr = Surface_Node_Set[ Path[last_ptr] ].Neighbors[n];
 
@@ -3957,7 +3957,7 @@ vector <long> Surface_Class::get_shortest_path_between_nodes(long Node_1,long No
 		if( min_dist_ptr >= 0 )
 		{
 			Path.push_back(min_dist_ptr);
-			Surface_Node_Set[min_dist_ptr].Flag_A = 1;
+			Surface_Node_Set[min_dist_ptr].Flag_B = 1;
 			sth_done = true;
 		}
 
@@ -4000,7 +4000,10 @@ void Surface_Class::initiate_propagation(int Region_Code,long Seed_Node_Ptr)
 	// transfer paths to nodes (so that boundaries are set)
 	//--------------------------------------------------------
 	for(unsigned long n=0;n<Surface_Node_Set.size();n++)
-	Surface_Node_Set[n].Flag_A=0;
+	{
+		Surface_Node_Set[n].Flag_A=0;
+		Surface_Node_Set[n].GroupId = -1;
+	}
 
 	for(unsigned long n=0;n<  Ap_SA_Path.size();n++)
 	Surface_Node_Set[Ap_SA_Path[n]].Flag_A=1;
@@ -4061,14 +4064,16 @@ void Surface_Class::propagate_region_one_step(int Region_Code)
 //---------------------------------------------------------------------------
 int Surface_Class::propagate_region(int Region_Code,long Seed_Node_Ptr)
 {
-	if( Seed_Node_Ptr >= 0 &&
-		Seed_Node_Ptr < Surface_Node_Set.size() )
+	if( Seed_Node_Ptr >= 0 && Seed_Node_Ptr < Surface_Node_Set.size() )
 	{
 	//--------------------------------------------------------
 	// transfer paths to nodes (so that boundaries are set)
 	//--------------------------------------------------------
 	for(unsigned long n=0;n<Surface_Node_Set.size();n++)
-	Surface_Node_Set[n].Flag_A=0;
+	{
+		Surface_Node_Set[n].Flag_A=0;
+		Surface_Node_Set[n].GroupId = -1;
+	}
 
 	for(unsigned long n=0;n<  Ap_SA_Path.size();n++)
 	Surface_Node_Set[Ap_SA_Path[n]].Flag_A=1;
@@ -4080,13 +4085,13 @@ int Surface_Class::propagate_region(int Region_Code,long Seed_Node_Ptr)
 	Surface_Node_Set[Ap_AL_Path[n]].Flag_A=1;
 
 	for(unsigned long n=0;n<Anterior_Base_Path.size();n++)
-	Surface_Node_Set[Anterior_Base_Path[n]].Flag_A=1;
+		   Surface_Node_Set[Anterior_Base_Path[n]].Flag_A=1;
 
 	for(unsigned long n=0;n<Septal_Base_Path.size();n++)
-	Surface_Node_Set[Septal_Base_Path[n]].Flag_A=1;
+		   Surface_Node_Set[Septal_Base_Path[n]].Flag_A=1;
 
 	for(unsigned long n=0;n<Lateral_Base_Path.size();n++)
-	Surface_Node_Set[Lateral_Base_Path[n]].Flag_A=1;
+		   Surface_Node_Set[Lateral_Base_Path[n]].Flag_A=1;
 
 	//--------------------------------------------------------
 	// main propagation
@@ -4096,8 +4101,8 @@ int Surface_Class::propagate_region(int Region_Code,long Seed_Node_Ptr)
 	vector <long> List;
 	List.push_back(Seed_Node_Ptr);
 
-	Surface_Node_Set[Seed_Node_Ptr].Flag_A=1;
-	Surface_Node_Set[Seed_Node_Ptr].GroupId=Region_Code;
+	Surface_Node_Set[Seed_Node_Ptr].Flag_A = 1;
+	Surface_Node_Set[Seed_Node_Ptr].GroupId = Region_Code;
 
 	while(sth_done)
 	{
@@ -4109,7 +4114,7 @@ int Surface_Class::propagate_region(int Region_Code,long Seed_Node_Ptr)
 		for(unsigned long n=0;n<Surface_Node_Set[ List[l] ].Neighbors.size();n++)
 		if( Surface_Node_Set[Surface_Node_Set[ List[l] ].Neighbors[n] ].Flag_A == 0 )
 		{
-			List.push_back( Surface_Node_Set[ List[l] ].Neighbors[n] );
+			List.push_back(  Surface_Node_Set[ List[l] ].Neighbors[n] );
 			Surface_Node_Set[Surface_Node_Set[ List[l] ].Neighbors[n] ].Flag_A = 1;
 			Surface_Node_Set[Surface_Node_Set[ List[l] ].Neighbors[n] ].GroupId = Region_Code;
 			sth_done=true;

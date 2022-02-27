@@ -83,6 +83,7 @@ class Geometry_Triangle
 		int Segment_Id;
 
 		double Tmp_Flag;
+        int Temp_B;
 		float tmp_vec[3]; // used for various calculations
 
 		int GroupId;

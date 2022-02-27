@@ -412,6 +412,11 @@ class TMain_Application_Window : public TForm
 	TMenuItem *N1Createwheelgeometryaslastgeoonthelist1;
 	TMenuItem *N2Repositiondatapointsfromcurrentgeometrymaptopolarplot1;
 	TMenuItem *Removecurrentgeometry1;
+	TMenuItem *N34;
+	TMenuItem *PropagatesegmentsbackfromPolarplottofirstgeometry1;
+	TMenuItem *Debug1;
+	TMenuItem *S11;
+	TMenuItem *Leaveonly2ndmapvisible1;
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
@@ -659,6 +664,10 @@ class TMain_Application_Window : public TForm
 	void __fastcall N1Createwheelgeometryaslastgeoonthelist1Click(TObject *Sender);
 	void __fastcall N2Repositiondatapointsfromcurrentgeometrymaptopolarplot1Click(TObject *Sender);
 	void __fastcall Removecurrentgeometry1Click(TObject *Sender);
+	void __fastcall PropagatesegmentsbackfromPolarplottofirstgeometry1Click(TObject *Sender);
+	void __fastcall S11Click(TObject *Sender);
+	void __fastcall Leaveonly2ndmapvisible1Click(TObject *Sender);
+
 
 
 

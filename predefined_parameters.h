@@ -368,3 +368,8 @@ SOFTWARE. */
 #define LV_LATERAL_SEGMENT_NAME "LV_Lateral"
 #endif
 
+#ifndef POLAR_PLOT_GEOMETRY_RADIUS
+#define POLAR_PLOT_GEOMETRY_RADIUS 50
+#endif
+
+

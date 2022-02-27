@@ -559,13 +559,12 @@ void OpenGL_Panel_Class::paint_polar_plot_rings(int Surface_Ptr)
 
 	glColor3f (1.0, 1.0, 1.0);
 	glEnable(GL_LINE_SMOOTH);
-	glLineWidth(7.0);
+	glLineWidth(OpenGL_Panel_Display_Parameters.Polar_Plot_Line_Width);
 
 	// circles
 	draw_Circle_xz_plane(0,0,0, R1, Sides );
 	draw_Circle_xz_plane(0,0,0, R2, Sides );
 	draw_Circle_xz_plane(0,0,0, R3, Sides );
-	glLineWidth(20.0);
 	draw_Circle_xz_plane(0,0,0, R4-0.5, Sides );
 
 	// lines
@@ -795,8 +794,8 @@ void OpenGL_Panel_Class::draw_palette()
 	Unit = STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_current_value_unit();
 
 	double Min_Value_On_Maps,Max_Value_On_Maps;
-	Min_Value_On_Maps = STUDY->Min_Value_On_All_Maps;
-	Max_Value_On_Maps = STUDY->Max_Value_On_All_Maps;
+	STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.
+		get_current_value_minmax(&Min_Value_On_Maps,&Max_Value_On_Maps);
 
 	Label = FloatToStrF(Min_Value_On_Maps,ffGeneral,3,2 );
 	Label += " "+Unit;
@@ -1254,8 +1253,7 @@ void OpenGL_Panel_Class::prepare_colors_for_display()
 		dset >= 0 && dset < STUDY->Surfaces_List[S].Data_Point_Set.size())
 	{
 
-	Min_Value = STUDY->Min_Value_On_All_Maps;
-	Max_Value = STUDY->Max_Value_On_All_Maps;
+	STUDY->Surfaces_List[S].Map_Values.get_current_value_minmax(&Min_Value,&Max_Value);
 
 	//---------------------------------------
 	// Computing colors of geometry vertices
@@ -1518,9 +1516,9 @@ void OpenGL_Panel_Class::paint_surface(int Surface_Ptr,int DP_Set,bool For_Mouse
 		}
 		else
 		{
-		R = 0.1;
-		G = 0.1;
-		B = 0.1;
+		R = 0.6;
+		G = 0.6;
+		B = 0.6;
 		}
 
 		glColor4f(R,G,B,OpenGL_Panel_Display_Parameters.Transparency_Level);

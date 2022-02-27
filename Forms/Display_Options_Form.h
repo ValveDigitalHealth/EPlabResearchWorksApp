@@ -105,6 +105,8 @@ __published:	// IDE-managed Components
 	TLabel *Label14;
 	TEdit *DTS_Edit;
 	TCheckBox *Display_Arrows_CheckBox;
+	TLabel *Label15;
+	TEdit *Polar_Plot_Line_Width_Edit;
 
 
     void __fastcall OK_ButtonClick(TObject *Sender);

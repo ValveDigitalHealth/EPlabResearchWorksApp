@@ -2,8 +2,8 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
   Left = 431
   Top = 158
   Caption = 'Display options'
-  ClientHeight = 792
-  ClientWidth = 1004
+  ClientHeight = 651
+  ClientWidth = 922
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -228,6 +228,13 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Width = 101
     Height = 13
     Caption = 'Text dist from surface'
+  end
+  object Label15: TLabel
+    Left = 192
+    Top = 470
+    Width = 91
+    Height = 13
+    Caption = 'Polar plot line width'
   end
   object Font_RadioGroup: TRadioGroup
     Left = 466
@@ -640,8 +647,8 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     TabOrder = 31
   end
   object OK_Button: TButton
-    Left = 884
-    Top = 708
+    Left = 796
+    Top = 556
     Width = 108
     Height = 64
     Margins.Left = 2
@@ -728,8 +735,8 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
       '15')
   end
   object Cancel_Button: TButton
-    Left = 771
-    Top = 708
+    Left = 683
+    Top = 556
     Width = 109
     Height = 64
     Margins.Left = 2
@@ -852,5 +859,13 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Height = 26
     Caption = 'Display arrows'
     TabOrder = 46
+  end
+  object Polar_Plot_Line_Width_Edit: TEdit
+    Left = 289
+    Top = 467
+    Width = 56
+    Height = 21
+    TabOrder = 47
+    Text = 'AT_Edit'
   end
 end

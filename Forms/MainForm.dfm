@@ -80,10 +80,6 @@ object Main_Application_Window: TMain_Application_Window
     TabOrder = 2
     object TabSheet_Main: TTabSheet
       Caption = 'Main'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label_p1: TLabel
         Left = 3
         Top = 2
@@ -246,10 +242,6 @@ object Main_Application_Window: TMain_Application_Window
     object TabSheet2: TTabSheet
       Caption = 'Segmentation'
       ImageIndex = 1
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label3: TLabel
         Left = 2
         Top = 29
@@ -399,10 +391,6 @@ object Main_Application_Window: TMain_Application_Window
     end
     object GroupedEGMs: TTabSheet
       Caption = 'Grouped id egms'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object All_EGMs_PaintBox: TPaintBox
         Left = 39
         Top = 32
@@ -427,10 +415,6 @@ object Main_Application_Window: TMain_Application_Window
     object ECGChannels: TTabSheet
       Caption = 'ECG'
       ImageIndex = 2
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object ECG_Channels_PaintBox: TPaintBox
         Left = 47
         Top = 40
@@ -455,10 +439,6 @@ object Main_Application_Window: TMain_Application_Window
     object ExtraChannels: TTabSheet
       Caption = 'Extra channels'
       ImageIndex = 3
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Extra_Channels_PaintBox: TPaintBox
         Left = 55
         Top = 48
@@ -483,10 +463,6 @@ object Main_Application_Window: TMain_Application_Window
     object ImagesPage: TTabSheet
       Caption = 'Histology'
       ImageIndex = 4
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Fluoro_Image_Paint_Box: TPaintBox
         Left = 22
         Top = 170
@@ -585,10 +561,6 @@ object Main_Application_Window: TMain_Application_Window
     object TabSheet1: TTabSheet
       Caption = 'Tools'
       ImageIndex = 5
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
       object Label4: TLabel
         Left = 3
         Top = 28
@@ -1006,6 +978,13 @@ object Main_Application_Window: TMain_Application_Window
             'lar plot geometry'
           OnClick = N2Repositiondatapointsfromcurrentgeometrymaptopolarplot1Click
         end
+        object N34: TMenuItem
+          Caption = '-'
+        end
+        object PropagatesegmentsbackfromPolarplottofirstgeometry1: TMenuItem
+          Caption = 'Propagate segments back from Polar plot to first geometry'
+          OnClick = PropagatesegmentsbackfromPolarplottofirstgeometry1Click
+        end
       end
       object N40: TMenuItem
         Caption = '-'
@@ -1128,6 +1107,10 @@ object Main_Application_Window: TMain_Application_Window
         Caption = 'Leave only 1st map visible'
         OnClick = Leaveonly1stmapvisible1Click
       end
+      object Leaveonly2ndmapvisible1: TMenuItem
+        Caption = 'Leave only 2nd map visible'
+        OnClick = Leaveonly2ndmapvisible1Click
+      end
     end
     object Help1: TMenuItem
       Caption = 'Help'
@@ -1145,6 +1128,13 @@ object Main_Application_Window: TMain_Application_Window
       object Showlogwindow1: TMenuItem
         Caption = 'Show log window'
         OnClick = Showlogwindow1Click
+      end
+      object Debug1: TMenuItem
+        Caption = 'Debug'
+        object S11: TMenuItem
+          Caption = 'S1'
+          OnClick = S11Click
+        end
       end
     end
   end
