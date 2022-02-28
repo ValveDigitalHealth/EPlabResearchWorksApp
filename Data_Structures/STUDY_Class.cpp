@@ -416,7 +416,7 @@ void STUDY_Class::perform_17_nuclear_segmentation(TProgress_Form *Progress_Form,
 	Surface_Class Suface_Class_Item;
 	Surfaces_List.push_back(Suface_Class_Item);
 	int Wheel_Surf = Surfaces_List.size()-1; // *********************
-	double Radius = 50; // assuming plaque is 100x100
+	double Radius = POLAR_PLOT_GEOMETRY_RADIUS;
 	Surfaces_List[Wheel_Surf].generate_wheel_sample(Progress_Form,Radius,1);
 
 	//---------------------------------------
@@ -514,6 +514,9 @@ void STUDY_Class::perform_17_nuclear_segmentation(TProgress_Form *Progress_Form,
 		Surfaces_List[Source_Surface].Surface_Node_Set[Node_Id].Flag_B = -1;
 	}
 
+	for(long t=0;t<(signed)Surfaces_List[Source_Surface].Surface_Triangle_Set.size();t++)
+	Surfaces_List[Source_Surface].Surface_Triangle_Set[t].Temp_B = -1;
+
 	//------------------------------------------------------
 	// Go through all nodes in 3D map within segments
 	//------------------------------------------------------
@@ -523,6 +526,8 @@ void STUDY_Class::perform_17_nuclear_segmentation(TProgress_Form *Progress_Form,
 
 	double Apex_Dist,d1,d2,D1,dp_to_base,dp_left,dp_right,Phi,new_x,new_y,new_z;
 	long closest_node,closest_triangle;
+	AnsiString RN,Region_Name;
+	bool Pass;
 
 	//-----------------------------------------------------------------------------------------
 	for(long Node_Id=0;Node_Id<(signed)Surfaces_List[Source_Surface].Surface_Node_Set.size();Node_Id++)
@@ -536,14 +541,29 @@ void STUDY_Class::perform_17_nuclear_segmentation(TProgress_Form *Progress_Form,
 		Application->ProcessMessages();
 		}
 
-	Region_Id = Surfaces_List[Source_Surface].Surface_Triangle_Set[
-		Surfaces_List[Source_Surface].
-			Surface_Node_Set[Node_Id].Neig_Triangles[0] ].Segment_Id;
+	Region_Name = "";
+	Pass = false;
+	for(int nt=0;nt<Surfaces_List[Source_Surface].Surface_Node_Set[Node_Id].Neig_Triangles.size();nt++)
+	if (Surfaces_List[Source_Surface].Surface_Node_Set[Node_Id].Neig_Triangles[nt] >= 0 &&
+		Surfaces_List[Source_Surface].Surface_Node_Set[Node_Id].Neig_Triangles[nt] < (signed)
+		Surfaces_List[Source_Surface].Surface_Triangle_Set.size() )
+	RN = Segments_Info->get_segment_name(
+			Surfaces_List[Source_Surface].Surface_Triangle_Set[
+				Surfaces_List[Source_Surface].Surface_Node_Set[Node_Id].Neig_Triangles[nt] ].Segment_Id);
 
-	if( Region_Id == Anterior_Region_Id || Region_Id == Septal_Region_Id || Region_Id == Lateral_Region_Id  )  // > 0 later
+	if( RN == LV_ANTERIOR_SEGMENT_NAME || RN == LV_LATERAL_SEGMENT_NAME || RN == LV_SEPTAL_SEGMENT_NAME  )
+	{
+		Pass = true;
+		Region_Name = RN;
+	}
+
+	if( Pass &&
+	   (Region_Name == LV_ANTERIOR_SEGMENT_NAME ||
+		Region_Name == LV_LATERAL_SEGMENT_NAME ||
+		Region_Name == LV_SEPTAL_SEGMENT_NAME) )
 	{
 
-	if( Region_Id == Anterior_Region_Id  ) // anterior
+	if( Region_Name == LV_ANTERIOR_SEGMENT_NAME  ) // anterior
 	{
 		P1 = Surfaces_List[Source_Surface].Septal_Anterior_Node_Ptr;
 		P2 = Surfaces_List[Source_Surface].Anterior_Lateral_Node_Ptr;
@@ -553,7 +573,7 @@ void STUDY_Class::perform_17_nuclear_segmentation(TProgress_Form *Progress_Form,
 		Phi_Offset = 0;
 	}
 
-	if( Region_Id == Lateral_Region_Id  ) // lateral
+	if( Region_Name == LV_LATERAL_SEGMENT_NAME  ) // lateral
 	{
 		P1 = Surfaces_List[Source_Surface].Anterior_Lateral_Node_Ptr;
 		P2 = Surfaces_List[Source_Surface].Septal_Lateral_Node_Ptr;
@@ -563,7 +583,7 @@ void STUDY_Class::perform_17_nuclear_segmentation(TProgress_Form *Progress_Form,
 		Phi_Offset = 2.*M_PI/3.;
 	}
 
-	if( Region_Id == Septal_Region_Id  ) // septal
+	if( Region_Name == LV_SEPTAL_SEGMENT_NAME  ) // septal
 	{
 		P1 = Surfaces_List[Source_Surface].Septal_Lateral_Node_Ptr;
 		P2 = Surfaces_List[Source_Surface].Septal_Anterior_Node_Ptr;
@@ -578,13 +598,6 @@ void STUDY_Class::perform_17_nuclear_segmentation(TProgress_Form *Progress_Form,
 	//------------------------------------------------------
 	Apex_Dist = Surfaces_List[Source_Surface].get_path_length(
 		Node_Id,Surfaces_List[Source_Surface].Apex_Node_Ptr);
-
-	d1 = Surfaces_List[Source_Surface].get_path_length(
-				P1,Surfaces_List[Source_Surface].Apex_Node_Ptr);
-	d2 = Surfaces_List[Source_Surface].get_path_length(
-				P2,Surfaces_List[Source_Surface].Apex_Node_Ptr);
-	if( d1+d2 != 0 )
-		D1 = 2*Apex_Dist/(d1+d2);
 
 	dp_to_base = Surfaces_List[Source_Surface].get_distance_to_path(Node_Id,&Path_Base);
 
@@ -615,39 +628,20 @@ void STUDY_Class::perform_17_nuclear_segmentation(TProgress_Form *Progress_Form,
 	Surfaces_List[Source_Surface].Surface_Node_Set[Node_Id].Flag_B =
 		Surfaces_List[Wheel_Surf].Surface_Triangle_Set[closest_triangle].Segment_Id;
 
+	for(int nt=0;nt<Surfaces_List[Source_Surface].Surface_Node_Set[Node_Id].Neig_Triangles.size();nt++)
+	Surfaces_List[Source_Surface].Surface_Triangle_Set[
+		Surfaces_List[Source_Surface].Surface_Node_Set[Node_Id].Neig_Triangles[nt] ].Temp_B =
+		Surfaces_List[Wheel_Surf].Surface_Triangle_Set[closest_triangle].Segment_Id;
+
 	} // if node is in region
+
 
 	} // through all nodes
 
-
-	// assign found segments from nodes to triangles
-	int count;
+	// transfer flags to Segment_Id
 	for(long t=0;t<(signed)Surfaces_List[Source_Surface].Surface_Triangle_Set.size();t++)
-	{
-		// set not segmented as default
-		Surfaces_List[Source_Surface].Surface_Triangle_Set[t].Segment_Id = -1;
-
-		count=0;
-		if( Surfaces_List[Source_Surface].Surface_Node_Set[
-				Surfaces_List[Source_Surface].Surface_Triangle_Set[t].Nodes[0] ].Flag_B > 0 )
-		count++;
-
-		if( Surfaces_List[Source_Surface].Surface_Node_Set[
-				Surfaces_List[Source_Surface].Surface_Triangle_Set[t].Nodes[1] ].Flag_B > 0 )
-		count++;
-
-		if( Surfaces_List[Source_Surface].Surface_Node_Set[
-				Surfaces_List[Source_Surface].Surface_Triangle_Set[t].Nodes[2] ].Flag_B > 0 )
-		count++;
-
-		if(count >= 1)
-		Surfaces_List[Source_Surface].Surface_Triangle_Set[t].Segment_Id =
-			Surfaces_List[Source_Surface].Surface_Node_Set[
-				Surfaces_List[Source_Surface].Surface_Triangle_Set[t].Nodes[0]].Flag_B;
-	}
-
-//	Surfaces_List[Wheel_Surf].Display_Flag = false;
-	// !!!!!!!!!!!!1 moze tutaj skasuj wheel geometry????
+	Surfaces_List[Source_Surface].Surface_Triangle_Set[t].Segment_Id =
+	Surfaces_List[Source_Surface].Surface_Triangle_Set[t].Temp_B;
 
 	//---------------------------------------------------------------
 	// smooth borders

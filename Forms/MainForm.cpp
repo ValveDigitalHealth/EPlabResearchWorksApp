@@ -33,9 +33,8 @@ TMain_Application_Window *Main_Application_Window;
 
 void __fastcall TMain_Application_Window::About1Click(TObject *Sender)
 {
-	ShowMessage("EPLab Works. Version v.2.0.9 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
+	ShowMessage("EPLab Works. Version v.2.0.10 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
 }
-//---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
 __fastcall TMain_Application_Window::TMain_Application_Window(TComponent* Owner)
@@ -9338,6 +9337,8 @@ void TMain_Application_Window::reposition_data_points_according_to_17segments(in
 	int Region_Id;
 	int dset = STUDY->Surfaces_List[Source_Geo].Current_Data_Point_Set_Ptr;
 	double Radius = POLAR_PLOT_GEOMETRY_RADIUS;
+	AnsiString Region_Name,RN;
+    bool Pass;
 
 	//------------------------------------------------------
 	// create empty dataset in target geo
@@ -9365,19 +9366,29 @@ void TMain_Application_Window::reposition_data_points_according_to_17segments(in
 	//------------------------------------------------------
 	// 1. find which region is the closest (within Threshold tolerance)
 	//------------------------------------------------------
-	AnsiString Region_Name = "";
+
+	Region_Name = "";
+	Pass = false;
 	Node_Id = STUDY->Surfaces_List[Source_Surf].Data_Point_Set[dset].Data_Points[dp].Closest_Node_Id;
 	if( Node_Id >= 0 && Node_Id < (signed)STUDY->Surfaces_List[Source_Surf].Surface_Node_Set.size() )
-	if (STUDY->Surfaces_List[Source_Surf].Surface_Node_Set[Node_Id].Neig_Triangles[0] > 0 &&
-		STUDY->Surfaces_List[Source_Surf].Surface_Node_Set[Node_Id].Neig_Triangles[0] < (signed)
+	for(int nt=0;nt<STUDY->Surfaces_List[Source_Surf].Surface_Node_Set[Node_Id].Neig_Triangles.size();nt++)
+	if (STUDY->Surfaces_List[Source_Surf].Surface_Node_Set[Node_Id].Neig_Triangles[nt] >= 0 &&
+		STUDY->Surfaces_List[Source_Surf].Surface_Node_Set[Node_Id].Neig_Triangles[nt] < (signed)
 		STUDY->Surfaces_List[Source_Surf].Surface_Triangle_Set.size() )
-	Region_Name = Segments_Info.get_segment_name(
+	RN = Segments_Info.get_segment_name(
 			STUDY->Surfaces_List[Source_Surf].Surface_Triangle_Set[
-				STUDY->Surfaces_List[Source_Surf].Surface_Node_Set[Node_Id].Neig_Triangles[0] ].Segment_Id);
+				STUDY->Surfaces_List[Source_Surf].Surface_Node_Set[Node_Id].Neig_Triangles[nt] ].Segment_Id);
 
-	if( Region_Name == LV_ANTERIOR_SEGMENT_NAME ||
+	if( RN == LV_ANTERIOR_SEGMENT_NAME || RN == LV_LATERAL_SEGMENT_NAME || RN == LV_SEPTAL_SEGMENT_NAME  )
+	{
+		Pass = true;
+		Region_Name = RN;
+	}
+
+	if( Pass &&
+	   (Region_Name == LV_ANTERIOR_SEGMENT_NAME ||
 		Region_Name == LV_LATERAL_SEGMENT_NAME ||
-		Region_Name == LV_SEPTAL_SEGMENT_NAME  )
+		Region_Name == LV_SEPTAL_SEGMENT_NAME) )
 	{
 
 	if( Region_Name == LV_ANTERIOR_SEGMENT_NAME  ) // anterior
@@ -9591,7 +9602,6 @@ void __fastcall TMain_Application_Window::PropagatesegmentsbackfromPolarplottofi
 	STUDY->Surfaces_List[Source_Surf].Surface_Triangle_Set[
 		STUDY->Surfaces_List[Source_Surf].Surface_Node_Set[Node_Id].Neig_Triangles[nt] ].Temp_B =
 		STUDY->Surfaces_List[Target_Surf].Surface_Triangle_Set[closest_triangle].Segment_Id;
-
 
 	} // if node is in region
 
