@@ -281,6 +281,9 @@ class Surface_Class
 	AnsiString calculate_egm_duration_map(int Data_Point_Set_Id,Computational_Module_Class *Comp_Module_Ptr);
 	AnsiString calculate_AFCL_map(int Data_Point_Set_Id,double Base_AFCL_ms,Computational_Module_Class *Comp_Module_Ptr);
 
+	AnsiString calculate_MPD_fractionation_map(int Data_Point_Set_Id,Computational_Module_Class *Comp_Module_Ptr);
+
+
 	AnsiString calculate_voltage_amplitude_map(int Data_Point_Set_Id,Computational_Module_Class *Comp_Module_Ptr);
 
 	AnsiString calculate_microfractionation_map(int Data_Point_Set_Id,Computational_Module_Class *Comp_Module_Ptr);

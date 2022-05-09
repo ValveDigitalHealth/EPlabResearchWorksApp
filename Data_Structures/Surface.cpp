@@ -2194,6 +2194,70 @@ AnsiString Surface_Class::calculate_voltage_amplitude_map(int Data_Point_Set_Id,
 
 //------------------------------------------------------------------------------
 
+AnsiString Surface_Class::calculate_MPD_fractionation_map(int Data_Point_Set_Id,Computational_Module_Class *Comp_Module_Ptr)
+{
+	// add value to list
+	Value_Description_Class Value_Desc;
+	Value_Desc.Type = VALUE_BASED_ON_DATA_POINTS;
+	Value_Desc.Displayed_In_Table = true;
+	Value_Desc.Inverted_Palette = true;
+	Value_Desc.Value_Name = "MPD: Number of peaks";
+	Value_Desc.Unit = "";
+	Map_Values.add_value(Value_Desc);
+
+	int MPD_map_Ptr = Map_Values.get_value_ptr(Value_Desc.Value_Name);
+	double mAT,DAT;
+
+	for(long i=0;i<(signed)Data_Point_Set[Data_Point_Set_Id].Data_Points.size();i++)
+	{
+
+	if( i%30 == 1 )
+	{
+		Progress_Form->replace_last_line_with_text("Processing dp: " + IntToStr((int)i) + "/" +
+			IntToStr((int)(Data_Point_Set[Data_Point_Set_Id].Data_Points.size())) );
+		Progress_Form->Show();
+		Application->ProcessMessages();
+	}
+
+	//------------------------------------------------------------------
+	// MPD analysis
+	//------------------------------------------------------------------
+	Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Roving_Signal.vPeak_Positions.clear();
+
+	if( Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Rov_Signal_Activation_ptr > 0 ) // local deflection found
+	{
+	PNUM.calculate_MPD_peaks_positions(
+		&Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Roving_Signal.Voltage_Values,
+		0,Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Roving_Signal.Voltage_Values.size()-1,
+		Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Roving_Signal.Time_Step_ms,
+		false,//Offset_Peaks_To_Ref_CheckBox->State,
+		Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Ref_Signal_Activation_ptr,
+		Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Rov_Signal_Activation_ptr,
+		Comp_Module_Ptr->Window_Size_ms,
+		Comp_Module_Ptr->PP_Threshold,
+		Comp_Module_Ptr->Peak_Definition_Range_ms,
+		&Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Roving_Signal.vPeak_Positions,
+		&Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Roving_Signal.Peak_Interval_Mean,
+		&Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Roving_Signal.Peak_Interval_SD,
+		&Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Roving_Signal.Last_Peak_Position_Relative_To_Roving_Position
+		);
+	}
+
+	Data_Point_Set[Current_Data_Point_Set_Ptr].Data_Points[i].set_value(
+		Value_Desc.Value_Name,
+		Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Roving_Signal.vPeak_Positions.size(),
+		Map_Values.get_values_table_ref() );
+
+	}
+
+	// interpolate map
+	interpolate_specific_value(0,Data_Point_Set_Id,MPD_map_Ptr,Progress_Form);
+
+	return Value_Desc.Value_Name;
+}
+
+//------------------------------------------------------------------------------
+
 AnsiString Surface_Class::calculate_egm_duration_map(int Data_Point_Set_Id,
 		Computational_Module_Class *Comp_Module_Ptr)
 {

@@ -106,6 +106,12 @@ class Computational_Module_Class
 	long Sliding_Window_Size_for_dispersion_calculation_ms;
 	double Voltage_threshold_for_dispersion_calculation_mV;
 
+	//----------------------------------------------------------------------
+	// Fractionation / MPD
+	//----------------------------------------------------------------------
+	double Window_Size_ms;
+	double PP_Threshold;
+	double Peak_Definition_Range_ms;
 };
 
 #endif

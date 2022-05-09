@@ -417,6 +417,7 @@ class TMain_Application_Window : public TForm
 	TMenuItem *Debug1;
 	TMenuItem *S11;
 	TMenuItem *Leaveonly2ndmapvisible1;
+	TMenuItem *Calculatefractionationmappeaksaroundlocalactivation1;
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
@@ -667,6 +668,8 @@ class TMain_Application_Window : public TForm
 	void __fastcall PropagatesegmentsbackfromPolarplottofirstgeometry1Click(TObject *Sender);
 	void __fastcall S11Click(TObject *Sender);
 	void __fastcall Leaveonly2ndmapvisible1Click(TObject *Sender);
+	void __fastcall Calculatefractionationmappeaksaroundlocalactivation1Click(TObject *Sender);
+
 
 
 

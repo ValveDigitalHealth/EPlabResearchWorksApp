@@ -3674,5 +3674,96 @@ double Numerical_Library::sign(double val)
 
 //---------------------------------------------------------------------------
 
+void Numerical_Library::calculate_MPD_peaks_positions(
+	std::vector<double> *Data_Vec, long Start,long Stop, double Time_Step,
+	bool Offset_to_Ref_Bar, long Ref_Bar_Position, long Roving_Bar_Position,
+	long Window_Size,
+	double PP_Threshold,
+	long Peak_Definition_Range,
+	std::vector <long> *Peaks_Positions_In_Signal,
+	double* Peak_Interval_Mean_ptr,
+	double* Peak_Interval_SD_ptr,
+	double* Last_Peak_Position_Relative_To_Roving_Position_ptr
+	)
+{
+	// adapted from
+	// EDWARD J. CIACCIO, et al
+	// Method to Predict Isthmus Location in Ventricular Tachycardia
+	// Caused by Reentry with a Double-Loop Pattern
+
+	Peaks_Positions_In_Signal[0].clear();
+
+	if( Time_Step == 0 )
+	Time_Step = 1;
+
+	if( Start < 0 || Start > Data_Vec[0].size() )
+	Start = 0;
+
+	if( Stop < 0 || Stop > Data_Vec[0].size() )
+	Stop = Data_Vec[0].size()-1;
+
+	Peaks_Positions_In_Signal[0].clear();
+
+	double min=0,max=0,mean=0,SD;
+
+	//-----------------------------------------------------------
+	// calculate all peaks
+	//-----------------------------------------------------------
+	bool pass_positive,pass_negative;
+
+	for(long i=Roving_Bar_Position-0.5*Window_Size/Time_Step;i<Roving_Bar_Position+0.5*Window_Size/Time_Step;i++)
+	if(i>Start && i<Stop)
+	{
+
+	min = 100000000; max = -100000000;
+
+	// check for positive peak:
+	pass_positive=true;
+	for(long kk=-Peak_Definition_Range/Time_Step;kk<=Peak_Definition_Range/Time_Step;kk++)
+	if(kk!=0)
+	if( i+kk >= 0 && i+kk < Data_Vec[0].size() )
+	{
+		if( Data_Vec[0][i+kk] > Data_Vec[0][i])
+		pass_positive=false;
+
+		if( Data_Vec[0][i+kk] > max ) max = Data_Vec[0][i+kk];
+		if( Data_Vec[0][i+kk] < min ) min = Data_Vec[0][i+kk];
+	}
+
+	// check for negative peak:
+	pass_negative=true;
+	for(long kk=-Peak_Definition_Range/Time_Step;kk<=Peak_Definition_Range/Time_Step;kk++)
+	if(kk!=0)
+	if( i+kk >= 0 && i+kk < Data_Vec[0].size() )
+	if( Data_Vec[0][i+kk] < Data_Vec[0][i])
+	pass_negative=false;
+
+	if( pass_negative && min < 0 || pass_positive && max>0 ) // either peak up or peak down AND if peaks are up or down (so no case of peak up in case of basline wonder down)
+//	if( pass_negative || pass_positive ) // either peak up or peak down
+	if( max - min > PP_Threshold ) // this enables peak detection in case baseline wander
+	{
+		Peaks_Positions_In_Signal[0].push_back(i);
+		i+=Peak_Definition_Range/Time_Step;
+	}
+
+	}
+
+	// offset to Ref bar if requested
+	if( Offset_to_Ref_Bar )
+	for(long i=0;i<(signed)Peaks_Positions_In_Signal[0].size();i++)
+	Peaks_Positions_In_Signal[0][i] -= Ref_Bar_Position;
+
+	stdev_cor_vec_long(Peaks_Positions_In_Signal,Peak_Interval_Mean_ptr, Peak_Interval_SD_ptr);
+
+	// position of last
+	if( Peaks_Positions_In_Signal[0].size() > 0 )
+	Last_Peak_Position_Relative_To_Roving_Position_ptr[0] =
+		(Peaks_Positions_In_Signal[0][Peaks_Positions_In_Signal[0].size()-1] -
+			Roving_Bar_Position);
+	else
+	Last_Peak_Position_Relative_To_Roving_Position_ptr[0] = 0;
+}
+
+//---------------------------------------------------------------------------
 
 

@@ -139,6 +139,19 @@ class Numerical_Library
 
 	double get_non_zero_mean(double v1, double v2);
 
+    // Fractionation (MPD) calculation
+	void Numerical_Library::calculate_MPD_peaks_positions(
+		std::vector<double> *Data_Vec, long Start,long Stop, double Time_Step,
+		bool Offset_to_Ref_Bar, long Ref_Bar_Position, long Roving_Bar_Position,
+		long Window_Size,
+		double PP_Threshold,
+		long Peak_Definition_Range,
+		std::vector <long> *Peaks_Positions_In_Signal,
+		double* Peak_Interval_Mean_ptr,
+		double* Peak_Interval_SD_ptr,
+		double* Last_Peak_Position_Relative_To_Roving_Position_ptr
+		);
+
 	// Histogramming
 	std::vector <long> get_histogram(
 		std::vector <double> *Data,

@@ -33,7 +33,7 @@ TMain_Application_Window *Main_Application_Window;
 
 void __fastcall TMain_Application_Window::About1Click(TObject *Sender)
 {
-	ShowMessage("EPLab Works. Version v.2.0.10 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
+	ShowMessage("EPLab Works. Version v.2.0.12 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
 }
 
 //---------------------------------------------------------------------------
@@ -2363,28 +2363,6 @@ void __fastcall TMain_Application_Window::Annotation_Window_PaintBoxPaint(TObjec
 	}
 
 	int Size=3;
-/*
-	// LOCAL ACTIVATIONS
-	Annotation_Window_PaintBox_Bitmap->Canvas->Brush->Color =  (TColor)RGB(0,0,0);
-	for(long box=0;box<STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[DS].
-		Data_Points[DP].Roving_Signal.Local_Activations.Local_Activations_vec.size();box++)
-	{
-		x1 = (STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[DS].
-			  Data_Points[DP].Roving_Signal.
-			  Local_Activations.Local_Activations_vec[box].Timing_In_EGM_ptr - Annotation_Box.Annotation_Display_Start )
-				 * (double)Annotation_Window_PaintBox_Bitmap->Width/
-				   (double)Annotation_Box.Displayed_Segment_Length_ptr;
-		if( x1 > 0 && x1 < Annotation_Window_PaintBox_Bitmap->Width )
-		{
-		T.Top = Annotation_Box.LC_Pos*Annotation_Window_PaintBox_Bitmap->Height-Size;
-		T.Left = x1-Size;
-		T.Right = x1+Size;
-		T.Bottom = Annotation_Box.LC_Pos*Annotation_Window_PaintBox_Bitmap->Height+Size;
-		Annotation_Window_PaintBox_Bitmap->Canvas->FillRect(T);
-		}
-	}
-*/
-
 	Annotation_Window_PaintBox_Bitmap->Canvas->Brush->Style = bsClear;
 
 	// Rov channel LAT line
@@ -2436,12 +2414,22 @@ void __fastcall TMain_Application_Window::Annotation_Window_PaintBoxPaint(TObjec
 		Data_Points[DP].Roving_Signal.vPeak_Positions[p] - Annotation_Box.Annotation_Display_Start )
 				 * (double)Annotation_Window_PaintBox_Bitmap->Width/
 				   (double)Annotation_Box.Displayed_Segment_Length_ptr;
+
+		y1 = Annotation_Box.LC_Pos*Annotation_Window_PaintBox_Bitmap->Height-
+			STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[DS].
+			Data_Points[DP].Roving_Signal.Voltage_Values
+			[STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[DS].
+				Data_Points[DP].Roving_Signal.vPeak_Positions[p] ]*Annotation_Box.Local_Signal_Zoom;
+
 		if( x1 > 0 && x1 < Annotation_Window_PaintBox_Bitmap->Width )
 		{
-			T.Top = Annotation_Box.LC_Pos*Annotation_Window_PaintBox_Bitmap->Height-Size;
+//			T.Top = Annotation_Box.LC_Pos*Annotation_Window_PaintBox_Bitmap->Height-Size;
+//			T.Bottom = Annotation_Box.LC_Pos*Annotation_Window_PaintBox_Bitmap->Height+Size;
+			T.Top = y1-Size;
+			T.Bottom = y1+Size;
+
 			T.Left = x1-Size;
 			T.Right = x1+Size;
-			T.Bottom = Annotation_Box.LC_Pos*Annotation_Window_PaintBox_Bitmap->Height+Size;
 			Annotation_Window_PaintBox_Bitmap->Canvas->FillRect(T);
 		}
 	}
@@ -9668,4 +9656,44 @@ void __fastcall TMain_Application_Window::Leaveonly2ndmapvisible1Click(TObject *
 	}
 }
 //---------------------------------------------------------------------------
+
+void __fastcall TMain_Application_Window::Calculatefractionationmappeaksaroundlocalactivation1Click(TObject *Sender)
+
+{
+	if( STUDY->is_current_surface_in_range() )
+	if( STUDY->Surfaces_List[STUDY->Current_Surface].data_points_set_ptr_in_range() )
+	{
+
+	int dset = STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr;
+
+	STUDY->Comp_Module.Window_Size_ms = Annotation_Parameters_Form->MPD_WL_Edit->Text.ToDouble();
+	STUDY->Comp_Module.PP_Threshold = Annotation_Parameters_Form->MPD_Th_Edit->Text.ToDouble();
+	STUDY->Comp_Module.Peak_Definition_Range_ms = Annotation_Parameters_Form->MPD_R_Edit->Text.ToDouble();
+
+	AnsiString Msg;
+	Msg += "Algorithm (called in app MPD - Multiple Peak Detection) is based on paper by Ciaccio 'Method to predict isthmus location in ventricular tachycardia caused by reentry with a double-loop pattern' "+
+	Msg += "Parameters set in Annotation setup.";
+	ShowMessage(Msg);
+
+	Progress_Form->add_text("Calculating electrogram duration map... ");
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	//---------------------
+	AnsiString New_Map_Name = STUDY->Surfaces_List[STUDY->Current_Surface].
+		calculate_MPD_fractionation_map(dset,&STUDY->Comp_Module);
+	//---------------------
+
+	STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.set_current_value_according_to_name(New_Map_Name);
+
+	STUDY->compute_min_max_values();
+	OpenGL_Panel_1.prepare_colors_for_display();
+	update_controls_state();
+	Progress_Form->Hide();
+	repaint_3D_panels();
+
+	}
+}
+//---------------------------------------------------------------------------
+
 

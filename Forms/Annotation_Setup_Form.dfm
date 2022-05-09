@@ -366,6 +366,57 @@ object Annotation_Parameters_Form: TAnnotation_Parameters_Form
     Margins.Bottom = 2
     Caption = 'Correlation threshold for template matching:'
   end
+  object Label17: TLabel
+    Left = 228
+    Top = 345
+    Width = 98
+    Height = 13
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Caption = 'MPD parameters:'
+    FocusControl = Annotation_Algorithm_RadioGroup
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -12
+    Font.Name = 'MS Sans Serif'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object Label21: TLabel
+    Left = 238
+    Top = 366
+    Width = 101
+    Height = 13
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Caption = 'Window size [+- Xms]'
+  end
+  object Label22: TLabel
+    Left = 244
+    Top = 408
+    Width = 98
+    Height = 13
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Caption = 'Peak det. range [ms]'
+  end
+  object Label23: TLabel
+    Left = 228
+    Top = 387
+    Width = 116
+    Height = 13
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Caption = 'Peak det. threshold [mV]'
+  end
   object ROV_Left_Edge_Edit: TEdit
     Left = 270
     Top = 42
@@ -766,5 +817,41 @@ object Annotation_Parameters_Form: TAnnotation_Parameters_Form
     Margins.Bottom = 2
     TabOrder = 30
     Text = '0.1'
+  end
+  object MPD_WL_Edit: TEdit
+    Left = 352
+    Top = 363
+    Width = 50
+    Height = 21
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    TabOrder = 31
+    Text = '150'
+  end
+  object MPD_Th_Edit: TEdit
+    Left = 352
+    Top = 386
+    Width = 50
+    Height = 21
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    TabOrder = 32
+    Text = '0.2'
+  end
+  object MPD_R_Edit: TEdit
+    Left = 352
+    Top = 409
+    Width = 50
+    Height = 21
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    TabOrder = 33
+    Text = '2'
   end
 end
