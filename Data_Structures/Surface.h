@@ -176,8 +176,9 @@ class Surface_Class
 	int get_data_point_segment_id(int Dset, int DP);
     bool is_segment_present_at_data_point(int Dset,int DP,int Segment_Id);
 
-	long get_number_of_data_points_in_segment(int Dset,int Segment_Id,AnsiString Value_Name,
+	long get_number_of_valid_data_points_in_segment(int Dset,int Segment_Id,AnsiString Value_Name,
 						vector <Value_Description_Class> *Values_List);
+	long get_total_number_of_data_points_in_segment(int Dset,int Segment_Id);
 
 	int force_data_points_to_surface(int Data_Point_Set_Ptr);
 	int restore_original_data_points_locations(int Data_Point_Set_Ptr);

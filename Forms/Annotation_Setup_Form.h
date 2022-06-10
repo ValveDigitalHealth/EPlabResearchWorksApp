@@ -102,6 +102,10 @@ __published:	// IDE-managed Components
 	TEdit *MPD_WL_Edit;
 	TEdit *MPD_Th_Edit;
 	TEdit *MPD_R_Edit;
+	TLabel *Label24;
+	TLabel *Label25;
+	TEdit *MPD_MinDuration_Edit;
+	TEdit *MPD_Min_Peaks_No_Edit;
     void __fastcall OK_ButtonClick(TObject *Sender);
     void __fastcall Cancel_ButtonClick(TObject *Sender);
     void __fastcall FormResize(TObject *Sender);

@@ -2194,7 +2194,8 @@ AnsiString Surface_Class::calculate_voltage_amplitude_map(int Data_Point_Set_Id,
 
 //------------------------------------------------------------------------------
 
-AnsiString Surface_Class::calculate_MPD_fractionation_map(int Data_Point_Set_Id,Computational_Module_Class *Comp_Module_Ptr)
+AnsiString Surface_Class::calculate_MPD_fractionation_map(int Data_Point_Set_Id,
+	Computational_Module_Class *Comp_Module_Ptr)
 {
 	// add value to list
 	Value_Description_Class Value_Desc;
@@ -2206,7 +2207,7 @@ AnsiString Surface_Class::calculate_MPD_fractionation_map(int Data_Point_Set_Id,
 	Map_Values.add_value(Value_Desc);
 
 	int MPD_map_Ptr = Map_Values.get_value_ptr(Value_Desc.Value_Name);
-	double mAT,DAT;
+	double mAT,DAT,time_Span_ms;
 
 	for(long i=0;i<(signed)Data_Point_Set[Data_Point_Set_Id].Data_Points.size();i++)
 	{
@@ -2245,10 +2246,27 @@ AnsiString Surface_Class::calculate_MPD_fractionation_map(int Data_Point_Set_Id,
 
 	Data_Point_Set[Current_Data_Point_Set_Ptr].Data_Points[i].set_value(
 		Value_Desc.Value_Name,
-		Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Roving_Signal.vPeak_Positions.size(),
+		NOT_POSSIBLE_TO_CALCULATE_VALUE,
 		Map_Values.get_values_table_ref() );
 
+	// test for inclusion criteria
+	if( Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Roving_Signal.vPeak_Positions.size() >=
+			Comp_Module_Ptr->MPD_Min_Peak_No )
+	{
+	time_Span_ms = (Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Roving_Signal.vPeak_Positions[
+		Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Roving_Signal.vPeak_Positions.size()-1]-
+		Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Roving_Signal.vPeak_Positions[0] )
+		/
+		Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Roving_Signal.Time_Step_ms;
+
+	if( time_Span_ms >= Comp_Module_Ptr->MPD_Min_Duration )
+	Data_Point_Set[Current_Data_Point_Set_Ptr].Data_Points[i].set_value(
+		Value_Desc.Value_Name,
+		Data_Point_Set[Data_Point_Set_Id].Data_Points[i].Roving_Signal.vPeak_Positions.size(),
+		Map_Values.get_values_table_ref() );
 	}
+
+	} // for
 
 	// interpolate map
 	interpolate_specific_value(0,Data_Point_Set_Id,MPD_map_Ptr,Progress_Form);
@@ -4637,7 +4655,8 @@ int Surface_Class::get_data_point_segment_id(int Dset,int DP)
 }
 
 //---------------------------------------------------------------------------
-long Surface_Class::get_number_of_data_points_in_segment(int Dset,int Segment_Id,
+
+long Surface_Class::get_number_of_valid_data_points_in_segment(int Dset,int Segment_Id,
 		AnsiString Value_Name,vector <Value_Description_Class> *Values_List)
 {
 	long Number=0;
@@ -4646,6 +4665,31 @@ long Surface_Class::get_number_of_data_points_in_segment(int Dset,int Segment_Id
 	for(unsigned long d=0;d<Data_Point_Set[Dset].Data_Points.size();d++)
 	if( Data_Point_Set[Dset].Data_Points[d].get_value(Value_Name, Values_List )
 		!= NOT_POSSIBLE_TO_CALCULATE_VALUE )
+	{
+
+	NPtr = Data_Point_Set[Dset].Data_Points[d].Closest_Node_Id;
+
+	if( NPtr >= 0 )
+	{
+		TPtr = Surface_Node_Set[ NPtr ].Neig_Triangles[0];
+
+		if( TPtr >= 0 )
+		if( Surface_Triangle_Set[TPtr].Segment_Id == Segment_Id )
+		Number++;
+	}
+	}
+
+	return Number;
+}
+
+//---------------------------------------------------------------------------
+
+long Surface_Class::get_total_number_of_data_points_in_segment(int Dset,int Segment_Id)
+{
+	long Number=0;
+	long NPtr,TPtr;
+
+	for(unsigned long d=0;d<Data_Point_Set[Dset].Data_Points.size();d++)
 	{
 
 	NPtr = Data_Point_Set[Dset].Data_Points[d].Closest_Node_Id;

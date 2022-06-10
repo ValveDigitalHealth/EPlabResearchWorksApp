@@ -417,6 +417,28 @@ object Annotation_Parameters_Form: TAnnotation_Parameters_Form
     Margins.Bottom = 4
     Caption = 'Peak det. threshold [mV]'
   end
+  object Label24: TLabel
+    Left = 244
+    Top = 439
+    Width = 240
+    Height = 13
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Caption = 'Inclusion criteria: min duration (latest - earliest) [ms] '
+  end
+  object Label25: TLabel
+    Left = 301
+    Top = 460
+    Width = 183
+    Height = 13
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    Caption = 'Inclusion criteria: min number of peaks:'
+  end
   object ROV_Left_Edge_Edit: TEdit
     Left = 270
     Top = 42
@@ -853,5 +875,29 @@ object Annotation_Parameters_Form: TAnnotation_Parameters_Form
     Margins.Bottom = 4
     TabOrder = 33
     Text = '2'
+  end
+  object MPD_MinDuration_Edit: TEdit
+    Left = 492
+    Top = 434
+    Width = 50
+    Height = 21
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    TabOrder = 34
+    Text = '50'
+  end
+  object MPD_Min_Peaks_No_Edit: TEdit
+    Left = 491
+    Top = 457
+    Width = 50
+    Height = 21
+    Margins.Left = 4
+    Margins.Top = 4
+    Margins.Right = 4
+    Margins.Bottom = 4
+    TabOrder = 35
+    Text = '3'
   end
 end

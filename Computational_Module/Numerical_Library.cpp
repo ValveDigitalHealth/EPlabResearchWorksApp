@@ -3739,7 +3739,6 @@ void Numerical_Library::calculate_MPD_peaks_positions(
 	pass_negative=false;
 
 	if( pass_negative && min < 0 || pass_positive && max>0 ) // either peak up or peak down AND if peaks are up or down (so no case of peak up in case of basline wonder down)
-//	if( pass_negative || pass_positive ) // either peak up or peak down
 	if( max - min > PP_Threshold ) // this enables peak detection in case baseline wander
 	{
 		Peaks_Positions_In_Signal[0].push_back(i);

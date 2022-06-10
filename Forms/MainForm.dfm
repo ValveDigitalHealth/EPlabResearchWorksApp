@@ -27,6 +27,11 @@ object Main_Application_Window: TMain_Application_Window
     Top = 401
     Width = 617
     Height = 193
+    Hint = 
+      'Use Ctrl+Left mouse button to drag reference line (may reannotat' +
+      'e map if automatic annotation on)'
+    ParentShowHint = False
+    ShowHint = False
     OnMouseDown = Annotation_Window_PaintBoxMouseDown
     OnMouseMove = Annotation_Window_PaintBoxMouseMove
     OnMouseUp = Annotation_Window_PaintBoxMouseUp
@@ -1087,6 +1092,10 @@ object Main_Application_Window: TMain_Application_Window
       object GetareaandareaofcurrentvaluewithinrangePERSEGMENT1: TMenuItem
         Caption = 'Get area and %area of current value within range [PER SEGMENT]'
         OnClick = GetareaandareaofcurrentvaluewithinrangePERSEGMENT1Click
+      end
+      object GetpercentageofvaliddatapointsPERSEGMENT1: TMenuItem
+        Caption = 'Get percentage of valid data points [PER SEGMENT]'
+        OnClick = GetpercentageofvaliddatapointsPERSEGMENT1Click
       end
       object N14: TMenuItem
         Caption = '-'

@@ -112,6 +112,8 @@ class Computational_Module_Class
 	double Window_Size_ms;
 	double PP_Threshold;
 	double Peak_Definition_Range_ms;
+	double MPD_Min_Duration;
+    long MPD_Min_Peak_No;
 };
 
 #endif

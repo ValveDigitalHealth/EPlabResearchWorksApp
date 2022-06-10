@@ -33,7 +33,7 @@ TMain_Application_Window *Main_Application_Window;
 
 void __fastcall TMain_Application_Window::About1Click(TObject *Sender)
 {
-	ShowMessage("EPLab Works. Version v.2.0.12 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
+	ShowMessage("EPLab Works. Version v.2.0.14 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
 }
 
 //---------------------------------------------------------------------------
@@ -178,7 +178,7 @@ void __fastcall TMain_Application_Window::FormResize(TObject *Sender)
 
 	Panel_1->Left = Left_PageControl->Left + Left_PageControl->Width + Spacing;
 	Panel_1->Top = ToolBar1->Height;
-	Panel_1->Width = 0.7*(W - W*page_ratio-5*Spacing);
+	Panel_1->Width = 0.6*(W - W*page_ratio-5*Spacing);
 	Panel_1->Height = H*opengl_panel_height_ratio;
 
 	Zoom_Label->Left = Left_PageControl->Width - Zoom_Label->Width - 20;
@@ -190,7 +190,7 @@ void __fastcall TMain_Application_Window::FormResize(TObject *Sender)
 
 	Right_PageControl->Left = Panel_1->Left + Panel_1->Width + Spacing;
 	Right_PageControl->Top = Panel_1->Top;
-	Right_PageControl->Width = W - Left_PageControl->Width - Panel_1->Width - Spacing;
+	Right_PageControl->Width = W - Left_PageControl->Width - Panel_1->Width - Spacing - 50;
 	Right_PageControl->Height = Panel_1->Height;
 
 	All_EGMs_PaintBox->Left = 4;
@@ -1990,6 +1990,7 @@ void __fastcall TMain_Application_Window::Getstatsofcurrentmapvalue1Click(TObjec
    StringGrid_Form->StringGrid1->Cells[3][0] = "DataPointsNumber";
 
    StringGrid_Form->StringGrid1->Cells[4][0] = "Value";
+
    StringGrid_Form->StringGrid1->Cells[5][0] = "Min";
    StringGrid_Form->StringGrid1->Cells[6][0] = "Max";
    StringGrid_Form->StringGrid1->Cells[7][0] = "Median";
@@ -2022,8 +2023,8 @@ void __fastcall TMain_Application_Window::Getstatsofcurrentmapvalue1Click(TObjec
    StringGrid_Form->StringGrid1->Cells[0][Counter] = FileName;
    StringGrid_Form->StringGrid1->Cells[1][Counter] = STUDY->Surfaces_List[STUDY->Current_Surface].Name;
    StringGrid_Form->StringGrid1->Cells[2][Counter] = STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].Name;
-   StringGrid_Form->StringGrid1->Cells[3][Counter] = STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_value_name_according_to_ptr(val);
-   StringGrid_Form->StringGrid1->Cells[4][Counter] = FloatToStrF(DPValid_No,ffGeneral,3,2);
+   StringGrid_Form->StringGrid1->Cells[3][Counter] = FloatToStrF(DPValid_No,ffGeneral,3,2);
+   StringGrid_Form->StringGrid1->Cells[4][Counter] = STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_value_name_according_to_ptr(val);
    StringGrid_Form->StringGrid1->Cells[5][Counter] = FloatToStrF(min,ffGeneral,3,2);
    StringGrid_Form->StringGrid1->Cells[6][Counter] = FloatToStrF(max,ffGeneral,3,2);
    StringGrid_Form->StringGrid1->Cells[7][Counter] = FloatToStrF(median,ffGeneral,3,2);
@@ -2101,7 +2102,7 @@ void __fastcall TMain_Application_Window::GetstatsofcurrentmapvaluePERSEGMENT1Cl
 						get_value_name_according_to_ptr(val);
 
    DPValid_No = STUDY->Surfaces_List[STUDY->Current_Surface].
-		get_number_of_data_points_in_segment(dset,Segment_Id,Value_Name,
+		get_number_of_valid_data_points_in_segment(dset,Segment_Id,Value_Name,
 			STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_values_table_ref() );
 
    if( area > 0 )
@@ -2889,7 +2890,7 @@ void __fastcall TMain_Application_Window::Annotation_Window_PaintBoxMouseDown(TO
 		- Annotation_Box.Annotation_Display_Start)
 		*Annotation_Window_PaintBox_Bitmap->Width/
 		 Annotation_Box.Displayed_Segment_Length_ptr;
-	if(X > pos-5 && X < pos+5 )
+	if(X > pos-5 && X < pos+5 && Shift.Contains(ssCtrl))
 		Annotation_Box.Reference_Annotation_Dragged = true;
 
 	// Roving cath
@@ -2967,6 +2968,8 @@ void __fastcall TMain_Application_Window::Annotation_Window_PaintBoxMouseMove(TO
 
 	int pos;
 
+	Annotation_Window_PaintBox->ShowHint = false;
+
 	if(Annotation_Box.Displayed_Segment_Length_ptr!=0)
 	{
 
@@ -2978,7 +2981,10 @@ void __fastcall TMain_Application_Window::Annotation_Window_PaintBoxMouseMove(TO
 		*Annotation_Window_PaintBox_Bitmap->Width/
 		Annotation_Box.Displayed_Segment_Length_ptr;
 	if(X > pos-5 && X < pos+5 )
+	{
 		Annotation_Window_PaintBox->Cursor =(TCursor) -14;
+		Annotation_Window_PaintBox->ShowHint = true;
+	}
 
 	// rov vertical line
 	pos =
@@ -3012,7 +3018,7 @@ void __fastcall TMain_Application_Window::Annotation_Window_PaintBoxMouseMove(TO
             Annotation_Window_PaintBox->Cursor = (TCursor)(-14);
 
         // whole calipper dragging
-        if( X > 60 && Y < Annotation_Window_PaintBox->Height &&
+		if( X > 60 && Y < Annotation_Window_PaintBox->Height &&
                       Y > Annotation_Window_PaintBox->Height-30 )
         	for(int m=0;m<Annotation_Box.Left_Caliper_Edges.size();m++)
         if(Hitted_Timepoint_Ptr > Annotation_Box.Left_Caliper_Edges[m] )
@@ -3186,7 +3192,7 @@ void __fastcall TMain_Application_Window::Annotation_Window_PaintBoxMouseMove(TO
 	{
 
 	// Dragging Ref LAT line
-	if(Annotation_Box.Reference_Annotation_Dragged )
+	if(Annotation_Box.Reference_Annotation_Dragged  )
 	{
 
 	double New_Ptr = Annotation_Box.Annotation_Display_Start + (
@@ -9670,6 +9676,9 @@ void __fastcall TMain_Application_Window::Calculatefractionationmappeaksaroundlo
 	STUDY->Comp_Module.PP_Threshold = Annotation_Parameters_Form->MPD_Th_Edit->Text.ToDouble();
 	STUDY->Comp_Module.Peak_Definition_Range_ms = Annotation_Parameters_Form->MPD_R_Edit->Text.ToDouble();
 
+	STUDY->Comp_Module.MPD_Min_Duration = Annotation_Parameters_Form->MPD_MinDuration_Edit->Text.ToDouble();
+	STUDY->Comp_Module.MPD_Min_Peak_No = Annotation_Parameters_Form->MPD_Min_Peaks_No_Edit->Text.ToDouble();
+
 	AnsiString Msg;
 	Msg += "Algorithm (called in app MPD - Multiple Peak Detection) is based on paper by Ciaccio 'Method to predict isthmus location in ventricular tachycardia caused by reentry with a double-loop pattern' "+
 	Msg += "Parameters set in Annotation setup.";
@@ -9696,4 +9705,76 @@ void __fastcall TMain_Application_Window::Calculatefractionationmappeaksaroundlo
 }
 //---------------------------------------------------------------------------
 
+void __fastcall TMain_Application_Window::GetpercentageofvaliddatapointsPERSEGMENT1Click(TObject *Sender)
+{
+   if( STUDY->is_current_surface_in_range() )
+   if( STUDY->Surfaces_List[STUDY->Current_Surface].data_points_set_ptr_in_range() )
+   {
+
+   int Current_Value_Ptr = STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_current_value_ptr();
+   AnsiString Current_Value_Name = STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.Current_Map_Value_Name;
+
+   if( Current_Value_Name == SEGMENTATION_VALUE_NAME )
+   ShowMessage("Select other map than segmentation for this analysis");
+   else
+   {
+
+   StringGrid_Form->Caption = "% of valid data points per segment";
+
+   AnsiString FileName = Utils.get_file_name_from_full_path(STUDY->Study_Current_Path_And_File_Name);
+   int dset = STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr;
+   int Valid,Total;
+
+   StringGrid_Form->StringGrid1->ColCount = 8;
+
+   StringGrid_Form->StringGrid1->Cells[0][0] = "FileName";
+   StringGrid_Form->StringGrid1->Cells[1][0] = "Geometry";
+   StringGrid_Form->StringGrid1->Cells[2][0] = "DataPointsSetName";
+   StringGrid_Form->StringGrid1->Cells[3][0] = "Value";
+   StringGrid_Form->StringGrid1->Cells[4][0] = "Segment_Name";
+   StringGrid_Form->StringGrid1->Cells[5][0] = "Number_of_valid_DPs";
+   StringGrid_Form->StringGrid1->Cells[6][0] = "Total_Number_of_DPs";
+   StringGrid_Form->StringGrid1->Cells[7][0] = "Percentage";
+
+   int Segment_Id,Column = 0;
+
+   for(int Seg_Ptr=1;Seg_Ptr<Segments_Info.Segments.size();Seg_Ptr++)
+   {
+
+   Segment_Id = Segments_Info.Segments[Seg_Ptr].Code;
+
+   Valid = STUDY->Surfaces_List[STUDY->Current_Surface].
+		get_number_of_valid_data_points_in_segment(dset,Segment_Id,Current_Value_Name,
+			STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_values_table_ref() );
+
+   Total = STUDY->Surfaces_List[STUDY->Current_Surface].
+		get_total_number_of_data_points_in_segment(dset,Segment_Id);
+
+   if( Total >  0 )
+   {
+   Column++;
+   StringGrid_Form->StringGrid1->RowCount = 1 + Column;
+
+	   StringGrid_Form->StringGrid1->Cells[0][Column] = FileName;
+	   StringGrid_Form->StringGrid1->Cells[1][Column] = STUDY->Surfaces_List[STUDY->Current_Surface].Name;
+	   StringGrid_Form->StringGrid1->Cells[2][Column] = STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].Name;
+	   StringGrid_Form->StringGrid1->Cells[3][Column] = Current_Value_Name;
+	   StringGrid_Form->StringGrid1->Cells[4][Column] = Segments_Info.Segments[Seg_Ptr].Name;
+
+	   StringGrid_Form->StringGrid1->Cells[5][Column] = FloatToStrF(Valid,ffGeneral,3,2);
+	   StringGrid_Form->StringGrid1->Cells[6][Column] = FloatToStrF(Total,ffGeneral,3,2);
+
+	   if( Total != 0 )
+	   StringGrid_Form->StringGrid1->Cells[7][Column] = FloatToStrF(100.*Valid/Total,ffGeneral,3,2);
+	   else
+	   StringGrid_Form->StringGrid1->Cells[7][Column] = "";
+   }
+   } // THROUGH segments
+
+   StringGrid_Form->ShowModal();
+
+   }
+   }
+}
+//---------------------------------------------------------------------------
 
