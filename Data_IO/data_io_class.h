@@ -81,6 +81,7 @@ class Data_IO_Class
 	void export_master_NavX_files_Geoff_v1(STUDY_Class *STUDY,TProgress_Form *Progress_Form,AnsiString FileName);
 
 	void read_navx_AutoMarkSummaryList_File(AnsiString FileName,Surface_Class *Surface);
+	void read_navx_Lesions_csv_File(AnsiString FileName,Surface_Class *Surface);
 
 	// Ensite X import
 	AnsiString import_EnsiteX_DxL_folder(TFileListBox* Data_FileListBox,

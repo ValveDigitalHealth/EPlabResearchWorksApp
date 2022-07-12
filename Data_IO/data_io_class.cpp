@@ -241,14 +241,22 @@ AnsiString Data_IO_Class::import_NavX_DxL_folder(TFileListBox* Data_FileListBox,
 	//----------------------------------------------------
 
 	// find AutoMarkSummaryList.csv file
-	int AutoMarkSummaryList_File_Id = -1;
+	int File_Id = -1;
 	for( int i=0; i < Data_FileListBox->Items[0].Capacity; i++ )
 	if( Utils.is_substring_present( Data_FileListBox->Items[0].Strings[i],"AutoMarkSummaryList.csv") )
-	AutoMarkSummaryList_File_Id = i;
+	File_Id = i;
 
-	if( AutoMarkSummaryList_File_Id >= 0 )
-	read_navx_AutoMarkSummaryList_File(Data_FileListBox->Items[0].Strings[AutoMarkSummaryList_File_Id],
-		&Study->Surfaces_List[Study->Current_Surface] );
+	if( File_Id >= 0 )
+	read_navx_AutoMarkSummaryList_File(Data_FileListBox->Items[0].Strings[File_Id],&Study->Surfaces_List[Study->Current_Surface] );
+
+	// find Lesions.csv file
+	File_Id = -1;
+	for( int i=0; i < Data_FileListBox->Items[0].Capacity; i++ )
+	if( Utils.is_substring_present( Data_FileListBox->Items[0].Strings[i],"Lesions.csv") )
+	File_Id = i;
+
+	if( File_Id >= 0 )
+	read_navx_Lesions_csv_File(Data_FileListBox->Items[0].Strings[File_Id],&Study->Surfaces_List[Study->Current_Surface] );
 
 
 	Progress_Form->Cursor = crArrow;
@@ -429,21 +437,29 @@ AnsiString Data_IO_Class::import_EnsiteX_DxL_folder(TFileListBox* Data_FileListB
 
 
 	//####################################################
-/*
+
 	//----------------------------------------------------
 	// read ablation points list
 	//----------------------------------------------------
 
 	// find AutoMarkSummaryList.csv file
-	int AutoMarkSummaryList_File_Id = -1;
+	int File_Id = -1;
 	for( int i=0; i < Data_FileListBox->Items[0].Capacity; i++ )
 	if( Utils.is_substring_present( Data_FileListBox->Items[0].Strings[i],"AutoMarkSummaryList.csv") )
-	AutoMarkSummaryList_File_Id = i;
+	File_Id = i;
 
-	if( AutoMarkSummaryList_File_Id >= 0 )
-	read_navx_AutoMarkSummaryList_File(Data_FileListBox->Items[0].Strings[AutoMarkSummaryList_File_Id],
-		&Study->Surfaces_List[Study->Current_Surface] );
-	*/
+	if( File_Id >= 0 )
+	read_navx_AutoMarkSummaryList_File(Data_FileListBox->Items[0].Strings[File_Id],&Study->Surfaces_List[Study->Current_Surface] );
+
+	// find Lesions.csv file
+	File_Id = -1;
+	for( int i=0; i < Data_FileListBox->Items[0].Capacity; i++ )
+	if( Utils.is_substring_present( Data_FileListBox->Items[0].Strings[i],"Lesions.csv") )
+	File_Id = i;
+
+	if( File_Id >= 0 )
+	read_navx_Lesions_csv_File(Data_FileListBox->Items[0].Strings[File_Id],&Study->Surfaces_List[Study->Current_Surface] );
+
 
 	Progress_Form->Cursor = crArrow;
 
@@ -991,6 +1007,41 @@ void Data_IO_Class::read_navx_AutoMarkSummaryList_File(AnsiString FileName,Surfa
 
 	Surface->Ablation_Points_List = Ablation_Points_List;
 
+}
+
+//------------------------------------------------------------------------------
+
+void Data_IO_Class::read_navx_Lesions_csv_File(AnsiString FileName,Surface_Class *Surface)
+{
+	vector<Ablation_Point_Class> Ablation_Points_List;
+	int Start_Pos=-1;
+	Ablation_Point_Class ABL_Point;
+	std::vector <Row_vec> Table;
+	std::string SS;
+
+	Table = Utils.load_rectangular_csv_file_to_grid(FileName);
+
+	for(long row=1;row<(signed)Table.size();row++)
+	if( Table[row].Elements.size() > 0 )
+	if( Table[row].Elements[0].Trim() == "Number of samples (rows):" )
+	Start_Pos = row+2;
+
+	int Abl_Points_No = Utils.get_number_from_string(Table[Start_Pos-2].Elements[1].c_str());
+
+	if( Start_Pos > 0 )
+	for(long row=Start_Pos;row<Abl_Points_No;row++)
+	{
+		ABL_Point.RF_Episode = Utils.get_number_from_string(Table[row].Elements[0].c_str());
+		ABL_Point.Lesion_ID =  Utils.get_number_from_string(Table[row].Elements[0].c_str());
+
+		ABL_Point.x =        Utils.get_number_from_string(Table[row].Elements[3].c_str());
+		ABL_Point.y =        Utils.get_number_from_string(Table[row].Elements[4].c_str());
+		ABL_Point.z =        Utils.get_number_from_string(Table[row].Elements[5].c_str());
+
+		Ablation_Points_List.push_back(ABL_Point);
+	}
+
+	Surface->Ablation_Points_List = Ablation_Points_List;
 }
 
 //------------------------------------------------------------------------------
