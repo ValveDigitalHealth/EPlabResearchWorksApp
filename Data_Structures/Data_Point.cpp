@@ -670,11 +670,17 @@ void Data_Point::calculate_values_in_data_point(std::vector <Value_Description_C
 	}
 	else
 	{
+
 	set_value(Voltage_Amplitude_Value_Name,NOT_POSSIBLE_TO_CALCULATE_VALUE,Values_List);
+
+	if( Mapping_System_Type == MAPPING_SYSTEM_ORIGIN_CARTO )
+	{
 	set_value("Unipolar voltage",NOT_POSSIBLE_TO_CALCULATE_VALUE,Values_List);
 	set_value("Unipolar peak negative voltage",NOT_POSSIBLE_TO_CALCULATE_VALUE,Values_List);
 	set_value("Unipolar peak positive voltage",NOT_POSSIBLE_TO_CALCULATE_VALUE,Values_List);
 	set_value("Unipolar dvdt",NOT_POSSIBLE_TO_CALCULATE_VALUE,Values_List);
+	}
+
 	}
 
 	}

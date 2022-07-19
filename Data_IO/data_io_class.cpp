@@ -30,6 +30,29 @@ SOFTWARE. */
 //------------------------------------------------------------------------------
 Data_IO_Class::Data_IO_Class()
 {
+	ifstream df1;
+
+	// read lookup tables
+	for(long ii=0;ii<12;ii++)
+	for(long jj=0;jj<12;jj++)
+	EcoFlexMEA_36_lookup_table[ii][jj] = -1;
+
+	df1.clear();
+	df1.open("EcoFlexMEA_36 lookup table.txt");
+	if( df1.is_open() )
+	{
+		int X,Y;
+		df1 >> X;
+		df1 >> Y;
+
+		for(long ii=0;ii<X;ii++)
+		for(long jj=0;jj<Y;jj++)
+		df1 >> EcoFlexMEA_36_lookup_table[ii][jj];
+
+		df1.close();
+	}
+	else
+	ShowMessage("EcoFlexMEA_36 lookup table.txt file not found");
 
 }
 
@@ -4060,6 +4083,164 @@ void Data_IO_Class::save_values_at_data_points(AnsiString FileName,STUDY_Class *
 	}
 
 	df.close();
+}
+
+//---------------------------------------------------------------------------
+
+AnsiString Data_IO_Class::load_folder_MEA_flexv_36(STUDY_Class *STUDY,
+	AnsiString Data_Files_Path,int Value_To_Substract,TFileListBox* Data_FileListBox)
+{
+	AnsiString As,caption,Line;
+	char string[2000];
+	int version,channels_exported,Electrode_Id;
+	long samples_per_channel,X1,Y1;
+	double SRate,t1,t2,tmp,v1;
+	ifstream df;
+	Data_Point D;
+	bool Id_Found;
+	double Electrode_Spacing = 0.3;
+	double Timestep_ms = 0.01; // sampling rate with which singal is read
+
+	Data_FileListBox->Clear();
+	Data_FileListBox->Update();
+	Data_FileListBox->ApplyFilePath( Data_Files_Path );
+	Data_FileListBox->Update();
+
+	STUDY->Study_Source_Path = Data_Files_Path;
+	AnsiString FileName = Utils.get_string_after_last_occurence_of_specified_string(Data_Files_Path,"\\");
+	STUDY->Study_Current_Path_And_File_Name = Data_Files_Path + "\\" + FileName + ".eplab";
+
+	// Create empty square geometry (6x6 with 0.3 mm spacing)
+	//load_mea36_geo();
+	Surface_Class Suface_Class_Item;
+	STUDY->Surfaces_List.clear();
+	STUDY->Surfaces_List.push_back(Suface_Class_Item);
+	STUDY->Current_Surface = STUDY->Surfaces_List.size()-1;
+	STUDY->Surfaces_List[STUDY->Current_Surface].generate_square_sample(Progress_Form,6,6,0.3);
+	STUDY->Surfaces_List[STUDY->Current_Surface].Name = "MEA Ecoflex 36";
+
+	// create empty dataset
+	Data_Point_Set_Class Data_Point_Set;
+	STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set.clear();
+	STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set.push_back(Data_Point_Set);
+	int Current_Data_Point_Set = STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set.size()-1;
+	As = Utils.get_string_after_last_occurence_of_specified_string(Data_Files_Path,"\\");
+	STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[Current_Data_Point_Set].Name = As;
+
+	STUDY->Surfaces_List[STUDY->Current_Surface].Mapping_System_Source = MAPPING_SYSTEM_ORIGIN_MEA_PLAQUE;
+
+	//----------------------------------------------------------------------
+	// set values descriptors
+	//----------------------------------------------------------------------
+	Value_Description_Class Value_Desc;
+	Value_Desc.Type = VALUE_BASED_ON_DATA_POINTS; // based on data points
+	Value_Desc.Displayed_In_Table = true;
+
+	Value_Desc.Value_Name = "LAT";
+	Value_Desc.Unit = "ms";
+	Value_Desc.LAT_Value = true;
+	STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.add_value(Value_Desc);
+	Value_Desc.LAT_Value = false;
+
+	Value_Desc.Value_Name = "Amplitude";
+	Value_Desc.Unit = "mV";
+	Value_Desc.Voltage_Amplitude_Value = true;
+	STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.add_value(Value_Desc);
+	Value_Desc.Voltage_Amplitude_Value = false;
+
+	//***************************************************************
+	for(long i=0; i < Data_FileListBox->Items[0].Capacity; i++ )
+	if( Utils.is_substring_present(Data_FileListBox->Items[0].Strings[i],".dat") )
+	//***************************************************************
+	{
+
+	caption = "Processing (" +IntToStr((int)i)+"/";
+	caption += IntToStr((int)Data_FileListBox->Items[0].Capacity);
+	caption += ")   " + Data_FileListBox->Items[0].Strings[i];
+	Progress_Form->add_text(caption);
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	df.clear();
+	df.open((Data_Files_Path+"\\"+Data_FileListBox->Items[0].Strings[i]).c_str());
+	df.clear();
+
+	if( !df.is_open() )
+	ShowMessage("Unable to open file!");
+
+	// Read file header
+	df >> string;// 'T'
+	df >> string;// 'elec'
+	df >> Electrode_Id;
+	df >> string;// 's'
+	df >> string;// '[\niV]'
+
+	D.Identifier = Electrode_Id - Value_To_Substract;
+
+	df >> t1;// t1
+	df >> tmp;// v1
+	df >> t2;// t2
+	df >> tmp;// v2
+
+	// reading sample rate
+	double dt = t2-t1;
+	double last_sample=t2;
+	D.Roving_Signal.Time_Step_ms = Timestep_ms;
+//	D.Roving_Signal.Time_Step_ms = dt;
+
+	D.Roving_Signal.Voltage_Values.clear();
+
+	// Read data
+	while(!df.eof())
+	{
+
+	df >> t1;
+	df >> v1;
+
+	if( t1 - last_sample > Timestep_ms/1000. ) // divided by 1000 since unit in file is second
+	{
+		D.Roving_Signal.Voltage_Values.push_back(v1/1000.0);
+		last_sample = t1;
+	}
+
+	} // reading signal
+
+	df.clear();
+	df.close();
+	df.clear();
+
+   // to get rid of elevating baseline when zooming
+   D.Roving_Signal.Voltage_Values = PNUM.subtract_mean_from_signal(D.Roving_Signal.Voltage_Values);
+
+   D.Rov_Signal_Activation_ptr = 0.2*D.Roving_Signal.Voltage_Values.size();
+   D.Ref_Signal_Activation_ptr = 0.1*D.Roving_Signal.Voltage_Values.size();
+
+   // locate electordes on plaque //in EPAS: locate_electrodes_on_EcoFlexMEA_36_lookup_table_plaque(1);
+	Id_Found = false;
+	for(long ii=0;ii<12;ii++)
+	for(long jj=0;jj<12;jj++)
+	if( D.Identifier == EcoFlexMEA_36_lookup_table[ii][jj] )
+	{
+		X1=ii;
+		Y1=jj;
+		Id_Found = true;
+	}
+
+	if( Id_Found )
+	{
+
+	   D.x = X1*Electrode_Spacing - 0.5*5*0.3;
+	   D.y = 0;
+	   D.z = Y1*Electrode_Spacing - 0.5*5*0.3;
+
+	   STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[Current_Data_Point_Set].
+		Data_Points.push_back(D);
+	}
+
+   } // through all files in folder
+
+   // Plaque_Panel_Disp_Parameters.Data_Point_Size = 0.01;
+   return "Import completed";
 }
 
 //---------------------------------------------------------------------------

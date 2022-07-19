@@ -37,6 +37,13 @@ object Main_Application_Window: TMain_Application_Window
     OnMouseUp = Annotation_Window_PaintBoxMouseUp
     OnPaint = Annotation_Window_PaintBoxPaint
   end
+  object RefDragLineHint_Label: TLabel
+    Left = 448
+    Top = 448
+    Width = 244
+    Height = 13
+    Caption = 'Use Ctrl+Left mouse button to drag reference line '
+  end
   object Panel_1: TPanel
     Left = 377
     Top = 62
@@ -840,6 +847,67 @@ object Main_Application_Window: TMain_Application_Window
         Caption = '-'
       end
     end
+    object Datapoints2: TMenuItem
+      Caption = 'Data points'
+      object Deletepoints1: TMenuItem
+        Caption = 'Remove data points'
+        object Deletepointswithoutxyzcoordinates1: TMenuItem
+          Caption = 'Remove not used or utilized points'
+          OnClick = Deletepointswithoutxyzcoordinates1Click
+        end
+        object Deletedatapointswithcurrentvaluebelowgiventhreshold1: TMenuItem
+          Caption = 'Remove data points with current value BELOW given threshold'
+          OnClick = Deletedatapointswithcurrentvaluebelowgiventhreshold1Click
+        end
+        object DeletedatapointswithcurrentvalueABOVEgiventhreshold1: TMenuItem
+          Caption = 'Remove data points with current value ABOVE given threshold'
+          OnClick = DeletedatapointswithcurrentvalueABOVEgiventhreshold1Click
+        end
+        object Removedatapointsabovetop1: TMenuItem
+          Caption = 'Remove data points above % threshold'
+        end
+        object Removedatapointsbelowtop1: TMenuItem
+          Caption = 'Remove data points below % threshold '
+          OnClick = Removedatapointsbelowtop1Click
+        end
+        object Deletepointswithspecificvalue1: TMenuItem
+          Caption = 'Remove points with specific value'
+          OnClick = Deletepointswithspecificvalue1Click
+        end
+        object RemovedatapointsnotonmapsurfaceHARDdelete1: TMenuItem
+          Caption = 'Remove data points not on map surface (irreversible delete)'
+          OnClick = RemovedatapointsnotonmapsurfaceHARDdelete1Click
+        end
+        object N22: TMenuItem
+          Caption = '-'
+        end
+        object Undeletealldatapoints1: TMenuItem
+          Caption = 'Restore all removed data points'
+          OnClick = Undeletealldatapoints1Click
+        end
+      end
+      object N9: TMenuItem
+        Caption = '-'
+      end
+      object Forcedatapointsontosurface1: TMenuItem
+        Caption = 'Force data points onto surface'
+        OnClick = Forcedatapointsontosurface1Click
+      end
+      object Restoreoriginallocationsofdatapoints1: TMenuItem
+        Caption = 'Restore original locations of data points'
+        OnClick = Restoreoriginallocationsofdatapoints1Click
+      end
+      object N20: TMenuItem
+        Caption = '-'
+      end
+      object Smoothingfunctions1: TMenuItem
+        Caption = 'Smoothing functions'
+        object Averagefilter1: TMenuItem
+          Caption = 'Average spatial filter'
+          OnClick = Averagefilter1Click
+        end
+      end
+    end
     object Geometry1: TMenuItem
       Caption = 'Geometry'
       object Centeringtools1: TMenuItem
@@ -930,6 +998,14 @@ object Main_Application_Window: TMain_Application_Window
         object N43: TMenuItem
           Caption = '-'
         end
+        object Removesurfacewithoutdatapointsstrict1: TMenuItem
+          Caption = 'Remove surface without data points [strict]'
+          OnClick = Removesurfacewithoutdatapointsstrict1Click
+        end
+        object Removesurfacewithoutdatapointsliberal1: TMenuItem
+          Caption = 'Remove surface without data points [liberal]'
+          OnClick = Removesurfacewithoutdatapointsliberal1Click
+        end
         object Restoreremovedsurface1: TMenuItem
           Caption = 'Restore removed surface'
           OnClick = Restoreremovedsurface1Click
@@ -1003,67 +1079,6 @@ object Main_Application_Window: TMain_Application_Window
         OnClick = Geometrystatistics1Click
       end
     end
-    object Datapoints2: TMenuItem
-      Caption = 'Data points'
-      object Deletepoints1: TMenuItem
-        Caption = 'Remove data points'
-        object Deletepointswithoutxyzcoordinates1: TMenuItem
-          Caption = 'Remove not used or utilized points'
-          OnClick = Deletepointswithoutxyzcoordinates1Click
-        end
-        object Deletedatapointswithcurrentvaluebelowgiventhreshold1: TMenuItem
-          Caption = 'Remove data points with current value BELOW given threshold'
-          OnClick = Deletedatapointswithcurrentvaluebelowgiventhreshold1Click
-        end
-        object DeletedatapointswithcurrentvalueABOVEgiventhreshold1: TMenuItem
-          Caption = 'Remove data points with current value ABOVE given threshold'
-          OnClick = DeletedatapointswithcurrentvalueABOVEgiventhreshold1Click
-        end
-        object Removedatapointsabovetop1: TMenuItem
-          Caption = 'Remove data points above % threshold'
-        end
-        object Removedatapointsbelowtop1: TMenuItem
-          Caption = 'Remove data points below % threshold '
-          OnClick = Removedatapointsbelowtop1Click
-        end
-        object Deletepointswithspecificvalue1: TMenuItem
-          Caption = 'Remove points with specific value'
-          OnClick = Deletepointswithspecificvalue1Click
-        end
-        object RemovedatapointsnotonmapsurfaceHARDdelete1: TMenuItem
-          Caption = 'Remove data points not on map surface (irreversible delete)'
-          OnClick = RemovedatapointsnotonmapsurfaceHARDdelete1Click
-        end
-        object N22: TMenuItem
-          Caption = '-'
-        end
-        object Undeletealldatapoints1: TMenuItem
-          Caption = 'Restore all removed data points'
-          OnClick = Undeletealldatapoints1Click
-        end
-      end
-      object N9: TMenuItem
-        Caption = '-'
-      end
-      object Forcedatapointsontosurface1: TMenuItem
-        Caption = 'Force data points onto surface'
-        OnClick = Forcedatapointsontosurface1Click
-      end
-      object Restoreoriginallocationsofdatapoints1: TMenuItem
-        Caption = 'Restore original locations of data points'
-        OnClick = Restoreoriginallocationsofdatapoints1Click
-      end
-      object N20: TMenuItem
-        Caption = '-'
-      end
-      object Smoothingfunctions1: TMenuItem
-        Caption = 'Smoothing functions'
-        object Averagefilter1: TMenuItem
-          Caption = 'Average spatial filter'
-          OnClick = Averagefilter1Click
-        end
-      end
-    end
     object DataPoints1: TMenuItem
       Caption = 'Quantitative analysis'
       object Getstatsofcurrentmapvalue1: TMenuItem
@@ -1101,7 +1116,7 @@ object Main_Application_Window: TMain_Application_Window
         Caption = '-'
       end
       object Histograms1: TMenuItem
-        Caption = 'Histograms'
+        Caption = 'Histograms (based on data points)'
         object Showhistogramofcurrentvaluespatialgradient1: TMenuItem
           Caption = 'Show histogram of spatial gradient of current value '
           OnClick = Showhistogramofcurrentvaluespatialgradient1Click
@@ -1113,6 +1128,30 @@ object Main_Application_Window: TMain_Application_Window
           OnClick = ShowhistogramofspatialgradientofcurrentvalueOFCURRENTSEGMENT1Click
         end
       end
+      object Histogramsbasedonsurface1: TMenuItem
+        Caption = 'Histograms (based on surface)'
+        object Showhistogramofspatialgradientofcurrentvalue1: TMenuItem
+          Caption = 'Show histogram of spatial gradient of current value '
+          OnClick = Showhistogramofspatialgradientofcurrentvalue1Click
+        end
+        object ShowhistogramofspatialgradientofcurrentvalueOFCURRENTSEGMENT2: TMenuItem
+          Caption = 
+            'Show histogram of spatial gradient of current value [OF CURRENT ' +
+            'SEGMENT]'
+          OnClick = ShowhistogramofspatialgradientofcurrentvalueOFCURRENTSEGMENT2Click
+        end
+      end
+      object Analysecurrentmap1: TMenuItem
+        Caption = 'Analyse current map'
+        OnClick = Analysecurrentmap1Click
+      end
+      object N35: TMenuItem
+        Caption = '-'
+      end
+      object Makequantitativeanalysisofall1: TMenuItem
+        Caption = 'Make quantitative analysis of all workspace files in the folder'
+        OnClick = Makequantitativeanalysisofall1Click
+      end
     end
     object PRESETS1: TMenuItem
       Caption = 'PRESETS'
@@ -1123,6 +1162,10 @@ object Main_Application_Window: TMain_Application_Window
       object Leaveonly2ndmapvisible1: TMenuItem
         Caption = 'Leave only 2nd map visible'
         OnClick = Leaveonly2ndmapvisible1Click
+      end
+      object SETPLAQUEDISPLAYPRESETS1: TMenuItem
+        Caption = 'EcoFlexMEA 36 DISPLAY PRESETS'
+        OnClick = SETPLAQUEDISPLAYPRESETS1Click
       end
     end
     object Help1: TMenuItem
@@ -1147,6 +1190,42 @@ object Main_Application_Window: TMain_Application_Window
         object S11: TMenuItem
           Caption = 'S1'
           OnClick = S11Click
+        end
+        object Updatecontrols1: TMenuItem
+          Caption = 'Update controls'
+          OnClick = Updatecontrols1Click
+        end
+      end
+    end
+    object emplates1: TMenuItem
+      Caption = 'Templates'
+      object EcoFlexMEA361: TMenuItem
+        Caption = 'EcoFlexMEA 36 plaque'
+        object Loadfolderwithsignals1: TMenuItem
+          Caption = 'Load folder with signals'
+          OnClick = Loadfolderwithsignals1Click
+        end
+        object Loadfolderwithsignalsandsubtractsomethingfromdatapointindex1: TMenuItem
+          Caption = 
+            'Load folder with signals (and subtract something from data point' +
+            ' index)'
+          OnClick = Loadfolderwithsignalsandsubtractsomethingfromdatapointindex1Click
+        end
+        object Loadfolderwithsignalsandsubtractsomethingfromdatapointindex2: TMenuItem
+          Caption = '-'
+        end
+        object Processallfoldersandgenerateplaquefiles1: TMenuItem
+          Caption = 'Process all folders and generate plaque files'
+          OnClick = Processallfoldersandgenerateplaquefiles1Click
+        end
+        object Processallfoldersandgenerateplaquefiles3: TMenuItem
+          Caption = 
+            'Process all folders and generate plaque files (and subtract some' +
+            'thing from data point index)'
+          OnClick = Processallfoldersandgenerateplaquefiles3Click
+        end
+        object Processallfoldersandgenerateplaquefiles2: TMenuItem
+          Caption = '-'
         end
       end
     end

@@ -80,11 +80,14 @@ class Utils_Tools
 
 	AnsiString get_string_from_the_middle(AnsiString Main_String,AnsiString Start_Stop_String);
 
-    // not debugged yet!
-    AnsiString get_string_between_two_texts(AnsiString Main_String,AnsiString First_String,AnsiString Second_String,bool* Found_Flag);
+	// not debugged yet!
+	AnsiString get_string_between_two_texts(AnsiString Main_String,AnsiString First_String,AnsiString Second_String,bool* Found_Flag);
 
 	AnsiString get_string_after_given_occurence_of_specified_string(AnsiString Main_String,
 					AnsiString Given_String, int Which_Occurence);
+
+	int how_many_times_substring_present(AnsiString Main_String,AnsiString Given_String);
+
 
 	AnsiString get_string_before_given_occurence_of_specified_string(AnsiString Main_String,
 					AnsiString Given_String, int Which_Occurence);
@@ -98,7 +101,7 @@ class Utils_Tools
 	AnsiString get_file_name_from_full_path(AnsiString Full_Path);
 	AnsiString get_only_path_from_full_path(AnsiString Full_Path);
 
-    double get_number_from_string(std::string String);
+	double get_number_from_string(std::string String);
 
 	int is_pentaray_type_name_v2(AnsiString Name);
 	bool is_lasso_type_name(AnsiString Name);
@@ -114,9 +117,6 @@ class Utils_Tools
 	bool is_this_basket_name_Flinders_Navx(AnsiString Name,
 								AnsiString* Spline,AnsiString* Electrode,
 								int* Spline_Id, int* Electrode_Id);
-
-	void get_mike_pope_bimap_names(AnsiString Filename,AnsiString *Patient_Id,
-			AnsiString *S1S2,AnsiString *Stage,AnsiString *Chamber);
 
 	void set_combobox_selection(TComboBox *ComboBox,AnsiString Selection_Text);
 
@@ -148,78 +148,6 @@ class Utils_Tools
 };
 
 //-----------------------------------------------------------------------------
-class Diagram_Element // used in state diagram construction
-{
-        public:
-
-        Diagram_Element();
-
-        int Mode_Type_Code;
-        TColor Mode_Type_Color;
-
-        int Phase_Code;
-        AnsiString Phase_Name;
-
-        int Transition_Code;
-        AnsiString Transition_Name;
-
-        int Type; // 0 if State, 1 if Transition
-
-        int Counter; // how many occurences of this element were in time sequence
-
-        // positioning
-        int Cell_X;
-        int Cell_Y; // position in 2D grid
-
-		std::vector <int> Connections_Ptrs;
-
-//        vector <int> Connections_Side_Source; // on which side of the box draw line
-//        vector <int> Connections_Side_Target; // on which side of the box draw line
-
-        void get_position_of_this_state(int Phase_Code,int* X,int* Y);
-
-		std::vector <int> Sources;
-
-        double Beginning_Time, Ending_Time; // time reference
-};
-
-//-----------------------------------------------------------------------------
-
-class State_Diagram
-{
-    public:
-
-	State_Diagram();
-
-    AnsiString Case_Name;
-    
-    int Starting_Cell_X;
-    int Starting_Cell_Y;
-
-    int Cell_Width; // in pixels
-    int Cell_Height; // in pixels
-    int Box_Width; // in pixels, box is inside the cell, so it should be smaller
-    int Box_Height; // in pixels, box is inside the cell, so it should be smaller
-
-    TColor State_Box_Color;
-	TColor Transition_Box_Color; // or maybe pass colors from phases definitions?
-
-	std::vector <Diagram_Element> Time_Sequenced_Elements;
-    bool time_sequenced_elements_proper_syntax();
-
-	std::vector <Diagram_Element> Diagram_Elements;
-    int get_ptr_of_this_state(int Phase_Code); // if state is present returns ptr, else returns -1
-    int get_ptr_of_this_transition(int Transition_Code); // if transition is present returns ptr, else returns -1
-    int is_this_sequence_present(int Phase_Code1,int Transition_Code,int Phase_Code2);
-    int is_this_sequence_present(int Phase_Code1,int Transition_Code);
-    int reduce_time_sequenced_elements_to_diagram();
-    int which_box_is_at_this_location(int X,int Y);
-
-    bool is_this_spot_free(int X,int Y);
-	bool find_free_spot_around(int Ptr,int* X,int* Y);
-
-};
-//-----------------------------------------------------------------------------
 
 class Mode_Type
 {
@@ -239,7 +167,7 @@ class Mode_Types_Set
 
     std::vector <Mode_Type> Types;
 
-    int read_mode_types(AnsiString Application_Directory, AnsiString Filename);
+	int read_mode_types(AnsiString Application_Directory, AnsiString Filename);
     int get_mode_type_code(AnsiString Name);
     TColor get_mode_type_color(int Code);
     AnsiString get_mode_type_name(int Code);

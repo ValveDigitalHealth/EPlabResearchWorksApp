@@ -2916,6 +2916,7 @@ void Surface_Class::generate_contours(double Threshold_Interval)
 	Map_Values.get_current_value_minmax(&Min, &Max);
 
 	for(unsigned long t=0;t<Surface_Triangle_Set.size();t++)
+	if( Surface_Triangle_Set[t].Removed_Flag != ON )
 	{
 
 	x1 = Surface_Node_Set[ Surface_Triangle_Set[t].Nodes[0] ].x+
@@ -3508,7 +3509,7 @@ void Surface_Class::update_closest_nodes_and_dps_around_xyz(double x, double y,
 	if( Data_Point_Set_Id >= 0 && Data_Point_Set_Id < Data_Point_Set.size() )
 	{
 
-	//------------------------------------------xxx-----------------------------------
+	//-----------------------------------------------------------------------------
 	// main loop through nodes
 	//-----------------------------------------------------------------------------
 	for(unsigned long j=0;j<Surface_Node_Set.size();j++)
@@ -6394,9 +6395,77 @@ void Surface_Class::set_phase_value_of_map_to_specific_time_point(long TimePoint
 
 //---------------------------------------------------------------------------
 
+std::vector <long> Surface_Class::get_histogram_of_value_gradient_based_on_geo_nodes(int Data_Point_Set_Ptr,
+		int Segment_Id, AnsiString Value_Name, double* Min, double* Box_Size)
+{
+	std::vector <double> Gradient_Values;
+	std::vector <double> Values_Within_Neighb;
+	std::vector <int> Values_Within_Neighb_Ptr;
+	double d12,vneig,MinV, MaxV,vc;
+	long Neig_Ptr,Min_Ptr, Max_Ptr,T_Ptr,n1,n2,n3;
+	std::vector <long> Result_Histo;
+	bool Segment_Present;
+	int Value_Id = Map_Values.get_value_ptr(Value_Name);
+
+//xxx
+	for(long n=0;n<(signed)Surface_Node_Set.size();n++)
+	if( !Surface_Node_Set[n].Removed_Geometry_Vertex_Flag )
+	if( Segment_Id <= 0 || (Segment_Id>0 && is_node_part_of_segment(n,Segment_Id) ) )
+	{
+
+	Values_Within_Neighb.clear();
+	Values_Within_Neighb_Ptr.clear();
+
+	vc = Surface_Node_Set[n].get_value(Data_Point_Set_Ptr,Value_Id);
+
+	for(int nn=0;nn<Surface_Node_Set[n].Neighbors.size();nn++)
+	if( !Surface_Node_Set[nn].Removed_Geometry_Vertex_Flag )
+	if( Segment_Id <= 0 || (Segment_Id>0 && is_node_part_of_segment(nn,Segment_Id) ) )
+	{
+
+	Neig_Ptr = Surface_Node_Set[n].Neighbors[nn];
+
+	vneig = Surface_Node_Set[Neig_Ptr].get_value(Data_Point_Set_Ptr,Value_Id);
+
+	if( vc!= NOT_POSSIBLE_TO_CALCULATE_VALUE && vneig!= NOT_POSSIBLE_TO_CALCULATE_VALUE )
+	{
+		Values_Within_Neighb.push_back(vneig);
+		Values_Within_Neighb_Ptr.push_back(Neig_Ptr);
+	}
+
+	} // through all neig nodes
+
+	if( Values_Within_Neighb.size() > 2 )
+	{
+		PNUM.find_min_max(&Values_Within_Neighb,&MinV, &MaxV, &Min_Ptr, &Max_Ptr);
+
+		d12 = std::sqrt(
+			std::pow( Surface_Node_Set[Values_Within_Neighb_Ptr[Min_Ptr]].x-Surface_Node_Set[Values_Within_Neighb_Ptr[Max_Ptr]].x,2) +
+			std::pow( Surface_Node_Set[Values_Within_Neighb_Ptr[Min_Ptr]].y-Surface_Node_Set[Values_Within_Neighb_Ptr[Max_Ptr]].y,2) +
+			std::pow( Surface_Node_Set[Values_Within_Neighb_Ptr[Min_Ptr]].z-Surface_Node_Set[Values_Within_Neighb_Ptr[Max_Ptr]].z,2) );
+
+		// push max-min divided by distance as a gradient
+		if( d12 != 0 )
+		Gradient_Values.push_back((MaxV-MinV)/d12);
+	}
+
+	} // through all nodes
+
+	PNUM.find_min_max(&Gradient_Values,&MinV, &MaxV, &Min_Ptr, &Max_Ptr);
+	Min[0] = MinV;
+
+	if( Gradient_Values.size() < 2 )
+	ShowMessage("Emtpy values vec e3349");
+
+	if( Gradient_Values.size() > 1 )
+	return PNUM.get_histogram(&Gradient_Values,0,true, Box_Size);
+	else
+	return Result_Histo;
+}
+
 //---------------------------------------------------------------------------
 
-std::vector <long> Surface_Class::get_histogram_of_value_gradient(
+std::vector <long> Surface_Class::get_histogram_of_value_gradient_based_on_data_points(
 	int Data_Point_Set_Ptr,int Segment_Id,double Neighb_Range_mm, AnsiString Value_Name,
 	double* Min, double* Box_Size,bool Only_DPs_With_Specified_Flag_A,int Flag_A_Value)
 {
@@ -6749,5 +6818,90 @@ double Surface_Class::get_path_value_difference(long Node_1,long Node_2)
 }
 
 //---------------------------------------------------------------------------
+
+void Surface_Class::remove_triangles_without_data_points_at_vertices(int DSet_Ptr,int Tolerance_Level)
+{
+	double dist,dist0,min_dist0;
+	double dist1,min_dist1;
+	double dist2,min_dist2;
+	int node0,node1,node2;
+
+	for(long i=0;i<(signed)Surface_Triangle_Set.size();i++)
+	Surface_Triangle_Set[i].Removed_Flag = OFF;
+
+	for(long i=0;i<(signed)Surface_Node_Set.size();i++)
+	Surface_Node_Set[i].Removed_Geometry_Vertex_Flag = true;
+
+	double TD = 0.02; // threshold_for_distance_marking
+
+	if( data_points_set_ptr_in_range() )
+	{
+
+	// remove triangles
+	for(long i=0;i<(signed)Surface_Triangle_Set.size();i++)
+	{
+		node0 = Surface_Triangle_Set[i].Nodes[0];
+		node1 = Surface_Triangle_Set[i].Nodes[1];
+		node2 = Surface_Triangle_Set[i].Nodes[2];
+
+        min_dist0 = 10000; min_dist1 = 10000; min_dist2 = 10000;
+
+        for( long dp=0;dp<(signed)Data_Point_Set[DSet_Ptr].Data_Points.size();dp++)
+        {
+
+        dist = std::pow(Surface_Node_Set[node0].x - Data_Point_Set[DSet_Ptr].Data_Points[dp].x,2)+
+               std::pow(Surface_Node_Set[node0].y - Data_Point_Set[DSet_Ptr].Data_Points[dp].y,2)+
+               std::pow(Surface_Node_Set[node0].z - Data_Point_Set[DSet_Ptr].Data_Points[dp].z,2);
+        if( dist < min_dist0 ) min_dist0 = dist;
+
+        dist = std::pow(Surface_Node_Set[node1].x - Data_Point_Set[DSet_Ptr].Data_Points[dp].x,2)+
+               std::pow(Surface_Node_Set[node1].y - Data_Point_Set[DSet_Ptr].Data_Points[dp].y,2)+
+               std::pow(Surface_Node_Set[node1].z - Data_Point_Set[DSet_Ptr].Data_Points[dp].z,2);
+		if( dist < min_dist1 ) min_dist1 = dist;
+
+		dist = std::pow(Surface_Node_Set[node2].x - Data_Point_Set[DSet_Ptr].Data_Points[dp].x,2)+
+			   std::pow(Surface_Node_Set[node2].y - Data_Point_Set[DSet_Ptr].Data_Points[dp].y,2)+
+			   std::pow(Surface_Node_Set[node2].z - Data_Point_Set[DSet_Ptr].Data_Points[dp].z,2);
+		if( dist < min_dist2 ) min_dist2 = dist;
+
+		}
+
+		if( Tolerance_Level == 0 ) // liberal
+		{
+		if( min_dist0 < TD || min_dist1 < TD || min_dist2 < TD )
+		Surface_Triangle_Set[i].Removed_Flag = OFF;
+		else
+		Surface_Triangle_Set[i].Removed_Flag = ON;
+		}
+
+		if( Tolerance_Level == 1 ) // strict
+		{
+		if( min_dist0 < TD && min_dist1 < TD && min_dist2 < TD )
+		Surface_Triangle_Set[i].Removed_Flag = OFF;
+		else
+		Surface_Triangle_Set[i].Removed_Flag = ON;
+		}
+
+		}
+
+	// restore nodes of non-removed triangles
+	for(long i=0;i<(signed)Surface_Triangle_Set.size();i++)
+	{
+		node0 = Surface_Triangle_Set[i].Nodes[0];
+		node1 = Surface_Triangle_Set[i].Nodes[1];
+		node2 = Surface_Triangle_Set[i].Nodes[2];
+
+		if( Surface_Triangle_Set[i].Removed_Flag == OFF )
+		{
+			Surface_Node_Set[node0].Removed_Geometry_Vertex_Flag = false;
+			Surface_Node_Set[node1].Removed_Geometry_Vertex_Flag = false;
+			Surface_Node_Set[node2].Removed_Geometry_Vertex_Flag = false;
+		}
+	}
+
+	}
+}
+
+//-----------------------------------------------------------------------------------------
 
 

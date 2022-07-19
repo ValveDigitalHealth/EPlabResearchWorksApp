@@ -33,7 +33,7 @@ TMain_Application_Window *Main_Application_Window;
 
 void __fastcall TMain_Application_Window::About1Click(TObject *Sender)
 {
-	ShowMessage("EPLab Works. Version v.2.0.15 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
+	ShowMessage("EPLab Works. Version v.2.0.16 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
 }
 
 //---------------------------------------------------------------------------
@@ -241,6 +241,9 @@ void __fastcall TMain_Application_Window::FormResize(TObject *Sender)
 	Annotation_Popup_Button->Left = Annotation_Window_PaintBox->Left;
 	Annotation_Popup_Button->Top = Annotation_Window_PaintBox->Top;
 
+	RefDragLineHint_Label->Left = Annotation_Popup_Button->Left + Annotation_Popup_Button->Width + 10;
+	RefDragLineHint_Label->Top = Annotation_Popup_Button->Top;
+
 	Signals_ScrollBar->Left = Annotation_Window_PaintBox->Left;
 	Signals_ScrollBar->Top = Annotation_Window_PaintBox->Top + Annotation_Window_PaintBox->Height + 5;
 	Signals_ScrollBar->Width = Annotation_Window_PaintBox->Width - 8;
@@ -315,7 +318,7 @@ void TMain_Application_Window::map_display_panel_mouse_down(TMouseButton Button,
 	OpenGL_Panel_1.MouseFeedBack(X, Y,Paint_Segments_CheckBox->State);
 
 	if(STUDY->Current_Surface != STUDY->Previous_Current_Surface )
-			update_controls_state();
+		update_controls_state();
 
 	// if data point clicked
 	if( OpenGL_Panel_1.closest_dp_clicked >= 0 )
@@ -1460,6 +1463,12 @@ void TMain_Application_Window::post_study_load_processing()
 	OpenGL_Panel_1.prepare_colors_for_display();
 
 	repaint_all_controls();
+
+	if( STUDY->Surfaces_List[STUDY->Current_Surface].Mapping_System_Source == MAPPING_SYSTEM_ORIGIN_MEA_PLAQUE )
+	{
+		SETPLAQUEDISPLAYPRESETS1Click(this);
+	}
+
 }
 //---------------------------------------------------------------------------
 
@@ -2883,21 +2892,20 @@ void __fastcall TMain_Application_Window::Annotation_Window_PaintBoxMouseDown(TO
 	if(Annotation_Box.Displayed_Segment_Length_ptr!=0)
 	{
 
+    long ref = STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
+		Data_Points[cdp].Ref_Signal_Activation_ptr;
+	long rov = STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
+		Data_Points[cdp].Rov_Signal_Activation_ptr;
+
 	// Reference cath
-	pos =
-		(STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
-		Data_Points[cdp].Ref_Signal_Activation_ptr
-		- Annotation_Box.Annotation_Display_Start)
+	pos = (ref - Annotation_Box.Annotation_Display_Start)
 		*Annotation_Window_PaintBox_Bitmap->Width/
 		 Annotation_Box.Displayed_Segment_Length_ptr;
 	if(X > pos-5 && X < pos+5 && Shift.Contains(ssCtrl))
 		Annotation_Box.Reference_Annotation_Dragged = true;
 
 	// Roving cath
-	pos =
-		(STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].
-		Data_Points[cdp].Rov_Signal_Activation_ptr
-		- Annotation_Box.Annotation_Display_Start)
+	pos = (rov - Annotation_Box.Annotation_Display_Start)
 		*Annotation_Window_PaintBox_Bitmap->Width/
 		Annotation_Box.Displayed_Segment_Length_ptr;
 	if(X > pos-5 && X < pos+5 )
@@ -4112,6 +4120,12 @@ void TMain_Application_Window::post_import_initialization(int Surface_Ptr,double
 //		Annotation_Box.Reference_Signal_Zoom = 0.004;
 //		Annotation_Box.ECG_Signal_Zoom = 0.004;
 	}
+
+	if( STUDY->Surfaces_List[S].Mapping_System_Source == MAPPING_SYSTEM_ORIGIN_MEA_PLAQUE )
+	{
+		SETPLAQUEDISPLAYPRESETS1Click(this);
+	}
+
 
 	}
 
@@ -7716,10 +7730,6 @@ void __fastcall TMain_Application_Window::Undocentering1Click(TObject *Sender)
 }
 //---------------------------------------------------------------------------
 
-
-
-
-
 void __fastcall TMain_Application_Window::Zoom_Slider_ImageMouseDown(TObject *Sender,
 		  TMouseButton Button, TShiftState Shift, int X, int Y)
 {
@@ -7880,11 +7890,15 @@ void __fastcall TMain_Application_Window::Restoreremovedsurface1Click(TObject *S
 {
    if( STUDY->is_current_surface_in_range() )
    {
+   for(long i=0;i<(signed)STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Node_Set.size();i++)
+	   STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Node_Set[i].Removed_Geometry_Vertex_Flag = false;
+
    for(long i=0;i<(signed)STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Triangle_Set.size();i++)
 	   STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Triangle_Set[i].Removed_Flag = OFF;
    }
 
-	repaint_3D_panels();
+   OpenGL_Panel_1.prepare_colors_for_display();
+   repaint_3D_panels();
 }
 //---------------------------------------------------------------------------
 
@@ -7966,6 +7980,7 @@ void __fastcall TMain_Application_Window::Restoreoriginalgeometry1Click(TObject 
 
 	STUDY->Surfaces_List[STUDY->Current_Surface].calculate_normals();
 
+   OpenGL_Panel_1.prepare_colors_for_display();
 	repaint_3D_panels();
 
 	}
@@ -8356,74 +8371,27 @@ void __fastcall TMain_Application_Window::Showhistogramofcurrentvaluespatialgrad
    double Range_mm = Ask_For_Single_Item_Form1->Edit_Box->Text.ToDouble();
 
    Ask_For_Single_Item_Form1->Caption = "Min value cutoff: ";
-   Ask_For_Single_Item_Form1->Edit_Box->Text = "1";
+   Ask_For_Single_Item_Form1->Edit_Box->Text = "-1000";
    Ask_For_Single_Item_Form1->ShowModal();
    double Min_Cutoff = Ask_For_Single_Item_Form1->Edit_Box->Text.ToDouble();
 
    Ask_For_Single_Item_Form1->Caption = "Max value cutoff: ";
-   Ask_For_Single_Item_Form1->Edit_Box->Text = "100";
+   Ask_For_Single_Item_Form1->Edit_Box->Text = "1000";
 
    if( Ask_For_Single_Item_Form1->ShowModal() == mrOk )
    {
 
    double Max_Cutoff = Ask_For_Single_Item_Form1->Edit_Box->Text.ToDouble();
 
-   AnsiString Current_Value_Name = STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.Current_Map_Value_Name;
-   int dset = STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr;
-   double Min,Box_Size;
-
-   ShowMessage("Histogram will be based on data points! ");
-
-   std::vector <long> Histogram = STUDY->Surfaces_List[STUDY->Current_Surface].
-			get_histogram_of_value_gradient(dset,0,Range_mm,Current_Value_Name,
-				&Min,&Box_Size,false,0);
-
-   long DPs_Number_No_Cutoffs = PNUM.get_sum_of_vector(&Histogram);
-
-   // take values within min-max range
-   std::vector <long> Histogram2;
-   for(int i=0;i<Histogram.size();i++)
-   if( Min + i*Box_Size > Min_Cutoff && Min + i*Box_Size < Max_Cutoff )
-   Histogram2.push_back(Histogram[i]);
-
-   long DPs_Number_With_Cutoffs = PNUM.get_sum_of_vector(&Histogram2);
-
-   Min = Min_Cutoff;
-
-   // calculate CHI
-	double p5 = PNUM.get_percentile_from_histogram(&Histogram2,5,Min,Box_Size);
-	double p50 = PNUM.get_percentile_from_histogram(&Histogram2,50,Min,Box_Size);
-	double p95 = PNUM.get_percentile_from_histogram(&Histogram2,95,Min,Box_Size);
-	double CHI;
-	if(p50!=0)
-	CHI = (p95-p5)/p50;
-	else CHI = -1;
-
-   // plot histogram
-	Histogram_Form->Chart1->Series[0]->Clear();
-	for(int i=0;i<Histogram2.size();i++)
-	Histogram_Form->Chart1->Series[0]->AddXY(Min + i*Box_Size,Histogram2[i]);
-
-	Histogram_Form->RichEdit1->Clear();
-	Histogram_Form->RichEdit1->Lines[0].Add("5th percentile= " + FloatToStrF(p5,ffGeneral,3,2));
-	Histogram_Form->RichEdit1->Lines[0].Add("50th percentile= " + FloatToStrF(p50,ffGeneral,3,2));
-	Histogram_Form->RichEdit1->Lines[0].Add("95th percentile= " + FloatToStrF(p95,ffGeneral,3,2));
-	Histogram_Form->RichEdit1->Lines[0].Add("CHI: (p95-p5)/p50 = " + FloatToStrF(CHI,ffGeneral,3,2));
-	Histogram_Form->RichEdit1->Lines[0].Add("Number of data points (before cutoff) = " + FloatToStrF(DPs_Number_No_Cutoffs,ffGeneral,3,2));
-	Histogram_Form->RichEdit1->Lines[0].Add("Number of data points (with cutoff) = " + FloatToStrF(DPs_Number_With_Cutoffs,ffGeneral,3,2));
-
-	Histogram_Form->Chart1->BottomAxis->Title->Text = "LAT range within " + FloatToStr(Range_mm) + " mm radius neighbourhood [ms]";
-	Histogram_Form->Chart1->LeftAxis->Title->Text = "Count #";
-
-	Histogram_Form->ShowModal();
+   show_gradient_histogram(Range_mm,Min_Cutoff,Max_Cutoff,0,-1);
 
    }
 
    }
 }
+
 //---------------------------------------------------------------------------
 void __fastcall TMain_Application_Window::ShowhistogramofspatialgradientofcurrentvalueOFCURRENTSEGMENT1Click(TObject *Sender)
-
 {
    if( STUDY->is_current_surface_in_range() &&
 	   STUDY->Surfaces_List[STUDY->Current_Surface].data_points_set_ptr_in_range() )
@@ -8435,18 +8403,23 @@ void __fastcall TMain_Application_Window::Showhistogramofspatialgradientofcurren
    double Range_mm = Ask_For_Single_Item_Form1->Edit_Box->Text.ToDouble();
 
    Ask_For_Single_Item_Form1->Caption = "Min value cutoff: ";
-   Ask_For_Single_Item_Form1->Edit_Box->Text = "1";
+   Ask_For_Single_Item_Form1->Edit_Box->Text = "-1000";
    Ask_For_Single_Item_Form1->ShowModal();
    double Min_Cutoff = Ask_For_Single_Item_Form1->Edit_Box->Text.ToDouble();
 
    Ask_For_Single_Item_Form1->Caption = "Max value cutoff: ";
-   Ask_For_Single_Item_Form1->Edit_Box->Text = "100";
+   Ask_For_Single_Item_Form1->Edit_Box->Text = "1000";
 
    if( Ask_For_Single_Item_Form1->ShowModal() == mrOk )
    {
 
    double Max_Cutoff = Ask_For_Single_Item_Form1->Edit_Box->Text.ToDouble();
 
+   show_gradient_histogram(Range_mm,Min_Cutoff,Max_Cutoff,0,get_current_segment_id());
+
+   }
+   }
+/*
    AnsiString Current_Value_Name = STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.Current_Map_Value_Name;
    int dset = STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr;
    double Min,Box_Size;
@@ -8455,7 +8428,7 @@ void __fastcall TMain_Application_Window::Showhistogramofspatialgradientofcurren
    ShowMessage("Histogram will be based on data points! ");
 
    std::vector <long> Histogram = STUDY->Surfaces_List[STUDY->Current_Surface].
-			get_histogram_of_value_gradient(dset,Current_Segment_Id,Range_mm,Current_Value_Name,
+			get_histogram_of_value_gradient_based_on_data_points(dset,Current_Segment_Id,Range_mm,Current_Value_Name,
 				&Min,&Box_Size,false,0);
 
    long DPs_Number_No_Cutoffs = PNUM.get_sum_of_vector(&Histogram);
@@ -8500,8 +8473,130 @@ void __fastcall TMain_Application_Window::Showhistogramofspatialgradientofcurren
    }
 
    }
+   */
 }
 
+//---------------------------------------------------------------------------
+void __fastcall TMain_Application_Window::Showhistogramofspatialgradientofcurrentvalue1Click(TObject *Sender)
+
+{
+   if( STUDY->is_current_surface_in_range() &&
+	   STUDY->Surfaces_List[STUDY->Current_Surface].data_points_set_ptr_in_range() )
+   {
+
+   Ask_For_Single_Item_Form1->Caption = "Min value cutoff: ";
+   Ask_For_Single_Item_Form1->Edit_Box->Text = "-1000";
+   Ask_For_Single_Item_Form1->ShowModal();
+   double Min_Cutoff = Ask_For_Single_Item_Form1->Edit_Box->Text.ToDouble();
+
+   Ask_For_Single_Item_Form1->Caption = "Max value cutoff: ";
+   Ask_For_Single_Item_Form1->Edit_Box->Text = "1000";
+
+   if( Ask_For_Single_Item_Form1->ShowModal() == mrOk )
+   {
+
+   double Max_Cutoff = Ask_For_Single_Item_Form1->Edit_Box->Text.ToDouble();
+
+   show_gradient_histogram(0,Min_Cutoff,Max_Cutoff,1,-1);
+
+   }
+   }
+
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMain_Application_Window::ShowhistogramofspatialgradientofcurrentvalueOFCURRENTSEGMENT2Click(TObject *Sender)
+
+{
+   if( STUDY->is_current_surface_in_range() &&
+	   STUDY->Surfaces_List[STUDY->Current_Surface].data_points_set_ptr_in_range() )
+   {
+
+   Ask_For_Single_Item_Form1->Caption = "Min value cutoff: ";
+   Ask_For_Single_Item_Form1->Edit_Box->Text = "-1000";
+   Ask_For_Single_Item_Form1->ShowModal();
+   double Min_Cutoff = Ask_For_Single_Item_Form1->Edit_Box->Text.ToDouble();
+
+   Ask_For_Single_Item_Form1->Caption = "Max value cutoff: ";
+   Ask_For_Single_Item_Form1->Edit_Box->Text = "1000";
+
+   if( Ask_For_Single_Item_Form1->ShowModal() == mrOk )
+   {
+
+   double Max_Cutoff = Ask_For_Single_Item_Form1->Edit_Box->Text.ToDouble();
+
+   show_gradient_histogram(0,Min_Cutoff,Max_Cutoff,1,get_current_segment_id());
+
+   }
+   }
+
+}
+//---------------------------------------------------------------------------
+
+void TMain_Application_Window::show_gradient_histogram(
+	double Range_mm,double Min_Cutoff,double Max_Cutoff,int Type,int Segment_Id)
+{
+   AnsiString Current_Value_Name = STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.Current_Map_Value_Name;
+   int dset = STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr;
+   double Min,Box_Size;
+   std::vector <long> Histogram;
+
+   if( Type == 0 ) // based on data points
+   Histogram = STUDY->Surfaces_List[STUDY->Current_Surface].
+			get_histogram_of_value_gradient_based_on_data_points(dset,Segment_Id,Range_mm,Current_Value_Name,
+				&Min,&Box_Size,false,0);
+
+   if( Type == 1 ) // based on surface
+   Histogram = STUDY->Surfaces_List[STUDY->Current_Surface].
+			get_histogram_of_value_gradient_based_on_geo_nodes(dset,Segment_Id,Current_Value_Name,
+				&Min,&Box_Size);
+
+   long DPs_Number_No_Cutoffs = PNUM.get_sum_of_vector(&Histogram);
+
+   // take values within min-max range
+   std::vector <long> Histogram2;
+
+   double MinCutted = 100000000;
+   for(int i=0;i<Histogram.size();i++)
+   if( Min + i*Box_Size > Min_Cutoff && Min + i*Box_Size < Max_Cutoff )
+   {
+	   Histogram2.push_back(Histogram[i]);
+	   if( Min + i*Box_Size < MinCutted )
+	   MinCutted = Min + i*Box_Size;
+   }
+
+   Min = MinCutted;
+
+   long DPs_Number_With_Cutoffs = PNUM.get_sum_of_vector(&Histogram2);
+
+   // calculate CHI
+	double p5 = PNUM.get_percentile_from_histogram(&Histogram2,5,Min,Box_Size);
+	double p50 = PNUM.get_percentile_from_histogram(&Histogram2,50,Min,Box_Size);
+	double p95 = PNUM.get_percentile_from_histogram(&Histogram2,95,Min,Box_Size);
+	double CHI;
+	if(p50!=0)
+	CHI = (p95-p5)/p50;
+	else CHI = -1;
+
+   // plot histogram
+	Histogram_Form->Chart1->Series[0]->Clear();
+	for(int i=0;i<Histogram2.size();i++)
+	Histogram_Form->Chart1->Series[0]->AddXY(Min + i*Box_Size,Histogram2[i]);
+
+	Histogram_Form->RichEdit1->Clear();
+	Histogram_Form->RichEdit1->Lines[0].Add("5th percentile= " + FloatToStrF(p5,ffGeneral,3,2));
+	Histogram_Form->RichEdit1->Lines[0].Add("50th percentile= " + FloatToStrF(p50,ffGeneral,3,2));
+	Histogram_Form->RichEdit1->Lines[0].Add("95th percentile= " + FloatToStrF(p95,ffGeneral,3,2));
+	Histogram_Form->RichEdit1->Lines[0].Add("CHI: (p95-p5)/p50 = " + FloatToStrF(CHI,ffGeneral,3,2));
+	Histogram_Form->RichEdit1->Lines[0].Add("Number of data points (before cutoff) = " + FloatToStrF(DPs_Number_No_Cutoffs,ffGeneral,3,2));
+	Histogram_Form->RichEdit1->Lines[0].Add("Number of data points (with cutoff) = " + FloatToStrF(DPs_Number_With_Cutoffs,ffGeneral,3,2));
+
+	Histogram_Form->Chart1->BottomAxis->Title->Text = "LAT range within " + FloatToStr(Range_mm) + " mm radius neighbourhood [ms]";
+	Histogram_Form->Chart1->LeftAxis->Title->Text = "Count #";
+
+	Histogram_Form->ShowModal();
+
+}
 //---------------------------------------------------------------------------
 
 void __fastcall TMain_Application_Window::Getsegmentwithmaxvalue1Click(TObject *Sender)
@@ -8618,6 +8713,9 @@ void __fastcall TMain_Application_Window::Showdatasetinfo1Click(TObject *Sender)
 	Rich_Edit_Form->add_text("\nOrigin: CARTO");
 	if( STUDY->Surfaces_List[S].Mapping_System_Source == MAPPING_SYSTEM_ORIGIN_RHYTHMIA )
 	Rich_Edit_Form->add_text("\nOrigin: RHYTHMIA");
+	if( STUDY->Surfaces_List[S].Mapping_System_Source == MAPPING_SYSTEM_ORIGIN_MEA_PLAQUE )
+	Rich_Edit_Form->add_text("\nOrigin: MEA PLAQUE");
+
 
 	Rich_Edit_Form->add_text("\nData_Points_Filling_Threshold_mm: " + FloatToStr(
 		STUDY->Surfaces_List[S].Data_Points_Filling_Threshold_mm));
@@ -9777,4 +9875,544 @@ void __fastcall TMain_Application_Window::GetpercentageofvaliddatapointsPERSEGME
    }
 }
 //---------------------------------------------------------------------------
+
+void __fastcall TMain_Application_Window::Loadfolderwithsignals1Click(TObject *Sender)
+{
+	String Data_Files_Path;
+    AnsiString Result;
+
+	TModalResult Res = MessageDlg("Save current study?",
+	mtConfirmation, TMsgDlgButtons() << mbYes << mbNo << mbCancel, 0);
+	if( Res == mrYes)
+	Saveworkspace1Click(this);
+
+	if( SelectDirectory(AnsiString("Select folder with data files"), "", Data_Files_Path) )
+	Result = Data_IO_Object.load_folder_MEA_flexv_36(STUDY,Data_Files_Path,0,Data_FileListBox);
+
+		if( Result == "Import completed" )
+		{
+
+		STUDY->Current_Surface = 0;
+
+		Progress_Form->add_text("Initialization...");
+		Progress_Form->Show();
+		Application->ProcessMessages();
+		post_import_initialization(STUDY->Surfaces_List.size()-1,STUDY->Surfaces_List[STUDY->Current_Surface].Data_Points_Filling_Threshold_mm,true);
+
+		update_controls_state();
+
+		if( MessageDlg("Center map?",
+		mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, 0) == mrYes)
+		if( STUDY->is_current_surface_in_range() )
+			STUDY->Surfaces_List[STUDY->Current_Surface].center_geometry_and_data_points();
+
+		OpenGL_Panel_1.set_initial_zoom_in_3D_panel();
+		repaint_3D_panels();
+
+		Progress_Form->add_text("Import completed. Press CLOSE to continue." );
+		Application->ProcessMessages();
+		Progress_Form->Show();
+
+		}
+		else
+		{
+			Progress_Form->Hide();
+			ShowMessage(Result);
+		}
+
+	SETPLAQUEDISPLAYPRESETS1Click(this);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMain_Application_Window::Loadfolderwithsignalsandsubtractsomethingfromdatapointindex1Click(TObject *Sender)
+
+{
+	String Data_Files_Path;
+
+	Ask_For_Single_Item_Form1->Caption = "Value to be subtracted";
+	Ask_For_Single_Item_Form1->Edit_Box->Text = "32";
+	int result = Ask_For_Single_Item_Form1->ShowModal();
+	int K = Ask_For_Single_Item_Form1->Edit_Box->Text.ToInt();
+	AnsiString Result;
+
+	TModalResult Res = MessageDlg("Save current study?",
+	mtConfirmation, TMsgDlgButtons() << mbYes << mbNo << mbCancel, 0);
+	if( Res == mrYes)
+	Saveworkspace1Click(this);
+
+	if( SelectDirectory(AnsiString("Select folder with data files"), "", Data_Files_Path) )
+	Result = Data_IO_Object.load_folder_MEA_flexv_36(STUDY,Data_Files_Path,K,Data_FileListBox);
+
+		if( Result == "Import completed" )
+		{
+
+		STUDY->Current_Surface = 0;
+
+		Progress_Form->add_text("Initialization...");
+		Progress_Form->Show();
+		Application->ProcessMessages();
+		post_import_initialization(STUDY->Surfaces_List.size()-1,STUDY->Surfaces_List[STUDY->Current_Surface].Data_Points_Filling_Threshold_mm,true);
+
+		update_controls_state();
+
+		if( MessageDlg("Center map?",
+		mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, 0) == mrYes)
+		if( STUDY->is_current_surface_in_range() )
+			STUDY->Surfaces_List[STUDY->Current_Surface].center_geometry_and_data_points();
+
+		OpenGL_Panel_1.set_initial_zoom_in_3D_panel();
+		repaint_3D_panels();
+
+		Progress_Form->add_text("Import completed. Press CLOSE to continue." );
+		Application->ProcessMessages();
+		Progress_Form->Show();
+
+		}
+		else
+		{
+			Progress_Form->Hide();
+			ShowMessage(Result);
+		}
+
+
+	SETPLAQUEDISPLAYPRESETS1Click(this);
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMain_Application_Window::Processallfoldersandgenerateplaquefiles1Click(TObject *Sender)
+{
+	mea_plaque_process_all_folders(0);
+}
+
+//---------------------------------------------------------------------------
+void __fastcall TMain_Application_Window::Processallfoldersandgenerateplaquefiles3Click(TObject *Sender)
+
+{
+	Ask_For_Single_Item_Form1->Caption = "Value to be subtracted";
+	Ask_For_Single_Item_Form1->Edit_Box->Text = "32";
+
+	if( Ask_For_Single_Item_Form1->ShowModal() == mrOk)
+	mea_plaque_process_all_folders(Ask_For_Single_Item_Form1->Edit_Box->Text.ToInt());
+}
+//---------------------------------------------------------------------------
+
+void TMain_Application_Window::mea_plaque_process_all_folders(int Index_Shift)
+{
+	AnsiString AA,AS,Data_Files_Path;
+	int S1,S2;
+
+	ShowMessage("In next window, select folder containing all folders with .dat files to be processed.");
+
+	if( Directory_Selection_Form->ShowModal() == mrOk )
+	{
+
+	int Start_Pos = -1;
+	for(int i=2;i<Directory_Selection_Form->DirectoryListBox->Count;i++)
+	{
+
+	S1 = Utils.how_many_times_substring_present(Directory_Selection_Form->DirectoryListBox->GetItemPath(i-1),"\\");
+	S2 = Utils.how_many_times_substring_present(Directory_Selection_Form->DirectoryListBox->GetItemPath(i),"\\");
+
+	if( Start_Pos == -1 && S1==S2 )
+	Start_Pos = i-1;
+
+	}
+
+	if( Start_Pos >= 0 )
+	{
+
+	AnsiString Root_Path = Directory_Selection_Form->DirectoryListBox->GetItemPath(Start_Pos-1);
+
+	//------------------------------------------
+	// loop through all sub-folders
+	//------------------------------------------
+	for(int i=Start_Pos;i<Directory_Selection_Form->DirectoryListBox->Count;i++)
+	{
+
+	Data_Files_Path = Directory_Selection_Form->DirectoryListBox->GetItemPath(i);
+
+	Data_IO_Object.load_folder_MEA_flexv_36(STUDY,Data_Files_Path,0,Data_FileListBox);
+
+	// save plaque
+	STUDY->save_study(Data_Files_Path+".eplab",Progress_Form);
+
+	}
+	}
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMain_Application_Window::SETPLAQUEDISPLAYPRESETS1Click(TObject *Sender)
+{
+	if( STUDY->is_current_surface_in_range() )
+	{
+
+	STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.set_current_value_according_to_name("LAT");
+
+	Annotation_Box.Displayed_Segment_Length_ptr = 8000;
+	Annotation_Box.Local_Signal_Zoom = 10;
+
+	STUDY->Comp_Module.ROV_LAT_Annotation_Left_Edge_ms = 2;
+	STUDY->Comp_Module.ROV_LAT_Annotation_Right_Edge_ms = 20;
+
+	OpenGL_Panel_1.OpenGL_Panel_Display_Parameters.ZoomFactor = -3;
+
+	STUDY->Comp_Module.Individual_Reference_Channel_Annotation = false;
+
+	STUDY->Comp_Module.Deflection_Detection_Alg = MAX_DOWN_SLOPE_LAT_DETECTION_ALG;
+
+	STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.set_current_value_contours_display_flag(true);
+
+	STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.set_current_value_contours_interval(0.05);
+
+	OpenGL_Panel_1.OpenGL_Panel_Display_Parameters.DP_Size_Scaling_Ratio = 200;
+	OpenGL_Panel_1.autoscale_data_point_size();
+
+	Annotation_Box.LC=true;
+	Annotation_Box.REF=false;
+	Annotation_Box.ECG=false;
+	Annotation_Box.LC_Pos = 0.5;
+
+	OpenGL_Panel_1.prepare_colors_for_display();
+	update_controls_state();
+	repaint_all_controls();
+	repaint_3D_panels();
+
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMain_Application_Window::Updatecontrols1Click(TObject *Sender)
+{
+	update_controls_state();
+	repaint_all_controls();
+	repaint_3D_panels();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMain_Application_Window::Removesurfacewithoutdatapointsstrict1Click(TObject *Sender)
+{
+   if( STUDY->is_current_surface_in_range() )
+   {
+		int dset = STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr;
+
+		STUDY->Surfaces_List[STUDY->Current_Surface].
+			remove_triangles_without_data_points_at_vertices(dset,1);
+   }
+
+   OpenGL_Panel_1.prepare_colors_for_display();
+   repaint_3D_panels();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMain_Application_Window::Removesurfacewithoutdatapointsliberal1Click(TObject *Sender)
+{
+   if( STUDY->is_current_surface_in_range() )
+   {
+		int dset = STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr;
+
+		STUDY->Surfaces_List[STUDY->Current_Surface].
+			remove_triangles_without_data_points_at_vertices(dset,0);
+   }
+
+   OpenGL_Panel_1.prepare_colors_for_display();
+   repaint_3D_panels();
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMain_Application_Window::Makequantitativeanalysisofall1Click(TObject *Sender)
+{
+/*
+	String Data_Files_Path;
+
+	TModalResult Res = MessageDlg("Save current study?",
+	mtConfirmation, TMsgDlgButtons() << mbYes << mbNo << mbCancel, 0);
+	if( Res == mrYes)
+	SavePlaqueClick(Sender);
+
+	if( SelectDirectory("Select folder with saved workspace files", "", Data_Files_Path) )
+	{
+
+	Master_Path_and_File_Name = Data_Files_Path+"\\Analysis_Results.master.csv";
+	generate_master_file(Master_Path_and_File_Name);
+
+	Data_FileListBox->Clear();
+	Data_FileListBox->Update();
+	Data_FileListBox->ApplyFilePath( Data_Files_Path );
+	Data_FileListBox->Update();
+
+	Echo = OFF;
+
+	// SET parameters
+	Analysis_Output_Type_Selection_Form->ShowModal();
+
+	for(long i=0; i < Data_FileListBox->Items[0].Capacity; i++ )
+	{
+
+	Progress_Form->Caption = "Progress...";
+    Progress_Form->ProgressBar1->Min = 0;
+    Progress_Form->ProgressBar1->Max = Data_FileListBox->Items[0].Capacity;
+    Progress_Form->ProgressBar1->Position = i;
+	Progress_Form->Show();
+    Progress_Form->Repaint();
+    Application->ProcessMessages();
+
+    // -----------------------------------------------------
+    // Loading plaque
+    // -----------------------------------------------------
+	Hold_Display = ON;
+	int Result = load_plaque_file(((AnsiString)Data_FileListBox->Items[0].Strings[i]).c_str(),0);
+    Hold_Display = OFF;
+
+    if( Result == OK_RESULT)
+    {
+
+	Current_Plaque_Filename = Data_FileListBox->Items[0].Strings[i];
+    EPAS_Main_Screen->Caption = "Electrophysiological Plaque Analysis System: " + Data_FileListBox->Items[0].Strings[i];
+
+	for(long geo=0;geo<4;geo++)
+    for(long ds=0;ds<(signed)PA_MAPS[geo].Data_Point_Set.size();ds++)
+	if(PA_MAPS[geo].Data_Point_Set[ds].Data_Points.size() > 0 )
+    {
+        Current_Map = geo;
+        PA_MAPS[geo].Current_Data_Point_Set_Ptr = ds;
+        PA_MAPS[geo].Current_Data_Point_Ptr = 0;
+        analyze_plaque(0,1,Master_Path_and_File_Name); // 0 - all surface
+    }
+
+    } // if loaded
+
+	} // through all files in folder
+
+	Progress_Form->Close();
+	EPAS_Main_Screen->Caption = "DONE";
+
+	} // if execute
+*/
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMain_Application_Window::Analysecurrentmap1Click(TObject *Sender)
+
+{
+//	analyze_plaque(0,0,""); // 0 - all surface
+}
+//---------------------------------------------------------------------------
+
+/*
+void TEPAS_Main_Screen::analyze_plaque(int Segment_Id,int Silent_Mode,AnsiString MasterFileName)
+{
+	AnsiString Filename;
+	AnsiString Lastname,Firstname,Date;
+	int Result;
+
+	if( Current_Map >= 0 )
+	if( PA_MAPS[Current_Map].data_points_set_ptr_in_range() )
+    {
+
+	//-------------------------------------------------------------------------
+	// MASTER FILE LINE FIRST FIELDS
+	//-------------------------------------------------------------------------
+    AnsiString Set_Name = PA_MAPS[Current_Map].
+            Data_Point_Set[PA_MAPS[Current_Map].Current_Data_Point_Set_Ptr].Name;
+    Set_Name = Set_Name.Trim();
+
+    // pacing site
+	Analysis_Output_Type_Selection_Form->Pacing_Site_Edit->Text =
+        PA_MAPS[Current_Map].get_pacing_electrode_name
+        (PA_MAPS[Current_Map].Current_Data_Point_Set_Ptr).Trim();
+
+	if(Silent_Mode==0)
+	{
+
+	// DENNIS RAT ATRIA/VENTRICLE OUTPUT TYPE (FIRSTNAME,LASTNAME,DATE)
+    Lastname = Set_Name.SubString(1,3);
+    Firstname = Set_Name.SubString(5,Set_Name.Length()-13);
+    Date = Set_Name.SubString(Set_Name.Length()-7,8);
+    Analysis_Output_Type_Selection_Form->Lastname_Edit->Text = Lastname;
+    Analysis_Output_Type_Selection_Form->Firstname_Edit->Text = Firstname;
+	Analysis_Output_Type_Selection_Form->Date_Edit->Text = Date;
+
+    // Interpreting data set name (Lorraine Plaque)
+    if( Set_Name.SubString(0,2).UpperCase() == "AF" )
+    {
+		Set_Name = Set_Name.Insert("X",3);
+        Analysis_Output_Type_Selection_Form->Model_Edit->Text = "AF";
+    }
+
+    if( Set_Name.SubString(0,3).UpperCase() == "CON" )
+        Analysis_Output_Type_Selection_Form->Model_Edit->Text = "CON";
+
+    if( Set_Name.SubString(0,3).UpperCase() == "EXP" )
+		Analysis_Output_Type_Selection_Form->Model_Edit->Text = "EXP";
+
+    // sheep no
+    int Prev,Pos = 4;
+    while( Set_Name.SubString(Pos,1).UpperCase() != "E" && Pos <= Set_Name.Length() )  Pos++;
+	Analysis_Output_Type_Selection_Form->SheepNo_Edit->Text = Set_Name.SubString(4,Pos-4);
+    Prev = Pos;
+
+    // E
+    while( Set_Name.SubString(Pos,1).UpperCase() != "S" && Pos <= Set_Name.Length())  Pos++;
+    Analysis_Output_Type_Selection_Form->E_Edit->Text = Set_Name.SubString(Prev+1,Pos-Prev-1);
+	Prev = Pos;
+
+    // S
+    while( Set_Name.SubString(Pos,2).UpperCase() != "CL" && Pos <= Set_Name.Length())  Pos++;
+    Analysis_Output_Type_Selection_Form->S_Edit->Text = Set_Name.SubString(Prev+1,Pos-Prev-1);
+
+    // CL
+    Analysis_Output_Type_Selection_Form->CL_Edit->Text =
+        Set_Name.SubString(Pos+2,Set_Name.Length()-Pos-1);
+
+    Analysis_Output_Type_Selection_Form->Geo_Type_RadioGroup->ItemIndex = 1;
+	Analysis_Output_Type_Selection_Form->Left = 100;
+	Analysis_Output_Type_Selection_Form->Top = 100;
+    Analysis_Output_Type_Selection_Form->ShowModal();
+
+    } // if not silent mode
+
+    if(Silent_Mode==1)
+	Analysis_Output_Type_Selection_Form->Model_Edit->Text = Set_Name;
+
+    int Selection = Analysis_Output_Type_Selection_Form->Selection;
+
+    if( Selection > 0 )
+    {
+
+    Master_File_Line = "\n";
+
+    if( Selection == 1 )
+    {
+
+    if(Analysis_Output_Type_Selection_Form->Model_Edit->Text.Length() == 0 )
+       Analysis_Output_Type_Selection_Form->Model_Edit->Text = "x";
+    if(Analysis_Output_Type_Selection_Form->SheepNo_Edit->Text.Length() == 0 )
+	   Analysis_Output_Type_Selection_Form->SheepNo_Edit->Text = "x";
+	if(Analysis_Output_Type_Selection_Form->E_Edit->Text.Length() == 0 )
+       Analysis_Output_Type_Selection_Form->E_Edit->Text = "x";
+    if(Analysis_Output_Type_Selection_Form->S_Edit->Text .Length() == 0 )
+       Analysis_Output_Type_Selection_Form->S_Edit->Text = "x";
+    if(Analysis_Output_Type_Selection_Form->CL_Edit->Text .Length() == 0 )
+       Analysis_Output_Type_Selection_Form->CL_Edit->Text = "x";
+    if(Analysis_Output_Type_Selection_Form->Type_Edit2->Text .Length() == 0 )
+       Analysis_Output_Type_Selection_Form->Type_Edit2->Text = "x";
+	if(Analysis_Output_Type_Selection_Form->Pacing_Site_Edit->Text .Length() == 0 )
+       Analysis_Output_Type_Selection_Form->Pacing_Site_Edit->Text = "x";
+
+    // remove OTS (separation character) from names
+    Analysis_Output_Type_Selection_Form->Model_Edit->Text =
+    UT.remove_substring_from_string(Analysis_Output_Type_Selection_Form->Model_Edit->Text,OTS);
+
+    Analysis_Output_Type_Selection_Form->SheepNo_Edit->Text =
+    UT.remove_substring_from_string(Analysis_Output_Type_Selection_Form->SheepNo_Edit->Text,OTS);
+
+    Analysis_Output_Type_Selection_Form->E_Edit->Text =
+	UT.remove_substring_from_string(Analysis_Output_Type_Selection_Form->E_Edit->Text,OTS);
+
+	Analysis_Output_Type_Selection_Form->S_Edit->Text =
+	UT.remove_substring_from_string(Analysis_Output_Type_Selection_Form->S_Edit->Text,OTS);
+
+    Analysis_Output_Type_Selection_Form->CL_Edit->Text =
+    UT.remove_substring_from_string(Analysis_Output_Type_Selection_Form->CL_Edit->Text,OTS);
+
+    Analysis_Output_Type_Selection_Form->Type_Edit2->Text =
+    UT.remove_substring_from_string(Analysis_Output_Type_Selection_Form->Type_Edit2->Text,OTS);
+
+    Analysis_Output_Type_Selection_Form->Pacing_Site_Edit->Text =
+    UT.remove_substring_from_string(Analysis_Output_Type_Selection_Form->Pacing_Site_Edit->Text,OTS);
+
+    Master_File_Line += Analysis_Output_Type_Selection_Form->Model_Edit->Text+OTS;
+    Master_File_Line += Maps_Selection_ComboBox->Text+OTS; // geo type
+    Master_File_Line += Analysis_Output_Type_Selection_Form->SheepNo_Edit->Text+OTS;
+    Master_File_Line += Analysis_Output_Type_Selection_Form->E_Edit->Text+OTS;
+    Master_File_Line += Analysis_Output_Type_Selection_Form->S_Edit->Text+OTS;
+	Master_File_Line += Analysis_Output_Type_Selection_Form->CL_Edit->Text+OTS;
+    Master_File_Line += Analysis_Output_Type_Selection_Form->Type_Edit2->Text+OTS;
+    Master_File_Line += Analysis_Output_Type_Selection_Form->Pacing_Site_Edit->Text;
+
+    }
+
+	if( Selection == 2 )
+    Master_File_Line += Lastname + OTS + Firstname+ OTS+ Date +OTS;
+
+    if( Silent_Mode == 0 )
+    {
+
+    File_Save_Dialog->FileName = "";
+
+    if( Analysis_Output_Type_Selection_Form->Selection_RadioGroup->ItemIndex == 0 )
+    {
+        File_Save_Dialog->FilterIndex = 4; // result file
+        File_Save_Dialog->Title = "Select Result file";
+	}
+
+    if( Analysis_Output_Type_Selection_Form->Selection_RadioGroup->ItemIndex == 1 )
+    {
+        File_Save_Dialog->FilterIndex = 5; // master file
+        File_Save_Dialog->Title = "Select Master file";
+	}
+
+    File_Save_Dialog->InitialDir = GetCurrentDir();
+
+	Result = File_Save_Dialog->Execute();
+
+    Filename = File_Save_Dialog->FileName;
+
+    } // selecting master file in active mode
+    else
+    Filename = Master_Path_and_File_Name;
+
+    if( Analysis_Output_Type_Selection_Form->Selection_RadioGroup->ItemIndex == 0 )
+    if( Filename.SubString(Filename.Length()-10,11) != ".result.csv" )
+    Filename += ".result.csv";
+
+    if( Analysis_Output_Type_Selection_Form->Selection_RadioGroup->ItemIndex == 1 )
+    if( Filename.SubString(Filename.Length()-10,11) != ".master.csv" )
+	Filename += ".master.csv";
+
+
+	//---------------------------------------------------------------
+	if( Result==mrOk || Silent_Mode == 1 )
+	//---------------------------------------------------------------
+	{
+
+	if( Analysis_Output_Type_Selection_Form->Geo_Type_RadioGroup->ItemIndex == 2)
+	Transfergeometrytocylinder1Click(this);
+
+	repaint_main_screen();
+
+	// Put latency area (or not)
+	if( Analysis_Output_Type_Selection_Form->Mark_Latency_CheckBox->State == cbChecked)
+	PA_MAPS[Current_Map].put_latency_area(Analysis_Output_Type_Selection_Form->
+		Latency_Radius_Edit->Text.ToDouble()+0.1);
+
+	// remove triangles
+	if( Analysis_Output_Type_Selection_Form->Exclude_Non_Contact_Liberal_CheckBox->State == cbChecked)
+	PA_MAPS[Current_Map].remove_triangles_without_data_points_at_vertices
+		(PA_MAPS[Current_Map].Current_Data_Point_Set_Ptr,0);
+	if( Analysis_Output_Type_Selection_Form->Exclude_Non_Contact_Strict_CheckBox->State == cbChecked)
+	PA_MAPS[Current_Map].remove_triangles_without_data_points_at_vertices
+		(PA_MAPS[Current_Map].Current_Data_Point_Set_Ptr,1);
+
+	//-------------------------------------------------------------------
+	if( Analysis_Output_Type_Selection_Form->Selection_RadioGroup->ItemIndex == 0 )
+	make_quantitative_analysis(Filename,0,0,Segment_Id);
+	if( Analysis_Output_Type_Selection_Form->Selection_RadioGroup->ItemIndex == 1 )
+	make_quantitative_analysis(Filename,1,1,Segment_Id);
+	//-------------------------------------------------------------------
+
+	if( Analysis_Output_Type_Selection_Form->Geo_Type_RadioGroup->ItemIndex == 2)
+	Tranfergeometrybacktoflat1Click(this);
+
+	repaint_main_screen();
+
+	}
+	}
+	}
+}
+	*/
+
+//--------------------------------------------------------------------------------
+
 

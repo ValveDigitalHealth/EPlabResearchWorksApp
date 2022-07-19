@@ -280,6 +280,21 @@ AnsiString Utils_Tools::get_string_after_given_occurence_of_specified_string
 }
 
 //------------------------------------------------------------------------------
+int Utils_Tools::how_many_times_substring_present(AnsiString Main_String,AnsiString Given_String)
+{
+	int Strict_Hit_Count=0;
+
+	for(int i=0;i<=Main_String.Length();i++)
+	if( Main_String.SubString(i,Given_String.Length()) == Given_String )
+	{
+		Strict_Hit_Count++;
+	}
+
+	return Strict_Hit_Count;
+}
+
+//------------------------------------------------------------------------------
+
 AnsiString Utils_Tools::get_string_before_given_occurence_of_specified_string
 		(AnsiString Main_String,AnsiString Given_String, int Which_Occurence)
 {
@@ -510,280 +525,17 @@ AnsiString Utils_Tools::get_string_from_the_middle(AnsiString Main_String,AnsiSt
 
 	return Sub;
 }
-
-//------------------------------------------------------------------------------
-
-
-Diagram_Element::Diagram_Element()
-{
-        Counter = 0;
-
-        Phase_Code = -1;
-        Phase_Name = "N/A";
-
-        Transition_Code = -1;
-        Transition_Name = "N/A";
-
-        Type = -1; // 0 if State, 1 if Transition
-
-        Cell_X = -1;
-        Cell_Y = -1; // position in 2D grid
-}
-//------------------------------------------------------------------------------
-
-State_Diagram::State_Diagram()
-{
-    Starting_Cell_X = 1;
-    Starting_Cell_Y = 1;
-
-    Cell_Width = 120; // in pixels ///!!!!!! Its stored in plaque file!!!
-    Cell_Height = 40; // in pixels
-
-	Box_Width = 250; // in pixels, box is inside the cell, so it should be smaller
-    Box_Height = 30; // in pixels, box is inside the cell, so it should be smaller
-
-    State_Box_Color = clWhite;
-    Transition_Box_Color = clGray; // or maybe pass colors from phases definitions?
-}
-//------------------------------------------------------------------------------
-
-bool State_Diagram::time_sequenced_elements_proper_syntax()
-{
-    if(Time_Sequenced_Elements[0].Type != 0 ) // not starting with phase box
-    return false;
-
-    if(Time_Sequenced_Elements[Time_Sequenced_Elements.size()-1].Type != 0 )
-        // not ending with phase box
-    return false;
-
-    int error=0;
-	for(int e=1;e<(signed)Time_Sequenced_Elements.size()-1;e=e+2)
-    {
-        if(Time_Sequenced_Elements[e].Type != 1 ) error++;
-        if(Time_Sequenced_Elements[e+1].Type != 0 ) error++;
-    }
-
-	if(error>0)
-    return false;
-
-    return true;
-}
-
-//------------------------------------------------------------------------------
-
-int State_Diagram::get_ptr_of_this_state(int Phase_Code)
-{
-	for(int e=0;e<(signed)Diagram_Elements.size();e++)
-    if(Diagram_Elements[e].Phase_Code == Phase_Code)
-    return e;
-
-    return -1;
-}
-
-//------------------------------------------------------------------------------
-int State_Diagram::get_ptr_of_this_transition(int Transition_Code) // if transition is present returns ptr, else returns -1
-{
-	for(int e=0;e<(signed)Diagram_Elements.size();e++)
-    if(Diagram_Elements[e].Transition_Code == Transition_Code)
-    return e;
-
-    return -1;
-}            
-
-//------------------------------------------------------------------------------
-
-int State_Diagram::is_this_sequence_present(int Phase_Code1,int Transition_Code,int Phase_Code2)
-{
-
-	for(int e=0;e<(signed)Diagram_Elements.size()-2;e++)
-    if(Diagram_Elements[e].Phase_Code == Phase_Code1)
-    if(Diagram_Elements[e+1].Transition_Code == Transition_Code)
-    if(Diagram_Elements[e+2].Phase_Code == Phase_Code2)
-    return e+1;
-
-	return -1;
-}
-
-//------------------------------------------------------------------------------
-
-int State_Diagram::is_this_sequence_present(int Phase_Code1,int Transition_Code)
-{
-	for(int e=0;e<(signed)Diagram_Elements.size()-1;e++)
-    if(Diagram_Elements[e].Phase_Code == Phase_Code1)
-    if(Diagram_Elements[e+1].Transition_Code == Transition_Code)
-    return e+1;
-
-    return -1;
-}
-
-//------------------------------------------------------------------------------
-
-int State_Diagram::which_box_is_at_this_location(int X,int Y)
-{
-	for(int e=0;e<(signed)Diagram_Elements.size();e++)
-    if(Diagram_Elements[e].Cell_X == X)
-    if(Diagram_Elements[e].Cell_Y == Y)
-    return e;
-
-    return -1;
-}
-
-//------------------------------------------------------------------------------
-
-bool State_Diagram::is_this_spot_free(int X,int Y)
-{
-	for(int e=0;e<(signed)Diagram_Elements.size();e++)
-    if( Diagram_Elements[e].Cell_X == X )
-    if( Diagram_Elements[e].Cell_Y == Y )
-    return false;
-
-    return true;
-}
-
-//------------------------------------------------------------------------------
-
-bool State_Diagram::find_free_spot_around(int Ptr,int* X,int* Y)
-{
-    int cX,cY;
-    int Spacing = 2;
-
-    cX = Diagram_Elements[Ptr].Cell_X;
-    cY = Diagram_Elements[Ptr].Cell_Y;
-
-    if( is_this_spot_free(cX,cY+Spacing) ) { X[0]=cX; Y[0]=cY+Spacing; return true; }
-    if( is_this_spot_free(cX+Spacing,cY) ) { X[0]=cX+Spacing; Y[0]=cY; return true; }
-    if( is_this_spot_free(cX+Spacing,cY-Spacing) ) { X[0]=cX+Spacing; Y[0]=cY-Spacing; return true; }
-    if( is_this_spot_free(cX+Spacing,cY+Spacing) ) { X[0]=cX+Spacing; Y[0]=cY+Spacing; return true; }
-    if( is_this_spot_free(cX,cY-Spacing) ) { X[0]=cX; Y[0]=cY-Spacing; return true; }
-
-    if( is_this_spot_free(cX+2*Spacing,cY-Spacing) ) { X[0]=cX+2*Spacing; Y[0]=cY-Spacing; return true; }
-    if( is_this_spot_free(cX+2*Spacing,cY) ) { X[0]=cX+2*Spacing; Y[0]=cY; return true; }
-    if( is_this_spot_free(cX+2*Spacing,cY+Spacing) ) { X[0]=cX+2*Spacing; Y[0]=cY+Spacing; return true; }
-
-    return false;
-}
-
-//------------------------------------------------------------------------------
-int State_Diagram::reduce_time_sequenced_elements_to_diagram()
-{
-    int ptr,X,Y;
-    int this_state_ptr;
-	int prev_state_ptr;
-
-    // put first element (pacing phase)
-    Diagram_Elements.push_back(Time_Sequenced_Elements[0]);
-    Diagram_Elements[0].Cell_X = Starting_Cell_X;
-    Diagram_Elements[0].Cell_Y = Starting_Cell_Y;
-//    Diagram_Elements[0].Counter = 1;
-
-    // put second element (pacing termination)
-    Diagram_Elements.push_back(Time_Sequenced_Elements[1]);
-    Diagram_Elements[1].Cell_X = Starting_Cell_X;
-    Diagram_Elements[1].Cell_Y = Starting_Cell_Y+1;
-//    Diagram_Elements[1].Counter = 1;
-    Diagram_Elements[1].Connections_Ptrs.push_back(0);
-
-    // go through all sequential elements
-    for(int e=2;e<(signed)Time_Sequenced_Elements.size();e++)
-    {
-
-    prev_state_ptr = get_ptr_of_this_state(Time_Sequenced_Elements[e-2].Phase_Code);
-        this_state_ptr = get_ptr_of_this_state(Time_Sequenced_Elements[e].Phase_Code);
-
-    // ok, lets begin
-    ptr = is_this_sequence_present(Time_Sequenced_Elements[e-2].Phase_Code,
-                                   Time_Sequenced_Elements[e-1].Transition_Code,
-                                   Time_Sequenced_Elements[e].Phase_Code);
-
-
-    //-----------------------------------------
-	if( ptr >= 0 ) // if P1-T-P2 sequence present in diagram
-    //-----------------------------------------
-    {
-        // increase transition and phase counter
-//        Diagram_Elements[ptr].Counter++;
-        this_state_ptr = get_ptr_of_this_state(Time_Sequenced_Elements[e].Phase_Code);
-//        Diagram_Elements[this_state_ptr].Counter++;
-    }
-    else // if sequence not present in diagram
-    {
-            ptr = is_this_sequence_present(Time_Sequenced_Elements[e-2].Phase_Code,
-                                           Time_Sequenced_Elements[e-1].Transition_Code);
-
-            //-----------------------------------------
-            if(ptr>=0) // if P1-T sequence present in diagram
-            //-----------------------------------------
-            {
-                if( this_state_ptr >= 0 ) // is P2 present
-                {
-                    // just link T and P2
-                    Diagram_Elements[this_state_ptr].Connections_Ptrs.push_back(ptr);
-//                    Diagram_Elements[ptr].Counter++;
-                }
-                else // P2 not yet present
-                {
-                    // create P2 around T box and link with T
-                    find_free_spot_around(ptr,&X,&Y);
-                    Diagram_Elements.push_back(Time_Sequenced_Elements[e]);
-                    Diagram_Elements[Diagram_Elements.size()-1].Cell_X = X;
-					Diagram_Elements[Diagram_Elements.size()-1].Cell_Y = Y;
-//                    Diagram_Elements[Diagram_Elements.size()-1].Counter = 1;
-                    Diagram_Elements[Diagram_Elements.size()-1].Connections_Ptrs.
-                            push_back(ptr);
-                }
-            }
-            else // no P1-T existing
-            {
-
-                // find spot for transition box around P1 box
-                find_free_spot_around(prev_state_ptr,&X,&Y);
-                // push transition there
-                Diagram_Elements.push_back(Time_Sequenced_Elements[e-1]);
-                Diagram_Elements[Diagram_Elements.size()-1].Cell_X = X;
-                Diagram_Elements[Diagram_Elements.size()-1].Cell_Y = Y;
-//                Diagram_Elements[Diagram_Elements.size()-1].Counter = 1;
-                Diagram_Elements[Diagram_Elements.size()-1].Connections_Ptrs.
-                        push_back(prev_state_ptr);
-
-                if( this_state_ptr >= 0 ) // is P2 present
-                {
-                    // link P2 with newly created transition
-                    Diagram_Elements[this_state_ptr].Connections_Ptrs.
-                        push_back(Diagram_Elements.size()-1);
-                }
-                else // no P2 present
-                {
-                    // find space around newly created transition and create P2 there
-                    find_free_spot_around(Diagram_Elements.size()-1,&X,&Y);
-
-                    Diagram_Elements.push_back(Time_Sequenced_Elements[e]);
-					Diagram_Elements[Diagram_Elements.size()-1].Cell_X = X;
-                    Diagram_Elements[Diagram_Elements.size()-1].Cell_Y = Y;
-//                    Diagram_Elements[Diagram_Elements.size()-1].Counter = 1;
-                    Diagram_Elements[Diagram_Elements.size()-1].Connections_Ptrs.
-                        push_back(Diagram_Elements.size()-2);
-                }
-
-            }
-
-     } // if P1-T-P2 not existing
-
-	} // through all source elements
-
-	return 1;
-}
-
 //------------------------------------------------------------------------------
 
 int Mode_Types_Set::read_mode_types(AnsiString Application_Directory, AnsiString Filename)
 {
-    AnsiString As;
+	AnsiString As;
 	std::vector <Row> Rows;
-    int Current_Column;
-    int Iterator;
-    char string[2000];
-    Row Row1;
-    char c;
+	int Current_Column;
+	int Iterator;
+	char string[2000];
+	Row Row1;
+	char c;
     TColor TC;
 
     ifstream dfile((Application_Directory+Filename).c_str());
@@ -804,7 +556,7 @@ int Mode_Types_Set::read_mode_types(AnsiString Application_Directory, AnsiString
     Row1.clear();
     Current_Column = 0;
 
-    while(c!=10 && !dfile.eof()) // till end of line
+	while(c!=10 && !dfile.eof()) // till end of line
     {
         dfile.get(c);
         if( c == 32 || c == 9 ) // space or tab
@@ -834,7 +586,7 @@ int Mode_Types_Set::read_mode_types(AnsiString Application_Directory, AnsiString
         MT.Mode_Type_Code = Rows[i].Element[0].ToInt();
 
         MT.R = Rows[i].Element[1].ToInt();
-        MT.R = Rows[i].Element[2].ToInt();
+		MT.R = Rows[i].Element[2].ToInt();
         MT.R = Rows[i].Element[3].ToInt();
 
         MT.Type_Color= (TColor)RGB(Rows[i].Element[1].ToInt(),
@@ -842,7 +594,7 @@ int Mode_Types_Set::read_mode_types(AnsiString Application_Directory, AnsiString
                                    Rows[i].Element[3].ToInt());
 
         As = "";
-        for(int k=4;k<20;k++)
+		for(int k=4;k<20;k++)
 		As += Rows[i].Element[k].Trim()+" ";
 
         MT.Mode_Type_Name = As.Trim();
@@ -864,7 +616,7 @@ int Mode_Types_Set::read_mode_types(AnsiString Application_Directory, AnsiString
 
 TColor Mode_Types_Set::get_mode_type_color(int Code)
 {
-    for(int i=0;i<(signed)Types.size();i++)
+	for(int i=0;i<(signed)Types.size();i++)
     if( Code == Types[i].Mode_Type_Code )
     return Types[i].Type_Color;
 
@@ -1157,7 +909,6 @@ void Utils_Tools::load_int_variable_from_file(ifstream* File,AnsiString S1,int* 
 }
 
 //---------------------------------------------------------------------------
-//---------------------------------------------------------------------------
 
 void Utils_Tools::save_std_string_to_File(ofstream* File, std::string QS)
 {
@@ -1314,34 +1065,6 @@ const char *Utils_Tools::ExtractAfterKey(const char *pcString, const char *pcKey
 		while(pc[0]==' ') pc++;
 	}
 	return pc;
-}
-
-//---------------------------------------------------------------------------
-
-void Utils_Tools::get_mike_pope_bimap_names(AnsiString Filename,AnsiString *Patient_Id,
-			AnsiString *S1S2,AnsiString *Stage,AnsiString *Chamber)
-{
-	if( is_substring_present(Filename," S1") )
-	S1S2[0] = "S1";
-	if( is_substring_present(Filename," S2") )
-	S1S2[0] = "S2";
-
-	Patient_Id[0] = get_string_before_given_occurence_of_specified_string(Filename," ",1);
-
-	if( is_substring_present(Filename," prePVI") )
-	Stage[0] = "prePVI";
-	if( is_substring_present(Filename," postPVI") )
-	Stage[0] = "postPVI";
-	if( is_substring_present(Filename," postPWI") )
-	Stage[0] = "postPWI";
-	if( is_substring_present(Filename," postABLATION") )
-	Stage[0] = "postABLATION";
-
-	if( is_substring_present(Filename," LA") )
-	Chamber[0] = "LA";
-	if( is_substring_present(Filename," RA") )
-	Chamber[0] = "RA";
-
 }
 
 //---------------------------------------------------------------------------

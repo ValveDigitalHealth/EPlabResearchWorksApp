@@ -3765,4 +3765,35 @@ void Numerical_Library::calculate_MPD_peaks_positions(
 
 //---------------------------------------------------------------------------
 
+std::vector<double> Numerical_Library::subtract_mean_from_signal(std::vector<double> Signal)
+{
+	std::vector<double> Result;
+	double average, SD;
+
+	stdev_cor_vec(&Signal, &average, &SD);
+
+	//calculate average in SD range
+	double s_average = 0;
+	long counter = 0;
+	for(long j=0;j<(signed)Signal.size();j++)
+	if( Signal[j] > average - SD &&
+		Signal[j] < average + SD )
+	{
+		s_average += Signal[j];
+		counter++;
+	}
+
+	if( counter != 0 )
+	s_average /= counter;
+	else
+	s_average = 0.0;
+
+	Result.clear();
+	for(long j=0;j<(signed)Signal.size();j++)
+		Result.push_back(Signal[j] - s_average);
+
+	return Result;
+}
+
+//---------------------------------------------------------------------------
 

@@ -107,6 +107,15 @@ class Data_IO_Class
 
 
 	//---------------------------------------------------------------------------
+	// MEA plaques support
+	//---------------------------------------------------------------------------
+	AnsiString load_folder_MEA_flexv_36(STUDY_Class *STUDY,AnsiString Data_Files_Path,
+		int Value_To_Substract,TFileListBox* Data_FileListBox);
+
+	int EcoFlexMEA_36_lookup_table[12][12];
+
+
+	//---------------------------------------------------------------------------
 	// vtk support
 	//---------------------------------------------------------------------------
 	AnsiString import_vtk_file(AnsiString FileName,STUDY_Class *STUDY,

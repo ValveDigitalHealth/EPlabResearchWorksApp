@@ -266,6 +266,10 @@ SOFTWARE. */
 #define MAPPING_SYSTEM_ORIGIN_RHYTHMIA 3
 #endif
 
+#ifndef MAPPING_SYSTEM_ORIGIN_MEA_PLAQUE
+#define MAPPING_SYSTEM_ORIGIN_MEA_PLAQUE 4
+#endif
+
 //---------------------------------------------------------------------
 
 #ifndef DP_POINT_TYPE_NORMAL

@@ -72,6 +72,7 @@ SOFTWARE. */
 #include "Two_Plot_Form.h"
 #include "Bar_Plot_Form.h"
 #include "HistogramForm.h"
+#include "DirectorySelectionForm.h"
 
 #include "Numerical_Library.h"
 #include "Utils.h"
@@ -419,6 +420,25 @@ class TMain_Application_Window : public TForm
 	TMenuItem *Leaveonly2ndmapvisible1;
 	TMenuItem *Calculatefractionationmappeaksaroundlocalactivation1;
 	TMenuItem *GetpercentageofvaliddatapointsPERSEGMENT1;
+	TMenuItem *emplates1;
+	TMenuItem *EcoFlexMEA361;
+	TMenuItem *Loadfolderwithsignals1;
+	TMenuItem *Loadfolderwithsignalsandsubtractsomethingfromdatapointindex1;
+	TMenuItem *Loadfolderwithsignalsandsubtractsomethingfromdatapointindex2;
+	TMenuItem *Processallfoldersandgenerateplaquefiles1;
+	TMenuItem *Processallfoldersandgenerateplaquefiles2;
+	TMenuItem *SETPLAQUEDISPLAYPRESETS1;
+	TMenuItem *Updatecontrols1;
+	TMenuItem *Removesurfacewithoutdatapointsstrict1;
+	TMenuItem *Removesurfacewithoutdatapointsliberal1;
+	TLabel *RefDragLineHint_Label;
+	TMenuItem *Processallfoldersandgenerateplaquefiles3;
+	TMenuItem *Makequantitativeanalysisofall1;
+	TMenuItem *Analysecurrentmap1;
+	TMenuItem *N35;
+	TMenuItem *Histogramsbasedonsurface1;
+	TMenuItem *Showhistogramofspatialgradientofcurrentvalue1;
+	TMenuItem *ShowhistogramofspatialgradientofcurrentvalueOFCURRENTSEGMENT2;
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
@@ -671,9 +691,18 @@ class TMain_Application_Window : public TForm
 	void __fastcall Leaveonly2ndmapvisible1Click(TObject *Sender);
 	void __fastcall Calculatefractionationmappeaksaroundlocalactivation1Click(TObject *Sender);
 	void __fastcall GetpercentageofvaliddatapointsPERSEGMENT1Click(TObject *Sender);
-
-
-
+	void __fastcall Loadfolderwithsignals1Click(TObject *Sender);
+	void __fastcall Loadfolderwithsignalsandsubtractsomethingfromdatapointindex1Click(TObject *Sender);
+	void __fastcall Processallfoldersandgenerateplaquefiles1Click(TObject *Sender);
+	void __fastcall SETPLAQUEDISPLAYPRESETS1Click(TObject *Sender);
+	void __fastcall Updatecontrols1Click(TObject *Sender);
+	void __fastcall Removesurfacewithoutdatapointsstrict1Click(TObject *Sender);
+	void __fastcall Removesurfacewithoutdatapointsliberal1Click(TObject *Sender);
+	void __fastcall Processallfoldersandgenerateplaquefiles3Click(TObject *Sender);
+	void __fastcall Makequantitativeanalysisofall1Click(TObject *Sender);
+	void __fastcall Analysecurrentmap1Click(TObject *Sender);
+	void __fastcall Showhistogramofspatialgradientofcurrentvalue1Click(TObject *Sender);
+	void __fastcall ShowhistogramofspatialgradientofcurrentvalueOFCURRENTSEGMENT2Click(TObject *Sender);
 
 
 
@@ -806,6 +835,11 @@ class TMain_Application_Window : public TForm
 	AnsiString get_value_name_from_selection_form();
 
 	AnsiString Root_Directory_of_Folders_List;
+
+	void mea_plaque_process_all_folders(int Index_Shift);
+
+	void show_gradient_histogram(double Range_mm,double Min_Cutoff,double Max_Cutoff,int Type,int Segment_Id);
+
 
 	// tmp
 	void create_new_dpset(AnsiString Name);

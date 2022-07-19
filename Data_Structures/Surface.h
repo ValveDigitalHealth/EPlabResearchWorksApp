@@ -191,6 +191,7 @@ class Surface_Class
 	//----------------------------------------------------------------------------
 	//----------------------------------------------------------------------------
 	void remove_surface_related_with_specific_segment(int Segment_Id);
+    void remove_triangles_without_data_points_at_vertices(int DSet_Ptr,int Tolerance_Level);
 	long node_xyz_present(std::vector<Geometry_Vertex> *Node_Set,double x, double y, double z);
 
 	void get_surface_dimensions(double* x,double* y,double* z);
@@ -423,9 +424,13 @@ class Surface_Class
 
 	long get_central_node(vector <long> *Nodes_Ptrs);
 
-	std::vector <long> get_histogram_of_value_gradient(int Data_Point_Set_Ptr,int Segment_Id,
-		double Neighb_Range_mm, AnsiString Value_Name,
+	std::vector <long> get_histogram_of_value_gradient_based_on_data_points(
+		int Data_Point_Set_Ptr,int Segment_Id,double Neighb_Range_mm, AnsiString Value_Name,
 		double* Min, double* Box_Size,bool Only_DPs_With_Specified_Flag_A,int Flag_A_Value);
+
+	std::vector <long> get_histogram_of_value_gradient_based_on_geo_nodes(int Data_Point_Set_Ptr,
+		int Segment_Id, AnsiString Value_Name, double* Min, double* Box_Size);
+
 
 	void create_value_based_elevation_in_surface(int Data_Point_Set_Ptr,
 		AnsiString Value_Name,double Threshold, int Direction, double Height_mm);

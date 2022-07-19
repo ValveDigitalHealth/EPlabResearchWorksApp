@@ -859,6 +859,7 @@ void STUDY_Class::post_study_load_processing()
 	int dset;
 
 	Current_Surface = 0;
+	if( Surfaces_List.size() > 0 )
 	Surfaces_List[0].Display_Whole_Dataset_Flag = true;
 
 	for(int S=0;S<Surfaces_List.size();S++)

@@ -392,6 +392,8 @@ class Numerical_Library
 	double sign(double val);
 
 
+	std::vector<double> subtract_mean_from_signal(std::vector<double> Signal);
+
 };
 
 #endif

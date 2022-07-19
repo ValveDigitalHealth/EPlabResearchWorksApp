@@ -192,7 +192,7 @@ void Computational_Module_Class::detect_single_activation(
 
     //------------------------------------------------------------
     //------------------------------------------------------------
-    if(Deflection_Detection_Alg ==MAX_DOWN_SLOPE_LAT_DETECTION_ALG)
+    if(Deflection_Detection_Alg == MAX_DOWN_SLOPE_LAT_DETECTION_ALG)
 	{
 
     double min = std::numeric_limits< double >::max();
