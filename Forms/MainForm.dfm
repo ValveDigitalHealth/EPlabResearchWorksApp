@@ -1195,6 +1195,10 @@ object Main_Application_Window: TMain_Application_Window
           Caption = 'Update controls'
           OnClick = Updatecontrols1Click
         end
+        object Filterl1: TMenuItem
+          Caption = 'Filter low'
+          OnClick = Filterl1Click
+        end
       end
     end
     object emplates1: TMenuItem

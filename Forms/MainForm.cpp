@@ -33,7 +33,7 @@ TMain_Application_Window *Main_Application_Window;
 
 void __fastcall TMain_Application_Window::About1Click(TObject *Sender)
 {
-	ShowMessage("EPLab Works. Version v.2.0.16 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
+	ShowMessage("EPLab Works. Version v.2.0.17 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
 }
 
 //---------------------------------------------------------------------------
@@ -9901,8 +9901,6 @@ void __fastcall TMain_Application_Window::Loadfolderwithsignals1Click(TObject *S
 
 		update_controls_state();
 
-		if( MessageDlg("Center map?",
-		mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, 0) == mrYes)
 		if( STUDY->is_current_surface_in_range() )
 			STUDY->Surfaces_List[STUDY->Current_Surface].center_geometry_and_data_points();
 
@@ -9925,7 +9923,6 @@ void __fastcall TMain_Application_Window::Loadfolderwithsignals1Click(TObject *S
 //---------------------------------------------------------------------------
 
 void __fastcall TMain_Application_Window::Loadfolderwithsignalsandsubtractsomethingfromdatapointindex1Click(TObject *Sender)
-
 {
 	String Data_Files_Path;
 
@@ -9955,8 +9952,6 @@ void __fastcall TMain_Application_Window::Loadfolderwithsignalsandsubtractsometh
 
 		update_controls_state();
 
-		if( MessageDlg("Center map?",
-		mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, 0) == mrYes)
 		if( STUDY->is_current_surface_in_range() )
 			STUDY->Surfaces_List[STUDY->Current_Surface].center_geometry_and_data_points();
 
@@ -9973,7 +9968,6 @@ void __fastcall TMain_Application_Window::Loadfolderwithsignalsandsubtractsometh
 			Progress_Form->Hide();
 			ShowMessage(Result);
 		}
-
 
 	SETPLAQUEDISPLAYPRESETS1Click(this);
 }
@@ -10062,7 +10056,6 @@ void __fastcall TMain_Application_Window::SETPLAQUEDISPLAYPRESETS1Click(TObject 
 	STUDY->Comp_Module.Deflection_Detection_Alg = MAX_DOWN_SLOPE_LAT_DETECTION_ALG;
 
 	STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.set_current_value_contours_display_flag(true);
-
 	STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.set_current_value_contours_interval(0.05);
 
 	OpenGL_Panel_1.OpenGL_Panel_Display_Parameters.DP_Size_Scaling_Ratio = 200;
@@ -10154,7 +10147,7 @@ void __fastcall TMain_Application_Window::Makequantitativeanalysisofall1Click(TO
     Progress_Form->ProgressBar1->Max = Data_FileListBox->Items[0].Capacity;
     Progress_Form->ProgressBar1->Position = i;
 	Progress_Form->Show();
-    Progress_Form->Repaint();
+	Progress_Form->Repaint();
     Application->ProcessMessages();
 
     // -----------------------------------------------------
@@ -10178,7 +10171,7 @@ void __fastcall TMain_Application_Window::Makequantitativeanalysisofall1Click(TO
         PA_MAPS[geo].Current_Data_Point_Set_Ptr = ds;
         PA_MAPS[geo].Current_Data_Point_Ptr = 0;
         analyze_plaque(0,1,Master_Path_and_File_Name); // 0 - all surface
-    }
+	}
 
     } // if loaded
 
@@ -10227,7 +10220,7 @@ void TEPAS_Main_Screen::analyze_plaque(int Segment_Id,int Silent_Mode,AnsiString
 
 	// DENNIS RAT ATRIA/VENTRICLE OUTPUT TYPE (FIRSTNAME,LASTNAME,DATE)
     Lastname = Set_Name.SubString(1,3);
-    Firstname = Set_Name.SubString(5,Set_Name.Length()-13);
+	Firstname = Set_Name.SubString(5,Set_Name.Length()-13);
     Date = Set_Name.SubString(Set_Name.Length()-7,8);
     Analysis_Output_Type_Selection_Form->Lastname_Edit->Text = Lastname;
     Analysis_Output_Type_Selection_Form->Firstname_Edit->Text = Firstname;
@@ -10275,7 +10268,7 @@ void TEPAS_Main_Screen::analyze_plaque(int Segment_Id,int Silent_Mode,AnsiString
     if(Silent_Mode==1)
 	Analysis_Output_Type_Selection_Form->Model_Edit->Text = Set_Name;
 
-    int Selection = Analysis_Output_Type_Selection_Form->Selection;
+	int Selection = Analysis_Output_Type_Selection_Form->Selection;
 
     if( Selection > 0 )
     {
@@ -10323,7 +10316,7 @@ void TEPAS_Main_Screen::analyze_plaque(int Segment_Id,int Silent_Mode,AnsiString
     UT.remove_substring_from_string(Analysis_Output_Type_Selection_Form->Pacing_Site_Edit->Text,OTS);
 
     Master_File_Line += Analysis_Output_Type_Selection_Form->Model_Edit->Text+OTS;
-    Master_File_Line += Maps_Selection_ComboBox->Text+OTS; // geo type
+	Master_File_Line += Maps_Selection_ComboBox->Text+OTS; // geo type
     Master_File_Line += Analysis_Output_Type_Selection_Form->SheepNo_Edit->Text+OTS;
     Master_File_Line += Analysis_Output_Type_Selection_Form->E_Edit->Text+OTS;
     Master_File_Line += Analysis_Output_Type_Selection_Form->S_Edit->Text+OTS;
@@ -10347,7 +10340,7 @@ void TEPAS_Main_Screen::analyze_plaque(int Segment_Id,int Silent_Mode,AnsiString
         File_Save_Dialog->Title = "Select Result file";
 	}
 
-    if( Analysis_Output_Type_Selection_Form->Selection_RadioGroup->ItemIndex == 1 )
+	if( Analysis_Output_Type_Selection_Form->Selection_RadioGroup->ItemIndex == 1 )
     {
         File_Save_Dialog->FilterIndex = 5; // master file
         File_Save_Dialog->Title = "Select Master file";
@@ -10415,4 +10408,31 @@ void TEPAS_Main_Screen::analyze_plaque(int Segment_Id,int Silent_Mode,AnsiString
 
 //--------------------------------------------------------------------------------
 
+
+void __fastcall TMain_Application_Window::Filterl1Click(TObject *Sender)
+{
+/*
+	if( STUDY->is_current_surface_in_range() )
+	if( STUDY->Surfaces_List[STUDY->Current_Surface].data_points_set_ptr_in_range() )
+	{
+
+	int dset = STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr;
+
+	for(int d=0;d<STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].Data_Points.size();d++)
+	{
+
+	STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set[dset].Data_Points[d].
+		Roving_Signal.Voltage_Values
+
+	Data_Items[Selected_Data_Item_1]->Filtered_Signal = Numerical_Library_Obj.Butt_low_20_3th_order(
+			&Data_Items[Selected_Data_Item_1]->Filtered_Signal,false);
+
+	Data_Items[Selected_Data_Item_1]->Filtered_Signal = Numerical_Library_Obj.Butt_low_20_3th_order(
+			&Data_Items[Selected_Data_Item_1]->Filtered_Signal,true);
+
+	}
+	}
+*/
+}
+//---------------------------------------------------------------------------
 

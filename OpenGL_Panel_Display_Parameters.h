@@ -136,6 +136,7 @@ class OpenGL_Panel_Display_Parameters_class
 	//-----------------------------------------------------------
 	double Abl_Point_Size;
 	bool Display_Ablation_Points;
+	bool Display_Ablation_Point_Label;
 
 	bool Paint_Registration_Points;
 

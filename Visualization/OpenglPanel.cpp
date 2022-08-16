@@ -509,6 +509,9 @@ void OpenGL_Panel_Class::paint_geometry_nodes(int Surface_Ptr)
 void OpenGL_Panel_Class::paint_ablation_points(int Surface_Ptr)
 {
 	double x,y,z;
+	AnsiString Label;
+	double DistsN = OpenGL_Panel_Display_Parameters.Text_Dist_From_Geo; // distance between geometry and text
+
 
 	if( OpenGL_Panel_Display_Parameters.Display_Ablation_Points )
 	for(long i=0;i<STUDY->Surfaces_List[Surface_Ptr].Ablation_Points_List.size();i++)
@@ -524,6 +527,17 @@ void OpenGL_Panel_Class::paint_ablation_points(int Surface_Ptr)
 		glTranslatef(x, y, z);
 		paint_sphere(1.4*OpenGL_Panel_Display_Parameters.Data_Point_Size);
 		glPopMatrix();
+
+		// name
+		if( OpenGL_Panel_Display_Parameters.Display_Ablation_Point_Label )
+		{
+		Label = IntToStr(STUDY->Surfaces_List[Surface_Ptr].Ablation_Points_List[i].Lesion_ID);
+
+		glColor4f( 0.0f,0.0f,0.0f,OpenGL_Panel_Display_Parameters.Transparency_Level);
+		renderBitmapString(x+DistsN,y+DistsN,z+DistsN,
+			(void*)OpenGL_Panel_Display_Parameters.Font_Type,Label.c_str() );
+		}
+
 	}
 }
 
@@ -1358,7 +1372,9 @@ void OpenGL_Panel_Class::prepare_colors_for_display()
 		if( STUDY->Surfaces_List[S].Map_Values.Current_Map_Value_Name !=
 			SEGMENTATION_VALUE_NAME )
 		if((Max_Value - Min_Value )/ Interval < 200 )
+		{
 			STUDY->Surfaces_List[S].generate_contours(Interval);
+		}
 		}
 
 	STUDY->Surfaces_List[S].Volume = STUDY->Surfaces_List[S].get_volume();

@@ -439,6 +439,7 @@ class TMain_Application_Window : public TForm
 	TMenuItem *Histogramsbasedonsurface1;
 	TMenuItem *Showhistogramofspatialgradientofcurrentvalue1;
 	TMenuItem *ShowhistogramofspatialgradientofcurrentvalueOFCURRENTSEGMENT2;
+	TMenuItem *Filterl1;
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
@@ -703,6 +704,7 @@ class TMain_Application_Window : public TForm
 	void __fastcall Analysecurrentmap1Click(TObject *Sender);
 	void __fastcall Showhistogramofspatialgradientofcurrentvalue1Click(TObject *Sender);
 	void __fastcall ShowhistogramofspatialgradientofcurrentvalueOFCURRENTSEGMENT2Click(TObject *Sender);
+	void __fastcall Filterl1Click(TObject *Sender);
 
 
 

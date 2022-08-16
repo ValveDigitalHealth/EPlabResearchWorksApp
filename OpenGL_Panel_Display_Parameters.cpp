@@ -42,6 +42,8 @@ OpenGL_Panel_Display_Parameters_class::OpenGL_Panel_Display_Parameters_class()
 
 	OpenGL_Panel_Dragging_Flag = false;
 
+	Display_Ablation_Point_Label = true;
+
 	// Initial coordinates for patient doll parts
 	Head_z_Coordinate = 60;
 	Arms_x_Coordinate = 40;
