@@ -33,7 +33,7 @@ TMain_Application_Window *Main_Application_Window;
 
 void __fastcall TMain_Application_Window::About1Click(TObject *Sender)
 {
-	ShowMessage("EPLab Works. Version v.2.0.17 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
+	ShowMessage("EPLab Works. Version v.2.0.18 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
 }
 
 //---------------------------------------------------------------------------
@@ -10433,6 +10433,103 @@ void __fastcall TMain_Application_Window::Filterl1Click(TObject *Sender)
 	}
 	}
 */
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMain_Application_Window::ImportRhythmiaadvancedmatlabfile1Click(TObject *Sender)
+
+{
+	TModalResult Result_2 = mrNo;
+
+	if( STUDY->Surfaces_List.size() > 0 )
+	{
+		Result_2 = MessageDlg("Save current study workspace before closing?",
+			mtConfirmation, TMsgDlgButtons() << mbYes << mbNo << mbCancel, 0);
+		if( Result_2 == mrYes)
+			Saveworkspace1Click(this);
+	}
+
+	if( Result_2 != mrCancel)
+	{
+
+	close_workspace();
+
+	OpenDialog->Title = "Select matlab file";
+	OpenDialog->FilterIndex = 0;
+
+
+	if( OpenDialog->Execute() )
+	{
+
+	Progress_Form->clear();
+	Progress_Form->add_text("File selected: " + OpenDialog->FileName);
+	Progress_Form->Show();
+	Application->ProcessMessages();
+
+	AnsiString Path = Utils.get_string_before_last_occurence_of_specified_string(OpenDialog->FileName,"\\");
+	AnsiString Intermediate_File_Name =
+		Utils.get_string_after_last_occurence_of_specified_string(OpenDialog->FileName,"\\")+
+		"A.intermediate_file_for_EPLabWorks.txt";
+
+	//------------------------------------------------------
+	// 1. Convert to intermediate file
+	//------------------------------------------------------
+	AnsiString quote = "\"";
+
+	AnsiString Command = "cmd /C decode_rhythmia_mat_file.exe " + quote + OpenDialog->FileName + quote;
+	system( (Command).c_str() );
+
+	Command = "cmd /C copy " + Intermediate_File_Name + " " + quote + Path + quote;
+	system( (Command).c_str() );
+
+	//------------------------------------------------------
+	// 2. Open intermediate file
+	//------------------------------------------------------
+	bool Append = false;
+	bool Downsample_Flag = false;
+	AnsiString Result = Data_IO_Object.import_rhythmia_file(Path,Intermediate_File_Name,STUDY,Progress_Form,Append);
+
+	if( Result == "Import completed" )
+	{
+		STUDY->Current_Surface = 0;
+		STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr = 0;
+
+		if( STUDY->is_current_surface_in_range() )
+			STUDY->Surfaces_List[STUDY->Current_Surface].center_geometry_and_data_points();
+
+		Progress_Form->add_text("Initialization...");
+		Progress_Form->Show();
+		Application->ProcessMessages();
+		post_import_initialization(STUDY->Surfaces_List.size()-1,STUDY->Surfaces_List[STUDY->Current_Surface].Data_Points_Filling_Threshold_mm,Downsample_Flag);
+
+		int dset = STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr;
+
+		// set caption of main window
+		Main_Application_Window->Caption = OpenDialog->FileName;
+
+		// interpolate maps
+		STUDY->Surfaces_List[STUDY->Current_Surface].interpolate_all_values(0,dset,Progress_Form);
+		STUDY->compute_min_max_values();
+		OpenGL_Panel_1.prepare_colors_for_display();
+		update_controls_state();
+		repaint_3D_panels();
+
+		Echo = true;
+		Progress_Form->Hide();
+		Application->ProcessMessages();
+	}
+	else
+	{
+		Progress_Form->Hide();
+		ShowMessage(Result);
+	}
+
+   }
+
+   Progress_Form->Hide();
+
+   } // not canceling
+
 }
 //---------------------------------------------------------------------------
 

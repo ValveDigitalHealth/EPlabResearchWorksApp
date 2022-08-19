@@ -707,6 +707,10 @@ object Main_Application_Window: TMain_Application_Window
           OnClick = ImportALLmapsfromCARTOexportfolder1Click
         end
       end
+      object ImportRhythmiaadvancedmatlabfile1: TMenuItem
+        Caption = 'Import Rhythmia advanced matlab file'
+        OnClick = ImportRhythmiaadvancedmatlabfile1Click
+      end
       object Otherimports1: TMenuItem
         Caption = 'Other imports'
         object Importvtkmeshfile1: TMenuItem
