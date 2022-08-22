@@ -441,6 +441,9 @@ class TMain_Application_Window : public TForm
 	TMenuItem *ShowhistogramofspatialgradientofcurrentvalueOFCURRENTSEGMENT2;
 	TMenuItem *Filterl1;
 	TMenuItem *ImportRhythmiaadvancedmatlabfile1;
+	TMenuItem *ImportRhythmiaadvancedmatlabfile2;
+	TMenuItem *N37;
+	TMenuItem *N2Importmapdataoctaveimport1;
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
@@ -706,7 +709,8 @@ class TMain_Application_Window : public TForm
 	void __fastcall Showhistogramofspatialgradientofcurrentvalue1Click(TObject *Sender);
 	void __fastcall ShowhistogramofspatialgradientofcurrentvalueOFCURRENTSEGMENT2Click(TObject *Sender);
 	void __fastcall Filterl1Click(TObject *Sender);
-	void __fastcall ImportRhythmiaadvancedmatlabfile1Click(TObject *Sender);
+	void __fastcall ImportRhythmiaadvancedmatlabfile2Click(TObject *Sender);
+	void __fastcall N2Importmapdataoctaveimport1Click(TObject *Sender);
 
 
 

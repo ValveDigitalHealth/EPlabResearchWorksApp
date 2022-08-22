@@ -998,7 +998,8 @@ void Data_IO_Class::read_navx_AutoMarkSummaryList_File(AnsiString FileName,Surfa
 	for(long row=Start_Pos;row<(signed)Table.size();row++)
 	{
 		ABL_Point.RF_Episode = Utils.get_number_from_string(Table[row].Elements[0].c_str());
-		ABL_Point.Lesion_ID =  Utils.get_number_from_string(Table[row].Elements[1].c_str());
+//		ABL_Point.Lesion_ID_Number =  Utils.get_number_from_string(Table[row].Elements[1].c_str());
+		ABL_Point.Lesion_ID_Text =  Table[row].Elements[1].c_str();
 
 		ABL_Point.Start_Time =  Utils.get_number_from_string(Table[row].Elements[3].Trim().c_str());
 		ABL_Point.End_Time =    Utils.get_number_from_string(Table[row].Elements[4].Trim().c_str());
@@ -1055,7 +1056,8 @@ void Data_IO_Class::read_navx_Lesions_csv_File(AnsiString FileName,Surface_Class
 	for(long row=Start_Pos;row<Abl_Points_No;row++)
 	{
 		ABL_Point.RF_Episode = Utils.get_number_from_string(Table[row].Elements[0].c_str());
-		ABL_Point.Lesion_ID =  Utils.get_number_from_string(Table[row].Elements[0].c_str());
+//		ABL_Point.Lesion_ID_Number =  Utils.get_number_from_string(Table[row].Elements[0].c_str());
+		ABL_Point.Lesion_ID_Text =  Table[row].Elements[0].c_str();
 
 		ABL_Point.x =        Utils.get_number_from_string(Table[row].Elements[3].c_str());
 		ABL_Point.y =        Utils.get_number_from_string(Table[row].Elements[4].c_str());
@@ -2841,7 +2843,7 @@ AnsiString Data_IO_Class::import_rhythmia_file(AnsiString Path, AnsiString FileN
 	double Sampling_Rate,x,y,z;
 
 	STUDY->Study_Source_Path = Path;
-	STUDY->Study_Current_Path_And_File_Name = Path + "\\" + FileName + ".eplab";
+	STUDY->Study_Current_Path_And_File_Name = FileName + ".eplab";
 
 	// clear surfaces
 	if( !Append )
@@ -2861,7 +2863,7 @@ AnsiString Data_IO_Class::import_rhythmia_file(AnsiString Path, AnsiString FileN
 	STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Triangle_Set.clear();
 
 	ifstream df;
-	df.open((Path + "\\" + FileName).c_str());
+	df.open(FileName.c_str());
 
 	df >> String;
 	df >> String;

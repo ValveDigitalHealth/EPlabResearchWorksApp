@@ -30,6 +30,7 @@ Ablation_Point_Class::Ablation_Point_Class()
 	Identifier = -1;
 	Identifier_Hash = -1;
 	Identifier_ID = -1;
+	Lesion_ID_Number = -1;
 
 	GeneratorMedianPower_W = 0;
 	DirectSenseImpedanceBase_Ohm = 0;
@@ -54,7 +55,7 @@ Ablation_Point_Class::Ablation_Point_Class()
 
 int Ablation_Point_Class::save_object_to_stream(ofstream* File)
 {
-		int version = 5;
+		int version = 6;
 
 		File->write((char*)&version, sizeof (int));
 
@@ -90,7 +91,8 @@ int Ablation_Point_Class::save_object_to_stream(ofstream* File)
 
 		// navx AutoMarkSummaryList
 		File->write((char*)&RF_Episode, sizeof (int));
-		File->write((char*)&Lesion_ID, sizeof (int));
+		File->write((char*)&Lesion_ID_Number, sizeof (int));
+		Utils.save_String_to_File(File,Lesion_ID_Text);
 		File->write((char*)&Is_Transition, sizeof (int));
 
 		Utils.save_std_string_to_File(File,Start_Time);
@@ -115,6 +117,62 @@ int Ablation_Point_Class::load_object_from_stream(ifstream* File)
 {
 	int version;
 	File->read((char*)&version, sizeof (int));
+
+	if( version == 6 )
+	{
+		File->read((char*)&Identifier_Hash, sizeof (int));
+		File->read((char*)&Identifier_ID, sizeof (int));
+
+		File->read((char*)&Original_x, sizeof (double));
+		File->read((char*)&Original_y, sizeof (double));
+		File->read((char*)&Original_z, sizeof (double));
+
+		File->read((char*)&Session, sizeof (double));
+		File->read((char*)&ChannelID, sizeof (double));
+		File->read((char*)&SiteIndex, sizeof (double));
+		File->read((char*)&x, sizeof (double));
+		File->read((char*)&y, sizeof (double));
+		File->read((char*)&z, sizeof (double));
+		File->read((char*)&DurationTime, sizeof (double));
+		File->read((char*)&AverageForce, sizeof (double));
+		File->read((char*)&MaxTemperature, sizeof (double));
+		File->read((char*)&MaxPower, sizeof (double));
+		File->read((char*)&BaseImpedance, sizeof (double));
+		File->read((char*)&ImpedanceDrop, sizeof (double));
+		File->read((char*)&FTI, sizeof (double));
+		File->read((char*)&RFIndex, sizeof (double));
+		File->read((char*)&TagIndexStatus, sizeof (double));
+
+		File->read((char*)&Deleted, sizeof (bool));
+
+		File->read((char*)&GeneratorMedianPower_W, sizeof (double));
+		File->read((char*)&DirectSenseImpedanceBase_Ohm, sizeof (double));
+		File->read((char*)&DirectSenseImpedanceMin_Ohm, sizeof (double));
+		File->read((char*)&DirectSenseImpedanceDrop_Ohm, sizeof (double));
+
+		// navx AutoMarkSummaryList
+		File->read((char*)&RF_Episode, sizeof (int));
+		File->read((char*)&Lesion_ID_Number, sizeof (int));
+		Lesion_ID_Text = Utils.load_String_from_File(File);
+		File->read((char*)&Is_Transition, sizeof (int));
+
+		Start_Time = Utils.load_std_string_from_File(File);
+		End_Time = Utils.load_std_string_from_File(File);
+
+		File->read((char*)&Energy, sizeof (double));
+		File->read((char*)&Avg_Power, sizeof (double));
+		File->read((char*)&Avg_Temp, sizeof (double));
+		File->read((char*)&Imp_Max, sizeof (double));
+		File->read((char*)&Imp_Min, sizeof (double));
+		File->read((char*)&Imp_Drop_Perc, sizeof (double));
+		File->read((char*)&Avg_Contact_Force_g, sizeof (double));
+		File->read((char*)&Min_Contact_Force_g, sizeof (double));
+		File->read((char*)&Max_Contact_Force_g, sizeof (double));
+		File->read((char*)&LSI, sizeof (double));
+
+		return 1;
+
+	} // ver 6
 
 	if( version == 5 )
 	{
@@ -150,7 +208,7 @@ int Ablation_Point_Class::load_object_from_stream(ifstream* File)
 
 		// navx AutoMarkSummaryList
 		File->read((char*)&RF_Episode, sizeof (int));
-		File->read((char*)&Lesion_ID, sizeof (int));
+		File->read((char*)&Lesion_ID_Number, sizeof (int));
 		File->read((char*)&Is_Transition, sizeof (int));
 
 		Start_Time = Utils.load_std_string_from_File(File);

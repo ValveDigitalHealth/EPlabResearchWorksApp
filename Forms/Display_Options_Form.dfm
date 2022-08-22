@@ -2,8 +2,8 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
   Left = 431
   Top = 158
   Caption = 'Display options'
-  ClientHeight = 651
-  ClientWidth = 922
+  ClientHeight = 707
+  ClientWidth = 974
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -90,8 +90,8 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Margins.Bottom = 2
   end
   object Bevel1: TBevel
-    Left = 6
-    Top = 245
+    Left = 4
+    Top = 260
     Width = 180
     Height = 62
     Margins.Left = 2
@@ -169,9 +169,9 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
   end
   object Bevel4: TBevel
     Left = 7
-    Top = 168
+    Top = 165
     Width = 180
-    Height = 69
+    Height = 88
     Margins.Left = 2
     Margins.Top = 2
     Margins.Right = 2
@@ -202,22 +202,22 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Caption = 'Scaling factor [0-100]'
   end
   object Label2: TLabel
-    Left = 38
-    Top = 443
+    Left = 36
+    Top = 458
     Width = 75
     Height = 13
     Caption = 'Arrow thickness'
   end
   object Label7: TLabel
-    Left = 23
-    Top = 465
+    Left = 21
+    Top = 480
     Width = 87
     Height = 13
     Caption = 'Perpendicular shift'
   end
   object Label8: TLabel
-    Left = 48
-    Top = 488
+    Left = 46
+    Top = 503
     Width = 63
     Height = 13
     Caption = 'Arrow scaling'
@@ -230,11 +230,18 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Caption = 'Text dist from surface'
   end
   object Label15: TLabel
-    Left = 192
-    Top = 470
+    Left = 190
+    Top = 485
     Width = 91
     Height = 13
     Caption = 'Polar plot line width'
+  end
+  object Label16: TLabel
+    Left = 400
+    Top = 368
+    Width = 197
+    Height = 13
+    Caption = 'Transparency level (experimental feature):'
   end
   object Font_RadioGroup: TRadioGroup
     Left = 466
@@ -354,8 +361,8 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     TabOrder = 8
   end
   object Display_Local_Signal_CheckBox: TCheckBox
-    Left = 9
-    Top = 249
+    Left = 7
+    Top = 264
     Width = 153
     Height = 17
     Margins.Left = 2
@@ -368,8 +375,8 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     TabOrder = 9
   end
   object Display_Ref1_Signal_CheckBox: TCheckBox
-    Left = 9
-    Top = 266
+    Left = 7
+    Top = 281
     Width = 167
     Height = 17
     Margins.Left = 2
@@ -382,8 +389,8 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     TabOrder = 10
   end
   object Display_ECG_Signal_CheckBox: TCheckBox
-    Left = 8
-    Top = 282
+    Left = 6
+    Top = 297
     Width = 167
     Height = 17
     Margins.Left = 2
@@ -533,8 +540,8 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     TabOrder = 21
   end
   object Display_17_LV_markersCheckBox: TCheckBox
-    Left = 192
-    Top = 290
+    Left = 190
+    Top = 305
     Width = 215
     Height = 19
     Margins.Left = 2
@@ -597,25 +604,24 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     TabOrder = 26
   end
   object Transparency_ScrollBar: TScrollBar
-    Left = 432
-    Top = 411
-    Width = 121
+    Left = 400
+    Top = 387
+    Width = 197
     Height = 17
     PageSize = 0
     TabOrder = 27
-    Visible = False
   end
   object Display_Map_Title_CheckBox: TCheckBox
-    Left = 192
-    Top = 253
+    Left = 190
+    Top = 268
     Width = 178
     Height = 17
     Caption = 'Display map title and value'
     TabOrder = 28
   end
   object Display_Normals_CheckBox: TCheckBox
-    Left = 192
-    Top = 310
+    Left = 190
+    Top = 325
     Width = 161
     Height = 17
     Caption = 'Display normals to surface'
@@ -748,16 +754,16 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     OnClick = Cancel_ButtonClick
   end
   object Display_Paths_CheckBox: TCheckBox
-    Left = 192
-    Top = 273
+    Left = 190
+    Top = 288
     Width = 97
     Height = 17
     Caption = 'Display paths'
     TabOrder = 36
   end
   object Background_Color_RadioGroup: TRadioGroup
-    Left = 190
-    Top = 369
+    Left = 188
+    Top = 384
     Width = 138
     Height = 59
     Caption = 'Background color'
@@ -778,8 +784,8 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     TabOrder = 38
   end
   object Display_3D_Point_Cloud_CheckBox: TCheckBox
-    Left = 192
-    Top = 332
+    Left = 190
+    Top = 347
     Width = 177
     Height = 31
     Margins.Left = 2
@@ -796,8 +802,8 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     TabOrder = 39
   end
   object Palette_Type_RadioGroup: TRadioGroup
-    Left = 2
-    Top = 314
+    Left = 0
+    Top = 329
     Width = 185
     Height = 52
     Caption = 'Palette'
@@ -808,8 +814,8 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     TabOrder = 40
   end
   object Min09Max_Range_CheckBox: TCheckBox
-    Left = 192
-    Top = 440
+    Left = 190
+    Top = 455
     Width = 141
     Height = 16
     Margins.Left = 2
@@ -821,24 +827,24 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Visible = False
   end
   object AT_Edit: TEdit
-    Left = 119
-    Top = 437
+    Left = 117
+    Top = 452
     Width = 56
     Height = 21
     TabOrder = 42
     Text = 'AT_Edit'
   end
   object PS_Edit: TEdit
-    Left = 119
-    Top = 462
+    Left = 117
+    Top = 477
     Width = 56
     Height = 21
     TabOrder = 43
     Text = 'Edit1'
   end
   object AS_Edit: TEdit
-    Left = 119
-    Top = 487
+    Left = 117
+    Top = 502
     Width = 56
     Height = 21
     TabOrder = 44
@@ -853,8 +859,8 @@ object Display_Options_Form_1: TDisplay_Options_Form_1
     Text = 'DTS_Edit'
   end
   object Display_Arrows_CheckBox: TCheckBox
-    Left = 41
-    Top = 411
+    Left = 39
+    Top = 426
     Width = 127
     Height = 26
     Caption = 'Display arrows'

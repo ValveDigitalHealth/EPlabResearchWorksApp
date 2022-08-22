@@ -83,6 +83,7 @@ class OpenGL_Panel_Class
 	void get_current_3D_panel_dimensions(double* Width, double* Height);
 
 	void paint_sphere(double Radius);
+    void paint_sphere_smooth_shape(double Radius);
 
 	//----------------------------------------------------------------------
 	// OPENGL PANEL MOUSE SUPPORT

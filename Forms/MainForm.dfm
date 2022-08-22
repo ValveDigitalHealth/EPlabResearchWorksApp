@@ -708,8 +708,18 @@ object Main_Application_Window: TMain_Application_Window
         end
       end
       object ImportRhythmiaadvancedmatlabfile1: TMenuItem
-        Caption = 'Import Rhythmia advanced matlab file'
-        OnClick = ImportRhythmiaadvancedmatlabfile1Click
+        Caption = 'Import Rhythmia data'
+        object ImportRhythmiaadvancedmatlabfile2: TMenuItem
+          Caption = 'Import Rhythmia advanced matlab file'
+          OnClick = ImportRhythmiaadvancedmatlabfile2Click
+        end
+        object N37: TMenuItem
+          Caption = '-'
+        end
+        object N2Importmapdataoctaveimport1: TMenuItem
+          Caption = 'Import '#39'intermediate_file_for_EPLabWorks'#39' file'
+          OnClick = N2Importmapdataoctaveimport1Click
+        end
       end
       object Otherimports1: TMenuItem
         Caption = 'Other imports'

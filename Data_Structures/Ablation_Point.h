@@ -67,7 +67,8 @@ class Ablation_Point_Class
 	int load_object_from_stream(ifstream* File);
 
 	// unique for navx section (AutoMarkSummaryList)
-	int RF_Episode, Lesion_ID,Is_Transition;
+	int RF_Episode, Lesion_ID_Number,Is_Transition;
+	AnsiString Lesion_ID_Text;
 	double Duration,Energy,Avg_Power, Avg_Temp, Max_Temp,Imp_Max,Imp_Min,Imp_Drop,Imp_Drop_Perc;
 	double Avg_Contact_Force_g, Min_Contact_Force_g, Max_Contact_Force_g,LSI;
 

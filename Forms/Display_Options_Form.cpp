@@ -91,3 +91,4 @@ void __fastcall TDisplay_Options_Form_1::Cancel_ButtonClick(TObject *Sender)
 
 
 
+

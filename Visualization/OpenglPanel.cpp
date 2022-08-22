@@ -510,7 +510,7 @@ void OpenGL_Panel_Class::paint_ablation_points(int Surface_Ptr)
 {
 	double x,y,z;
 	AnsiString Label;
-	double DistsN = OpenGL_Panel_Display_Parameters.Text_Dist_From_Geo; // distance between geometry and text
+	double DistsN = 1.1*OpenGL_Panel_Display_Parameters.Abl_Point_Size; // OpenGL_Panel_Display_Parameters.Text_Dist_From_Geo; // distance between geometry and text
 
 
 	if( OpenGL_Panel_Display_Parameters.Display_Ablation_Points )
@@ -525,13 +525,13 @@ void OpenGL_Panel_Class::paint_ablation_points(int Surface_Ptr)
 
 		glPushMatrix();
 		glTranslatef(x, y, z);
-		paint_sphere(1.4*OpenGL_Panel_Display_Parameters.Data_Point_Size);
+		paint_sphere_smooth_shape(OpenGL_Panel_Display_Parameters.Abl_Point_Size);
 		glPopMatrix();
 
 		// name
 		if( OpenGL_Panel_Display_Parameters.Display_Ablation_Point_Label )
 		{
-		Label = IntToStr(STUDY->Surfaces_List[Surface_Ptr].Ablation_Points_List[i].Lesion_ID);
+		Label = STUDY->Surfaces_List[Surface_Ptr].Ablation_Points_List[i].Lesion_ID_Text;
 
 		glColor4f( 0.0f,0.0f,0.0f,OpenGL_Panel_Display_Parameters.Transparency_Level);
 		renderBitmapString(x+DistsN,y+DistsN,z+DistsN,
@@ -1452,8 +1452,8 @@ void OpenGL_Panel_Class::paint_surface(int Surface_Ptr,int DP_Set,bool For_Mouse
 	{
 	double x2,y2,z2;
 	long nptr;
-	glLineWidth(1.5);
-	glColor4f(0.1,0.1,0.1,OpenGL_Panel_Display_Parameters.Transparency_Level);
+	glLineWidth(1.0);
+	glColor4f(0.5,0.5,0.5,OpenGL_Panel_Display_Parameters.Transparency_Level);
 	glBegin(GL_LINES);
 	for(long i=0; i <(signed) STUDY->Surfaces_List[Surface_Ptr].Surface_Node_Set.size(); i++)
 	for(long j=0; j <(signed) STUDY->Surfaces_List[Surface_Ptr].Surface_Node_Set[i].Neighbors.size(); j++)
@@ -1971,6 +1971,16 @@ void OpenGL_Panel_Class::paint_sphere(double Radius)
 	GLUquadricObj* quadric = gluNewQuadric();
 	gluQuadricNormals(quadric, GLU_SMOOTH);
 	gluSphere(quadric, Radius, 4,4);
+	gluDeleteQuadric(quadric);
+}
+
+//-------------------------------------------------------------------------
+
+void OpenGL_Panel_Class::paint_sphere_smooth_shape(double Radius)
+{
+	GLUquadricObj* quadric = gluNewQuadric();
+	gluQuadricNormals(quadric, GLU_SMOOTH);
+	gluSphere(quadric, Radius, 15,15);
 	gluDeleteQuadric(quadric);
 }
 
