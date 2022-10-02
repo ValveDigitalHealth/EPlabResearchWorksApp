@@ -1053,7 +1053,7 @@ void Data_IO_Class::read_navx_Lesions_csv_File(AnsiString FileName,Surface_Class
 	int Abl_Points_No = Utils.get_number_from_string(Table[Start_Pos-2].Elements[1].c_str());
 
 	if( Start_Pos > 0 )
-	for(long row=Start_Pos;row<Abl_Points_No;row++)
+	for(long row=Start_Pos;row<Start_Pos+Abl_Points_No;row++)
 	{
 		ABL_Point.RF_Episode = Utils.get_number_from_string(Table[row].Elements[0].c_str());
 //		ABL_Point.Lesion_ID_Number =  Utils.get_number_from_string(Table[row].Elements[0].c_str());
