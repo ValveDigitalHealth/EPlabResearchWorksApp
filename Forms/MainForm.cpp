@@ -33,7 +33,7 @@ TMain_Application_Window *Main_Application_Window;
 
 void __fastcall TMain_Application_Window::About1Click(TObject *Sender)
 {
-	ShowMessage("EPLab Works. Version v.2.0.20 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
+	ShowMessage("EPLab Works. Version v.2.0.21 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
 }
 
 //---------------------------------------------------------------------------
@@ -435,11 +435,14 @@ void TMain_Application_Window::update_controls_state()
 	// FILLING SURFACE SELECTION COMBOBOX
 	//--------------------------------------------
 	Geometry_Selection_ComboBox->Clear();
-//	Surfaces_CheckListBox->Clear();
+	Geos_Selection_Form->Geometry_Selection_ComboBox1->Clear();
+	Geos_Selection_Form->Geometry_Selection_ComboBox2->Clear();
+
 	for(long i=0;i<STUDY->Surfaces_List.size();i++)
 	{
 	Geometry_Selection_ComboBox->AddItem(STUDY->Surfaces_List[i].Name,NULL);
-//	Surfaces_CheckListBox->AddItem(STUDY->Surfaces_List[i].Name,NULL);
+	Geos_Selection_Form->Geometry_Selection_ComboBox1->AddItem(STUDY->Surfaces_List[i].Name,NULL);
+	Geos_Selection_Form->Geometry_Selection_ComboBox2->AddItem(STUDY->Surfaces_List[i].Name,NULL);
 	}
 
 	Geometry_Selection_ComboBox->ItemIndex = STUDY->Current_Surface;
@@ -8941,52 +8944,6 @@ void __fastcall TMain_Application_Window::Exportvaluesatgeometrynodes1Click(TObj
 }
 //---------------------------------------------------------------------------
 
-void __fastcall TMain_Application_Window::N67Click(TObject *Sender)
-{
-	int Source_Geometry = STUDY->Current_Surface;
-	int Target_Geometry = 0;
-
-	if(Source_Geometry > 0 )
-	{
-
-	double Threshold = 10;
-
-	if(Echo)
-	{
-	Ask_For_Single_Item_Form1->Caption = "Tolerance distance [mm]:";
-	Ask_For_Single_Item_Form1->Edit_Box->Text = "20";
-	Ask_For_Single_Item_Form1->ShowModal();
-	Threshold = Ask_For_Single_Item_Form1->Edit_Box->Text.ToDouble();
-	}
-
-	int dset = STUDY->Surfaces_List[Target_Geometry].Current_Data_Point_Set_Ptr;
-
-	// this one uses glm intersection
-	AnsiString New_Map_Name = STUDY->project_surface_onto_other_surface_ray_intersection_as_value(
-		Source_Geometry,Target_Geometry,Threshold,dset,"Geometric_Projection",Progress_Form,true);
-
-	// set current value to CV map
-	STUDY->Surfaces_List[STUDY->Current_Surface].
-		Map_Values.set_current_value_according_to_name(New_Map_Name);
-
-	STUDY->compute_min_max_values();
-
-	OpenGL_Panel_1.prepare_colors_for_display();
-
-	update_controls_state();
-
-	repaint_3D_panels();
-
-	if(Echo)
-	ShowMessage("Done");
-
-	}
-	else
-	ShowMessage("Select geometry other than 1st one to do projection");
-
-
-}
-//---------------------------------------------------------------------------
 
 void __fastcall TMain_Application_Window::Exportcurrentdatapointegms1Click(TObject *Sender)
 {
@@ -10559,9 +10516,10 @@ void __fastcall TMain_Application_Window::N2Importmapdataoctaveimport1Click(TObj
 	else
 	Downsample_Flag = false;
 
-	AnsiString Path = Utils.get_string_before_last_occurence_of_specified_string(OpenDialog->FileName,"\\");
+	AnsiString Path = Utils.get_only_path_from_full_path(OpenDialog->FileName);
+	AnsiString FileName = Utils.get_file_name_from_full_path(OpenDialog->FileName);
 
-	AnsiString Result = Data_IO_Object.import_rhythmia_file(Path,OpenDialog->FileName,STUDY,Progress_Form,Append);
+	AnsiString Result = Data_IO_Object.import_rhythmia_file(Path,FileName,STUDY,Progress_Form,Append);
 
 	if( Result == "Import completed" )
 	{
@@ -10667,4 +10625,81 @@ void __fastcall TMain_Application_Window::N2Importmapdataoctaveimport1Click(TObj
 }
 //---------------------------------------------------------------------------
 
+void __fastcall TMain_Application_Window::N41Click(TObject *Sender)
+{
+	// ask which geo overlap onto which:
+	if( Geos_Selection_Form->ShowModal() == mrOk )
+	{
+
+	Geos_Selection_Form->Left = 200;
+	Geos_Selection_Form->Top = 200;
+
+	int Source_Geometry = Geos_Selection_Form->Geometry_Selection_ComboBox1->ItemIndex;
+	int Target_Geometry = Geos_Selection_Form->Geometry_Selection_ComboBox2->ItemIndex;
+
+	if( Source_Geometry == Target_Geometry )
+	ShowMessage("Select diferent geometries");
+	else
+	{
+
+
+	double Threshold = 10;
+
+	if(Echo)
+	{
+		Ask_For_Single_Item_Form1->Caption = "Tolerance distance [mm]:";
+		Ask_For_Single_Item_Form1->Edit_Box->Text = "20";
+		Ask_For_Single_Item_Form1->ShowModal();
+		Threshold = Ask_For_Single_Item_Form1->Edit_Box->Text.ToDouble();
+	}
+
+	int dset = STUDY->Surfaces_List[Target_Geometry].Current_Data_Point_Set_Ptr;
+
+	// this one uses glm intersection
+	AnsiString New_Map_Name = STUDY->project_surface_onto_other_surface_ray_intersection_as_value(
+		Source_Geometry,Target_Geometry,Threshold,dset,"Geometric_Projection",Progress_Form,true);
+
+	// set current value to CV map
+	STUDY->Surfaces_List[STUDY->Current_Surface].
+		Map_Values.set_current_value_according_to_name(New_Map_Name);
+
+	STUDY->compute_min_max_values();
+
+	OpenGL_Panel_1.prepare_colors_for_display();
+
+	update_controls_state();
+
+	repaint_3D_panels();
+
+	if(Echo)
+	ShowMessage("Done. New value was added to geometry (Projection_Flag) that stores projection flag.");
+
+	}
+
+	}
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMain_Application_Window::ABCtoABCfitting2Click(TObject *Sender)
+{
+	ShowMessage("Development in pipeline. Contact support if feature needed.");
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMain_Application_Window::Leaveonlycurrentmapvisible1Click(TObject *Sender)
+
+{
+	if( STUDY->is_current_surface_in_range()  )
+	{
+	STUDY->Surfaces_List[STUDY->Current_Surface].Display_Whole_Dataset_Flag = true;
+
+	for(long i=0;i<STUDY->Surfaces_List.size();i++)
+	if( i != STUDY->Current_Surface )
+	STUDY->Surfaces_List[i].Display_Whole_Dataset_Flag = false;
+
+	repaint_3D_panels();
+	}
+
+}
+//---------------------------------------------------------------------------
 

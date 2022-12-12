@@ -1061,6 +1061,14 @@ object Main_Application_Window: TMain_Application_Window
         end
         object ABCtoABCfitting2: TMenuItem
           Caption = 'Refinement'
+          OnClick = ABCtoABCfitting2Click
+        end
+        object N39: TMenuItem
+          Caption = '-'
+        end
+        object N41: TMenuItem
+          Caption = 'Project one geometry onto another'
+          OnClick = N41Click
         end
       end
       object ransformationtopolarplot1: TMenuItem
@@ -1177,9 +1185,45 @@ object Main_Application_Window: TMain_Application_Window
         Caption = 'Leave only 2nd map visible'
         OnClick = Leaveonly2ndmapvisible1Click
       end
+      object Leaveonlycurrentmapvisible1: TMenuItem
+        Caption = 'Leave only current map visible'
+        OnClick = Leaveonlycurrentmapvisible1Click
+      end
       object SETPLAQUEDISPLAYPRESETS1: TMenuItem
         Caption = 'EcoFlexMEA 36 DISPLAY PRESETS'
         OnClick = SETPLAQUEDISPLAYPRESETS1Click
+      end
+    end
+    object emplates1: TMenuItem
+      Caption = 'Templates'
+      object EcoFlexMEA361: TMenuItem
+        Caption = 'EcoFlexMEA 36 plaque'
+        object Loadfolderwithsignals1: TMenuItem
+          Caption = 'Load folder with signals'
+          OnClick = Loadfolderwithsignals1Click
+        end
+        object Loadfolderwithsignalsandsubtractsomethingfromdatapointindex1: TMenuItem
+          Caption = 
+            'Load folder with signals (and subtract something from data point' +
+            ' index)'
+          OnClick = Loadfolderwithsignalsandsubtractsomethingfromdatapointindex1Click
+        end
+        object Loadfolderwithsignalsandsubtractsomethingfromdatapointindex2: TMenuItem
+          Caption = '-'
+        end
+        object Processallfoldersandgenerateplaquefiles1: TMenuItem
+          Caption = 'Process all folders and generate plaque files'
+          OnClick = Processallfoldersandgenerateplaquefiles1Click
+        end
+        object Processallfoldersandgenerateplaquefiles3: TMenuItem
+          Caption = 
+            'Process all folders and generate plaque files (and subtract some' +
+            'thing from data point index)'
+          OnClick = Processallfoldersandgenerateplaquefiles3Click
+        end
+        object Processallfoldersandgenerateplaquefiles2: TMenuItem
+          Caption = '-'
+        end
       end
     end
     object Help1: TMenuItem
@@ -1212,38 +1256,6 @@ object Main_Application_Window: TMain_Application_Window
         object Filterl1: TMenuItem
           Caption = 'Filter low'
           OnClick = Filterl1Click
-        end
-      end
-    end
-    object emplates1: TMenuItem
-      Caption = 'Templates'
-      object EcoFlexMEA361: TMenuItem
-        Caption = 'EcoFlexMEA 36 plaque'
-        object Loadfolderwithsignals1: TMenuItem
-          Caption = 'Load folder with signals'
-          OnClick = Loadfolderwithsignals1Click
-        end
-        object Loadfolderwithsignalsandsubtractsomethingfromdatapointindex1: TMenuItem
-          Caption = 
-            'Load folder with signals (and subtract something from data point' +
-            ' index)'
-          OnClick = Loadfolderwithsignalsandsubtractsomethingfromdatapointindex1Click
-        end
-        object Loadfolderwithsignalsandsubtractsomethingfromdatapointindex2: TMenuItem
-          Caption = '-'
-        end
-        object Processallfoldersandgenerateplaquefiles1: TMenuItem
-          Caption = 'Process all folders and generate plaque files'
-          OnClick = Processallfoldersandgenerateplaquefiles1Click
-        end
-        object Processallfoldersandgenerateplaquefiles3: TMenuItem
-          Caption = 
-            'Process all folders and generate plaque files (and subtract some' +
-            'thing from data point index)'
-          OnClick = Processallfoldersandgenerateplaquefiles3Click
-        end
-        object Processallfoldersandgenerateplaquefiles2: TMenuItem
-          Caption = '-'
         end
       end
     end
@@ -1600,13 +1612,6 @@ object Main_Application_Window: TMain_Application_Window
     object Removecurrentgeometry1: TMenuItem
       Caption = 'Remove current geometry'
       OnClick = Removecurrentgeometry1Click
-    end
-    object N66: TMenuItem
-      Caption = '-'
-    end
-    object N67: TMenuItem
-      Caption = 'Project this geometry onto 1st one'
-      OnClick = N67Click
     end
   end
   object ECG_Signal_Tracings_PopupMenu: TPopupMenu

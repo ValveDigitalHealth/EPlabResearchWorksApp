@@ -73,6 +73,7 @@ SOFTWARE. */
 #include "Bar_Plot_Form.h"
 #include "HistogramForm.h"
 #include "DirectorySelectionForm.h"
+#include "GeosSelection_Form.h"
 
 #include "Numerical_Library.h"
 #include "Utils.h"
@@ -400,8 +401,6 @@ class TMain_Application_Window : public TForm
 	TMenuItem *ABCtoABCfitting2;
 	TMenuItem *CenterALLEXCPEPTFIRSTgeometriessimultaneously1;
 	TMenuItem *Exportvaluesatgeometrynodes1;
-	TMenuItem *N66;
-	TMenuItem *N67;
 	TMenuItem *Exportcurrentdatapointegms1;
 	TMenuItem *ImportDxLmap1;
 	TMenuItem *ImportDxLmappreEnsiteX1;
@@ -444,6 +443,9 @@ class TMain_Application_Window : public TForm
 	TMenuItem *ImportRhythmiaadvancedmatlabfile2;
 	TMenuItem *N37;
 	TMenuItem *N2Importmapdataoctaveimport1;
+	TMenuItem *N39;
+	TMenuItem *N41;
+	TMenuItem *Leaveonlycurrentmapvisible1;
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
@@ -682,7 +684,6 @@ class TMain_Application_Window : public TForm
 	void __fastcall ABCtoABCfitting1Click(TObject *Sender);
 	void __fastcall CenterALLEXCPEPTFIRSTgeometriessimultaneously1Click(TObject *Sender);
 	void __fastcall Exportvaluesatgeometrynodes1Click(TObject *Sender);
-	void __fastcall N67Click(TObject *Sender);
 	void __fastcall Exportcurrentdatapointegms1Click(TObject *Sender);
 	void __fastcall ImportDxLmappreEnsiteX1Click(TObject *Sender);
 	void __fastcall ImportgeometryContactMappingModelxmlfile1Click(TObject *Sender);
@@ -711,6 +712,9 @@ class TMain_Application_Window : public TForm
 	void __fastcall Filterl1Click(TObject *Sender);
 	void __fastcall ImportRhythmiaadvancedmatlabfile2Click(TObject *Sender);
 	void __fastcall N2Importmapdataoctaveimport1Click(TObject *Sender);
+	void __fastcall N41Click(TObject *Sender);
+	void __fastcall ABCtoABCfitting2Click(TObject *Sender);
+	void __fastcall Leaveonlycurrentmapvisible1Click(TObject *Sender);
 
 
 

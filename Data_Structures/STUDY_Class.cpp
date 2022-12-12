@@ -2527,7 +2527,5 @@ AnsiString STUDY_Class::project_surface_onto_other_surface_ray_intersection_as_v
 	return Value_Desc.Value_Name;
 }
 
-
 //---------------------------------------------------------------------------------
-
 

@@ -1414,10 +1414,10 @@ void OpenGL_Panel_Class::paint_surface(int Surface_Ptr,int DP_Set,bool For_Mouse
 	if( OpenGL_Panel_Display_Parameters.Display_Normals )
 	{
 	double n0,n1,n2;
-	double A = 20*OpenGL_Panel_Display_Parameters.Data_Point_Size;
+	double A = 5*OpenGL_Panel_Display_Parameters.Data_Point_Size;
 	glLineWidth(1.0);
 	glBegin(GL_LINES);
-	for( long i=0; i <(signed) STUDY->Surfaces_List[Surface_Ptr].Surface_Triangle_Set.size(); i++)
+	for( long i=0; i <(signed) STUDY->Surfaces_List[Surface_Ptr].Surface_Triangle_Set.size(); i=i+2)
 	if( STUDY->Surfaces_List[Surface_Ptr].Surface_Triangle_Set[i].Removed_Flag != ON )
 	{
 		ptr1 = STUDY->Surfaces_List[Surface_Ptr].Surface_Triangle_Set[i].Nodes[0];

@@ -108,16 +108,6 @@ class Utils_Tools
 
 	void get_spline_and_electrode_from_pentray_name(AnsiString Name,int* Spline,int* Electrode);
 
-	bool is_this_basket_name_Hamburg_Navx(AnsiString Name,
-								AnsiString* Spline,AnsiString* Electrode,
-								int* Spline_Id, int* Electrode_Id);
-	bool is_this_basket_name_Maastricht_Navx(AnsiString Name,
-								AnsiString* Spline,AnsiString* Electrode,
-								int* Spline_Id, int* Electrode_Id);
-	bool is_this_basket_name_Flinders_Navx(AnsiString Name,
-								AnsiString* Spline,AnsiString* Electrode,
-								int* Spline_Id, int* Electrode_Id);
-
 	void set_combobox_selection(TComboBox *ComboBox,AnsiString Selection_Text);
 
 	void save_ansistrings_variable_to_file(ofstream* File,AnsiString S1,AnsiString S2,AnsiString S3,int Type_Flag);

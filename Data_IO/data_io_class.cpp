@@ -2863,7 +2863,7 @@ AnsiString Data_IO_Class::import_rhythmia_file(AnsiString Path, AnsiString FileN
 	STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Triangle_Set.clear();
 
 	ifstream df;
-	df.open(FileName.c_str());
+	df.open((Path+"\\"+FileName).c_str());
 
 	df >> String;
 	df >> String;

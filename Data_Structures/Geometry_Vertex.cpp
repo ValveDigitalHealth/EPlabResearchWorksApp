@@ -333,7 +333,6 @@ int Geometry_Vertex::load_object_from_stream(ifstream* File)
 	File->read((char*)&Closest_Data_Point_Id, sizeof (long));
 	File->read((char*)&Closest_Data_Point_Id_Unlimited, sizeof (long));
 
-	// Acutus
 	bool btmp=false;
 	long S;
 	File->read((char*)&S, sizeof (long));
