@@ -2389,6 +2389,18 @@ AnsiString STUDY_Class::project_surface_onto_other_surface_ray_intersection_as_v
 	if(Value_Id<0)
 	ShowMessage("Value empty studyclass project surf");
 
+	// check if projected geo has extra attribute, if yes, used during projection (instead value of 1)
+	bool CustomVal_Present;
+	int CustomVal_Ptr;
+	if( Surfaces_List[Projected_Geometry].Map_Values.is_value_present("CustomVal") )
+	{
+		CustomVal_Present = true;
+		CustomVal_Ptr = Surfaces_List[Projected_Geometry].Map_Values.get_value_ptr("CustomVal");
+	}
+	else
+	CustomVal_Present = false;
+
+
 	// thru all triangels of base geometry
 	for(long tt=0;tt<Surfaces_List[Base_Geometry].Surface_Triangle_Set.size();tt++)
 	{
@@ -2509,15 +2521,29 @@ AnsiString STUDY_Class::project_surface_onto_other_surface_ray_intersection_as_v
 
 	if( One_of_Triangles_Crossed )
 	{
+
+	if( CustomVal_Present )
+	{
+		Surfaces_List[Base_Geometry].Surface_Node_Set[n0].set_value(Data_Point_Set_Ptr,Value_Id,
+			Surfaces_List[Projected_Geometry].Surface_Node_Set[nt0].get_value(Data_Point_Set_Ptr,CustomVal_Ptr) );
+		Surfaces_List[Base_Geometry].Surface_Node_Set[n1].set_value(Data_Point_Set_Ptr,Value_Id,
+			Surfaces_List[Projected_Geometry].Surface_Node_Set[nt1].get_value(Data_Point_Set_Ptr,CustomVal_Ptr));
+		Surfaces_List[Base_Geometry].Surface_Node_Set[n2].set_value(Data_Point_Set_Ptr,Value_Id,
+			Surfaces_List[Projected_Geometry].Surface_Node_Set[nt2].get_value(Data_Point_Set_Ptr,CustomVal_Ptr));
+	}
+	else
+	{
 		Surfaces_List[Base_Geometry].Surface_Node_Set[n0].set_value(Data_Point_Set_Ptr,Value_Id,1);
 		Surfaces_List[Base_Geometry].Surface_Node_Set[n1].set_value(Data_Point_Set_Ptr,Value_Id,1);
 		Surfaces_List[Base_Geometry].Surface_Node_Set[n2].set_value(Data_Point_Set_Ptr,Value_Id,1);
 	}
+
+	}
 	else
 	{
-		Surfaces_List[Base_Geometry].Surface_Node_Set[n0].set_value(Data_Point_Set_Ptr,Value_Id,0);
-		Surfaces_List[Base_Geometry].Surface_Node_Set[n1].set_value(Data_Point_Set_Ptr,Value_Id,0);
-		Surfaces_List[Base_Geometry].Surface_Node_Set[n2].set_value(Data_Point_Set_Ptr,Value_Id,0);
+		Surfaces_List[Base_Geometry].Surface_Node_Set[n0].set_value(Data_Point_Set_Ptr,Value_Id,NOT_POSSIBLE_TO_CALCULATE_VALUE);
+		Surfaces_List[Base_Geometry].Surface_Node_Set[n1].set_value(Data_Point_Set_Ptr,Value_Id,NOT_POSSIBLE_TO_CALCULATE_VALUE);
+		Surfaces_List[Base_Geometry].Surface_Node_Set[n2].set_value(Data_Point_Set_Ptr,Value_Id,NOT_POSSIBLE_TO_CALCULATE_VALUE);
 	}
 
 	} // thru target surf triangles
@@ -2528,4 +2554,5 @@ AnsiString STUDY_Class::project_surface_onto_other_surface_ray_intersection_as_v
 }
 
 //---------------------------------------------------------------------------------
+
 

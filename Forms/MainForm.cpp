@@ -33,7 +33,7 @@ TMain_Application_Window *Main_Application_Window;
 
 void __fastcall TMain_Application_Window::About1Click(TObject *Sender)
 {
-	ShowMessage("EPLab Works. Version v.2.0.21 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
+	ShowMessage("EPLab Works. Version v.2.0.22 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
 }
 
 //---------------------------------------------------------------------------
@@ -10659,7 +10659,7 @@ void __fastcall TMain_Application_Window::N41Click(TObject *Sender)
 	AnsiString New_Map_Name = STUDY->project_surface_onto_other_surface_ray_intersection_as_value(
 		Source_Geometry,Target_Geometry,Threshold,dset,"Geometric_Projection",Progress_Form,true);
 
-	// set current value to CV map
+	// set current value to overlap map
 	STUDY->Surfaces_List[STUDY->Current_Surface].
 		Map_Values.set_current_value_according_to_name(New_Map_Name);
 

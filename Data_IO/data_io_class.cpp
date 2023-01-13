@@ -2743,6 +2743,136 @@ AnsiString Data_IO_Class::import_vtk_file(AnsiString FileName,STUDY_Class *STUDY
 	long TInt,TInt2;
 	Geometry_Vertex node;
 	double v;
+	int Value_Id;
+
+	// clear surfaces
+	if( !Append )
+	STUDY->Surfaces_List.clear();
+
+	Surface_Class Suface_Class_Item;
+	STUDY->Surfaces_List.push_back(Suface_Class_Item);
+	STUDY->Current_Surface = STUDY->Surfaces_List.size() -1;
+	AnsiString GeoName = Utils.get_string_after_last_occurence_of_specified_string(FileName,"\\");
+	STUDY->Surfaces_List[STUDY->Current_Surface].Name = GeoName;
+
+	Data_Point_Set_Class DSet;
+	DSet.Name = "Dataset";
+	STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set.push_back(DSet);
+	int dset = STUDY->Surfaces_List[STUDY->Current_Surface].Data_Point_Set.size()-1;
+
+	if( STUDY->is_current_surface_in_range() )
+	{
+
+	STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Node_Set.clear();
+	STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Triangle_Set.clear();
+
+	ifstream df;
+	df.open(FileName.c_str());
+
+	df >> String;
+	df >> String;
+
+	if( strcmp( String,"vtk") )
+	{
+		return "Not proper vtk file format. E134";
+	}
+	else
+	{
+		while(  strcmp(String,"POINTS" ) && !df.eof() )
+			df >> String;
+
+		df >> TInt;
+		df >> String;
+
+		for(long tt=0;tt<TInt;tt++)
+		STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Node_Set.push_back(node);
+
+		for(long tt=0;tt<TInt;tt++)
+		{
+			df >> STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Node_Set[tt].x;
+			df >> STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Node_Set[tt].y;
+			df >> STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Node_Set[tt].z;
+
+			STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Node_Set[tt].Original_x =
+				STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Node_Set[tt].x;
+			STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Node_Set[tt].Original_y =
+				STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Node_Set[tt].y;
+			STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Node_Set[tt].Original_z =
+				STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Node_Set[tt].z;
+
+		}
+
+		while(  strcmp(String,"POLYGONS" ) && !df.eof() )
+			df >> String;
+
+		df >> TInt;
+		df >> TInt2;
+		Geometry_Triangle triangle;
+		STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Triangle_Set.assign(TInt,triangle);
+
+		for(long tt=0;tt<TInt;tt++)
+		{
+			df >> String;
+			df >> STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Triangle_Set[tt].Nodes[0];
+			df >> STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Triangle_Set[tt].Nodes[1];
+			df >> STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Triangle_Set[tt].Nodes[2];
+		}
+
+
+		// check if POINT_DATA section is present
+		while(  strcmp(String,"POINT_DATA" ) && !df.eof() )
+			df >> String;
+
+		if( !strcmp(String,"POINT_DATA" ) )
+		{
+
+		df >> TInt;  //number of points
+
+		df >> String;
+		df >> String;
+		df >> String;
+
+		df >> String;
+		df >> String;
+
+		if( TInt == STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Node_Set.size() )
+		{
+
+		// add custom value
+		Value_Description_Class Value_Desc;
+		Value_Desc.Type = VALUE_BASED_ON_GEO_NODES;
+		Value_Desc.Displayed_In_Table = true;
+		Value_Desc.Value_Name = "CustomVal";
+		Value_Desc.Unit = "";
+		Value_Desc.LAT_Value = false;
+		STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.add_value(Value_Desc);
+		Value_Id = STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.get_value_ptr(Value_Desc.Value_Name);
+
+		for(long tt=0;tt<TInt;tt++)
+		{
+			df >> v;
+
+			STUDY->Surfaces_List[STUDY->Current_Surface].Surface_Node_Set[tt].set_value(dset,Value_Id,v);
+
+		}
+
+		}
+		} // if point_data section found
+
+		df.close();
+	}
+
+	return "Import completed";
+
+	}
+	else
+	return "Geo ptr not in range";
+
+/* xxx
+	char String[20000];
+	long TInt,TInt2;
+	Geometry_Vertex node;
+	double v;
 
 	// clear surfaces
 	if( !Append )
@@ -2825,6 +2955,8 @@ AnsiString Data_IO_Class::import_vtk_file(AnsiString FileName,STUDY_Class *STUDY
 	}
 	else
 	return "Geo ptr not in range";
+*/
+
 }
 
 //-----------------------------------------------------------------------------------------------
