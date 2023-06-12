@@ -1,7 +1,7 @@
 # EPlabResearchWorksApp
 App for cardiac EP data analysis
 
-Website: www.eplabworks.com
+Website: www.pawelkuklik.com
 
 Twitter: https://twitter.com/EplabW
 
