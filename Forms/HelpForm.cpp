@@ -44,7 +44,7 @@ void __fastcall THelp_Form::Close_ButtonClick(TObject *Sender)
 //---------------------------------------------------------------------------
 void __fastcall THelp_Form::LinkLabelClick(TObject *Sender)
 {
-	UnicodeString Link = "www.eplabworks.com/help";
+	UnicodeString Link = "www.pawelkuklik.com/help";
 
 	::ShellExecute(Handle, NULL,Link.c_str() , NULL, NULL, SW_SHOWNORMAL);
 

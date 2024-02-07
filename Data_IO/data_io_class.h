@@ -86,10 +86,15 @@ class Data_IO_Class
 	// Ensite X import
 	AnsiString import_EnsiteX_DxL_folder(TFileListBox* Data_FileListBox,
 				STUDY_Class *Study,TProgress_Form *Progress_Form,bool Append);
-	AnsiString read_EnsiteX_PP_omni_data_file(          AnsiString FileName, Data_Point_Set_Class *Data_Point_Set, STUDY_Class *Study);
+	AnsiString read_EnsiteX_PP_omni_data_file(AnsiString FileName, Data_Point_Set_Class *Data_Point_Set, STUDY_Class *Study);
+
 	AnsiString read_EnsiteX_egm_data_file(AnsiString FileName, Data_Point_Set_Class *Data_Point_Set, STUDY_Class *Study);
 	AnsiString read_EnsiteX_ref_data_file(AnsiString FileName, Data_Point_Set_Class *Data_Point_Set, STUDY_Class *Study);
 
+	AnsiString read_EnsiteX_MapPointLocations_file(AnsiString FileName, Data_Point_Set_Class *Data_Point_Set, STUDY_Class *Study);
+    AnsiString read_EnsiteX_MAP_Value_data_file_As_new_dataset(AnsiString FileName, STUDY_Class *Study);
+
+	AnsiString read_EnsiteX_MAP_Value_data_file(AnsiString FileName, Data_Point_Set_Class *Data_Point_Set, STUDY_Class *Study);
 
 	//---------------------------------------------------------------------------
 	// CARTO folder import

@@ -446,6 +446,7 @@ class TMain_Application_Window : public TForm
 	TMenuItem *N39;
 	TMenuItem *N41;
 	TMenuItem *Leaveonlycurrentmapvisible1;
+	TButton *Interpolate_Map_Button;
 
 	//----------------------------------------------------------------------
 	//----------------------------------------------------------------------
@@ -715,6 +716,7 @@ class TMain_Application_Window : public TForm
 	void __fastcall N41Click(TObject *Sender);
 	void __fastcall ABCtoABCfitting2Click(TObject *Sender);
 	void __fastcall Leaveonlycurrentmapvisible1Click(TObject *Sender);
+	void __fastcall Interpolate_Map_ButtonClick(TObject *Sender);
 
 
 

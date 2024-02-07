@@ -10,8 +10,6 @@ object Help_Form: THelp_Form
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
-  PixelsPerInch = 96
   TextHeight = 13
   object Label1: TLabel
     Left = 32
@@ -29,10 +27,10 @@ object Help_Form: THelp_Form
   object LinkLabel: TLabel
     Left = 157
     Top = 40
-    Width = 192
+    Width = 194
     Height = 19
     Cursor = crHandPoint
-    Caption = 'www.eplabworks.com/help'
+    Caption = 'www.pawelkuklik.com/help'
     Font.Charset = DEFAULT_CHARSET
     Font.Color = clBlue
     Font.Height = -16

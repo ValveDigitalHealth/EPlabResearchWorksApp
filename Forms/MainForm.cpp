@@ -33,7 +33,7 @@ TMain_Application_Window *Main_Application_Window;
 
 void __fastcall TMain_Application_Window::About1Click(TObject *Sender)
 {
-	ShowMessage("EPLab Works. Version v.2.0.22 (c) Pawel Kuklik. MIT License. FFT by Laurent de Soras.");
+	About_Window_Form1->ShowModal();
 }
 
 //---------------------------------------------------------------------------
@@ -1309,10 +1309,10 @@ void __fastcall TMain_Application_Window::FormShow(TObject *Sender)
 	else
 	Display_Images_In_3D_Panel_CheckBox->State = cbUnchecked;
 
-	About_Window_Form1->Application_Directory = Application_Directory;
-
 	App_Settings_Form->Application_Directory = Application_Directory;
 	App_Settings_Form->initialize();
+
+	About_Window_Form1->ShowModal();
 
 	repaint_3D_panels();
 }
@@ -4000,12 +4000,11 @@ void __fastcall TMain_Application_Window::CalculateWavefrontPropagationVelocityW
 	Rich_Edit_Form->add_text("with geometry triangles used as a basis for calculation of velocity.");
 	Rich_Edit_Form->ShowModal();
 
-	AnsiString New_Map_Name = STUDY->Surfaces_List[STUDY->Current_Surface].
-		calculate_conduction_velocity(Current_Value_Ptr);
+	AnsiString New_Map_Name;
+	New_Map_Name = STUDY->Surfaces_List[STUDY->Current_Surface].calculate_conduction_velocity(Current_Value_Ptr);
 
 	// set current value to CV map
-	STUDY->Surfaces_List[STUDY->Current_Surface].
-		Map_Values.set_current_value_according_to_name(New_Map_Name);
+	STUDY->Surfaces_List[STUDY->Current_Surface].Map_Values.set_current_value_according_to_name(New_Map_Name);
 
 	STUDY->compute_min_max_values();
 
@@ -4057,8 +4056,15 @@ void TMain_Application_Window::post_import_initialization(int Surface_Ptr,double
 	VDC.Displayed_In_Table = false;
 	STUDY->Surfaces_List[S].Map_Values.add_value(VDC);
 
+	bool Downsample_Flag;
+	if( MessageDlg("Downsample mesh?",
+	mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, 0) == mrYes)
+	Downsample_Flag = true;
+	else
+	Downsample_Flag = false;
+
 	// check for geo nodes number, downsample if necessary
-	if( DownSample_Mesh_Flag )
+	if( Downsample_Flag )
 	if( STUDY->Surfaces_List[S].Surface_Node_Set.size() >
 			App_Settings_Form->Application_Settings.Max_Number_of_Geometry_Nodes )
 	{
@@ -9125,12 +9131,12 @@ void __fastcall TMain_Application_Window::ImportgeometryContactMappingModelxmlfi
 		mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, 0) == mrYes)
 		if( STUDY->is_current_surface_in_range() )
 			STUDY->Surfaces_List[STUDY->Current_Surface].center_geometry_and_data_points();
-
+/*
 		if( MessageDlg("Force data points onto geometry surface?",
 		mtConfirmation, TMsgDlgButtons() << mbYes << mbNo, 0) == mrYes)
 		if( STUDY->is_current_surface_in_range() )
 			Forcedatapointsontosurface1Click(this);
-
+*/
 		Progress_Form->add_text("Import completed." );
 		Application->ProcessMessages();
 		Progress_Form->Hide();
@@ -10700,6 +10706,20 @@ void __fastcall TMain_Application_Window::Leaveonlycurrentmapvisible1Click(TObje
 	repaint_3D_panels();
 	}
 
+}
+//---------------------------------------------------------------------------
+
+void __fastcall TMain_Application_Window::Interpolate_Map_ButtonClick(TObject *Sender)
+{
+	if( STUDY->is_current_surface_in_range()  )
+	{
+		int dset = STUDY->Surfaces_List[STUDY->Current_Surface].Current_Data_Point_Set_Ptr;
+
+		STUDY->Surfaces_List[STUDY->Current_Surface].interpolate_all_values(0,dset,Progress_Form);
+		OpenGL_Panel_1.prepare_colors_for_display();
+		repaint_3D_panels();
+		Progress_Form->Hide();
+	}
 }
 //---------------------------------------------------------------------------
 

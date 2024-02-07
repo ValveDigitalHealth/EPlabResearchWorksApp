@@ -1281,7 +1281,7 @@ void OpenGL_Panel_Class::prepare_colors_for_display()
 		DP_Val = STUDY->Surfaces_List[S].Data_Point_Set[dset].Data_Points[Closest_DP_Ptr].
 					get_value(Current_Value_Name,STUDY->Surfaces_List[S].Map_Values.get_values_table_ref() );
 
-		if(    Value != NOT_POSSIBLE_TO_CALCULATE_VALUE )
+		if( Value != NOT_POSSIBLE_TO_CALCULATE_VALUE )
 		{
 			if( Max_Value - Min_Value != 0 && fabs(Max_Value - Min_Value) > 0.00000001 )
 			CV = 256.0 - 256.0 * ( Value - Min_Value ) / ( Max_Value - Min_Value );
@@ -1359,23 +1359,19 @@ void OpenGL_Panel_Class::prepare_colors_for_display()
 
 	 } // through all dps
 
-		//-----------------------------------
-		// Generate contours
-		//-----------------------------------
-		if( STUDY->Surfaces_List[S].Map_Values.get_current_value_contours_display_flag() )
-		{
-
+	//-----------------------------------
+	// Generate contours
+	//-----------------------------------
+	if( STUDY->Surfaces_List[S].Map_Values.get_current_value_contours_display_flag() )
+	{
 		double Interval = STUDY->Surfaces_List[S].Map_Values.get_current_value_contours_interval();
 		Interval = fabs(Interval);
 		STUDY->Surfaces_List[S].Contours_Set.clear();
 
-		if( STUDY->Surfaces_List[S].Map_Values.Current_Map_Value_Name !=
-			SEGMENTATION_VALUE_NAME )
+		if( STUDY->Surfaces_List[S].Map_Values.Current_Map_Value_Name != SEGMENTATION_VALUE_NAME )
 		if((Max_Value - Min_Value )/ Interval < 200 )
-		{
 			STUDY->Surfaces_List[S].generate_contours(Interval);
-		}
-		}
+	}
 
 	STUDY->Surfaces_List[S].Volume = STUDY->Surfaces_List[S].get_volume();
 	STUDY->Surfaces_List[S].Area = STUDY->Surfaces_List[S].get_total_area();

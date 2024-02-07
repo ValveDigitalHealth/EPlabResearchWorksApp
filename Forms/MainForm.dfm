@@ -12,7 +12,6 @@ object Main_Application_Window: TMain_Application_Window
   Font.Name = 'Tahoma'
   Font.Style = []
   Menu = MainMenuResearch
-  OldCreateOrder = False
   OnAfterMonitorDpiChanged = FormAfterMonitorDpiChanged
   OnCloseQuery = FormCloseQuery
   OnCreate = FormCreate
@@ -20,7 +19,6 @@ object Main_Application_Window: TMain_Application_Window
   OnPaint = FormPaint
   OnResize = FormResize
   OnShow = FormShow
-  PixelsPerInch = 96
   TextHeight = 13
   object Annotation_Window_PaintBox: TPaintBox
     Left = 399
@@ -64,6 +62,7 @@ object Main_Application_Window: TMain_Application_Window
     ButtonWidth = 33
     Caption = 'ToolBar1'
     TabOrder = 1
+    ExplicitWidth = 1908
     object AP_View_Button: TButton
       Left = 0
       Top = 0
@@ -232,6 +231,15 @@ object Main_Application_Window: TMain_Application_Window
         PopupMenu = Deleted_Data_Poins_List_PopupMenu
         TabOrder = 5
         OnClick = Data_Points_List_StringGridClick
+      end
+      object Interpolate_Map_Button: TButton
+        Left = 187
+        Top = 109
+        Width = 87
+        Height = 25
+        Caption = 'Interpolate map'
+        TabOrder = 6
+        OnClick = Interpolate_Map_ButtonClick
       end
     end
   end
@@ -1574,8 +1582,8 @@ object Main_Application_Window: TMain_Application_Window
     end
   end
   object DataPointsSet_PopupMenu: TPopupMenu
-    Left = 208
-    Top = 120
+    Left = 312
+    Top = 304
     object Changenameofdatapointset1: TMenuItem
       Caption = 'Change name of current data point set'
       OnClick = Changenameofdatapointset1Click
@@ -1721,8 +1729,8 @@ object Main_Application_Window: TMain_Application_Window
     end
   end
   object Values_List_PopupMenu: TPopupMenu
-    Left = 224
-    Top = 168
+    Left = 192
+    Top = 312
     object MenuItem12: TMenuItem
       Caption = 'Change name of current value'
       OnClick = MenuItem12Click

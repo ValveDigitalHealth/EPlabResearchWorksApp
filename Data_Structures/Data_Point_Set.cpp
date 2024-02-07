@@ -129,6 +129,8 @@ Data_Point_Set_Class::Data_Point_Set_Class()
 	Second_DP_Pointed_Ptr = -1;
 	Linear_CV_Value = -1;
 
+    Sparse_Data_Points_Flag = false;
+
 }
 
 //---------------------------------------------------------------------------

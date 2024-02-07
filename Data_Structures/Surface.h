@@ -438,6 +438,8 @@ class Surface_Class
 	// tmp/experimental stuff
 	Matrix_2D Connectivity_Matrix;
 
+	long get_closest_data_point_ptr_to_given_node(int DP_Set,long Node_Ptr);
+
 };
 
 //---------------------------------------------------------------------------

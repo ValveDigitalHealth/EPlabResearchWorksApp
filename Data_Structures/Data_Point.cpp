@@ -88,11 +88,13 @@ int Data_Point::save_object_to_stream(ofstream* File)
 {
 	long S;
 
-	int version = 5;
+	int version = 6;
 
 	File->write((char*)&version, sizeof (int));
 
 	File->write((char*)&Identifier, sizeof (int));
+	File->write((char*)&Freeze_Group, sizeof (int));
+
 	File->write((char*)&Type, sizeof (int));
 
 	File->write((char*)&x, sizeof (double));
@@ -158,6 +160,78 @@ int Data_Point::load_object_from_stream(ifstream* File)
 	double v=0;
 
 	File->read((char*)&version, sizeof (int));
+
+	if( version == 6 )
+	{
+
+	File->read((char*)&Identifier, sizeof (int));
+	File->read((char*)&Freeze_Group, sizeof (int));
+
+	File->read((char*)&Type, sizeof (int));
+
+	File->read((char*)&x, sizeof (double));
+	File->read((char*)&y, sizeof (double));
+	File->read((char*)&z, sizeof (double));
+
+	File->read((char*)&Original_x, sizeof (double));
+	File->read((char*)&Original_y, sizeof (double));
+	File->read((char*)&Original_z, sizeof (double));
+
+	int S;
+	File->read((char*)&S, sizeof (int));
+	Values_Set.clear();
+	Values_Set.assign(S,v);
+	for(int i=0;i<S;i++)
+	File->read((char*)&Values_Set[i], sizeof (double));
+
+	Reference_Signal.load_object_from_stream(File);
+	Roving_Signal.load_object_from_stream(File);
+	ECG_Signal.load_object_from_stream(File);
+	Reference_Signal_2.load_object_from_stream(File);
+
+	// expanded signals
+	for(int k=0;k<12;k++)
+	All_ECG_Channels[k].load_object_from_stream(File);
+
+	Electrogram ee;
+	File->read((char*)&S, sizeof (int));
+	Additional_Ref_Channels.clear();
+	Additional_Ref_Channels.assign(S,ee);
+	for(int i=0;i<S;i++)
+	Additional_Ref_Channels[i].load_object_from_stream(File);
+
+	File->read((char*)&Ref_Signal_Activation_ptr, sizeof (long));
+	File->read((char*)&Rov_Signal_Activation_ptr, sizeof (long));
+	File->read((char*)&Ref_Signal_Activation_ptr_Old, sizeof (long));
+	File->read((char*)&Old_Ref_Position, sizeof (long));
+	File->read((char*)&Rov_Signal_Activation_ptr_Old, sizeof (long));
+	File->read((char*)&Old_Rov_Position, sizeof (long));
+	File->read((char*)&Original_z, sizeof (long));
+	File->read((char*)&Original_z, sizeof (long));
+
+	File->read((char*)&Signal_Used_To_Activation_Detection, sizeof (int));
+	File->read((char*)&Selected_Peak_For_Annotation, sizeof (int));
+
+	File->read((char*)&S, sizeof (long));
+	V_Wave.clear();
+	double tmp;
+	V_Wave.assign(S,tmp);
+	for(long i=0;i<S;i++)
+	File->read((char*)&V_Wave[i], sizeof (double));
+
+	File->read((char*)&Closest_Node_Id, sizeof (long));
+	File->read((char*)&Utilized, sizeof (int));
+	File->read((char*)&Displayed, sizeof (int));
+
+	File->read((char*)&S, sizeof (long));
+	Ring.clear();
+	long tmpl=0;
+	Ring.assign(S,tmpl);
+	for(long i=0;i<S;i++)
+	File->read((char*)&Ring[i], sizeof (long));
+
+	return 1;
+	} // v.6
 
 	if( version == 5 )
 	{

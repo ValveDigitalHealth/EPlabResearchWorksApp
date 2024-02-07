@@ -35,6 +35,8 @@ SOFTWARE. */
 #include "Path.h"
 #include "Segments_List.h"
 #include "Numerical_Library.h"
+#include "Closest_DPs_to_node_class.h"
+
 
 //---------------------------------------------------------------------------
 
@@ -68,6 +70,10 @@ class Data_Point_Set_Class
 	std::vector<Data_Point> Data_Points;
 	std::vector<Data_Point> Deleted_Data_Points;
 	//---------------------------------------------------------------------
+
+	//-----------------------------------------------------------
+	std::vector <Closest_DPs_To_Node_Class> Closest_DPs_To_Nodes;
+	//-----------------------------------------------------------
 
 	long get_valid_data_points_number(AnsiString Value_Name,
 				std::vector <Value_Description_Class> *Values_List);
@@ -110,6 +116,7 @@ class Data_Point_Set_Class
 	void calculate_neighboring_data_points(double Range_mm);
 	void apply_average_spatial_filter(double Range_mm,AnsiString Value_Name,std::vector <Value_Description_Class> *Values_List);
 
+
 	//----------------------------------------------------------------------
 	// signal processing for whole datapoint set
 	//----------------------------------------------------------------------
@@ -120,6 +127,12 @@ class Data_Point_Set_Class
 
     double get_percentile_of_value(AnsiString Value_Name,
 				std::vector <Value_Description_Class> *Values_List, double Percentile);
+
+	//---------------------------------------------------------------------
+	// Flags about type of dpset
+	//---------------------------------------------------------------------
+	bool Sparse_Data_Points_Flag; // if true, in value projections step interpolation closest dp value is taken instead of mean
+
 };
 
 

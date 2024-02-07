@@ -62,6 +62,7 @@ class Data_Point
 	// Identifier of the data point
 	//------------------------------------------------------------------
 	int Identifier;
+    int Freeze_Group;
 
 	//--------------------------------
 	// DATA POINT PROPERTIES

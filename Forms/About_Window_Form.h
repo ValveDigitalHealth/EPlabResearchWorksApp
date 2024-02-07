@@ -36,6 +36,8 @@ SOFTWARE. */
 
 #include "Utils.h"
 #include <vcl.h>
+#include <Vcl.Imaging.GIFImg.hpp>
+#include <Vcl.Imaging.pngimage.hpp>
 #include <fstream>
 
 //---------------------------------------------------------------------------
@@ -44,16 +46,23 @@ class TAbout_Window_Form1 : public TForm
 __published:	// IDE-managed Components
 	TRichEdit *Info_RichEdit;
 	TButton *Close_Button;
+	TImage *Image1;
+	TImage *Image2;
+	TImage *Image3;
+	TImage *Image4;
 	void __fastcall Close_ButtonClick(TObject *Sender);
 	void __fastcall FormResize(TObject *Sender);
 	void __fastcall FormShow(TObject *Sender);
+	void __fastcall Image1Click(TObject *Sender);
+
 private:	// User declarations
 public:		// User declarations
 
 	__fastcall TAbout_Window_Form1(TComponent* Owner);
 
-    Utils_Tools Utils;
-	AnsiString Application_Directory;
+	Utils_Tools Utils;
+	AnsiString Version_Text;
+    LPCWSTR ConvertCharToLPCWSTR(const char* charString);
 };
 //---------------------------------------------------------------------------
 extern PACKAGE TAbout_Window_Form1 *About_Window_Form1;
